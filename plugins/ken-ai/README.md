@@ -1,15 +1,25 @@
-# ken-ai - Campaign Creation Plugin for Claude Code
+# ken-ai - Campaign Creation Plugin for Claude Code & Codex CLI
 
-End-to-end cold-email campaign creation on the [Ken AI platform](https://app.getken.ai), packaged as a Claude Code plugin. Plan a campaign, build the prospect targeting, write and review the copy, generate AI personalization prompts, and push everything to Ken AI - all through the ken-ai MCP server's OAuth session. No API keys to paste, no local scripts, no `.env`.
+End-to-end cold-email campaign creation on the [Ken AI platform](https://app.getken.ai), packaged as a plugin for **Claude Code and OpenAI Codex CLI**. Plan a campaign, build the prospect targeting, write and review the copy, generate AI personalization prompts, and push everything to Ken AI - all through the ken-ai MCP server's OAuth session. No API keys to paste, no local scripts, no `.env`.
 
 ## Install
+
+**Claude Code:**
 
 ```
 /plugin marketplace add Ken-Technology/ken-ai-plugin
 /plugin install ken-ai@ken-ai-plugin
 ```
 
-The plugin bundles the ken-ai MCP server (`https://mcp.getken.ai/ken-ai`). On first use your MCP client opens a browser OAuth flow: create an API key at app.getken.ai - Settings - API Keys, paste it once, done. If you already have the ken-ai server connected at user level, both entries point at the same server - you can remove the user-level one or keep both.
+**Codex CLI:**
+
+```
+codex plugin add https://github.com/Ken-Technology/ken-ai-plugin
+```
+
+Codex loads the plugin from `plugins/ken-ai` via its `.codex-plugin/` manifest; run `/plugins` to confirm "Ken AI" is listed. The same 13 skills and 3 commands are shared across both runtimes.
+
+The plugin bundles the ken-ai MCP server (Claude Code: `https://mcp.getken.ai/ken-ai`; Codex: `https://mcp.getken.ai/ken-ai/mcp`). On first use your MCP client opens a browser OAuth flow: create an API key at app.getken.ai - Settings - API Keys, paste it once, done. If you already have the ken-ai server connected at user level (e.g. an existing `[mcp_servers.ken_ai]` in `~/.codex/config.toml`), both entries point at the same server - you can remove the user-level one or keep both.
 
 ## Prerequisites
 
@@ -80,7 +90,7 @@ Everything lives in a per-client workspace folder (no repo required):
 
 | Problem | Fix |
 |---|---|
-| Tools missing / 401 / 403 | Run `/mcp`, select ken-ai, complete (or redo) the OAuth flow |
+| Tools missing / 401 / 403 | Reconnect the ken-ai MCP server and redo the OAuth flow - Claude Code: `/mcp` - select ken-ai; Codex: re-authenticate the server in `~/.codex/config.toml` |
 | `health_check` fails | Server-side issue - check with the Ken AI team |
 | Push failed partway | Re-run campaign-configuration on the same plan folder - configuration.json knows what landed |
 | Campaign misconfigured | Run the verify-campaign skill - it checks 44+ points against the live platform |

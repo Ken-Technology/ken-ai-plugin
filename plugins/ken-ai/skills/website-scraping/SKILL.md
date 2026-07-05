@@ -22,7 +22,7 @@ per-URL `web_scrape`.
 
 Do NOT use `web_batch_scrape` / `web_batch_scrape_wait` - the batch worker is unreliable and usually fails. Always loop `web_scrape` per URL instead.
 
-Do NOT use any external Firecrawl MCP tools - use the Ken AI platform `web_*` tools above. (Tool surface: `${CLAUDE_PLUGIN_ROOT}/reference/platform-capabilities.md`.)
+Do NOT use any external Firecrawl MCP tools - use the Ken AI platform `web_*` tools above. (Tool surface: `../../reference/platform-capabilities.md`.)
 
 ## Context-budget rule (IMPORTANT)
 This skill has hit context-limit errors. Keep the main thread tiny:

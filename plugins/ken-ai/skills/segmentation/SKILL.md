@@ -10,7 +10,7 @@ thinking: true
 Write the audience description and segment-specific prompts for AI segmentation. Maps to Ken AI PromptLibrary records (Flow=Segmentation).
 
 > The dashboard surfaces AI-criteria segments as **"AI Segments"** (formerly "Auto Segments"). See
-> `${CLAUDE_PLUGIN_ROOT}/reference/platform-capabilities.md` for current naming and enums.
+> `../../reference/platform-capabilities.md` for current naming and enums.
 
 ## Parser Contract
 
