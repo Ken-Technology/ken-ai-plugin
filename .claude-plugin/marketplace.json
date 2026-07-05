@@ -1,0 +1,15 @@
+{
+  "name": "ken-ai-plugin",
+  "description": "Ken AI plugins for Claude Code - cold email campaign creation on the Ken AI platform via the ken-ai MCP server.",
+  "owner": {
+    "name": "Ken AI",
+    "email": "development@getken.ai"
+  },
+  "plugins": [
+    {
+      "name": "ken-ai",
+      "source": "./plugins/ken-ai",
+      "description": "Ken AI campaign creation workflow: plan, target, write, review, and push cold email campaigns to the Ken AI platform via MCP."
+    }
+  ]
+}
