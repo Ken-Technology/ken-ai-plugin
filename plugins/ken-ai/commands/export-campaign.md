@@ -212,7 +212,7 @@ Filters: qualified=no, email_validity=valid
 | Campaign not found locally | Search database, present matches |
 | Multiple campaigns match | Present numbered list, ask user to select |
 | No campaign found | Ask user to verify the campaign name/ID |
-| API auth error (401/403) | Tell user: "Ken AI authentication expired. Run `claude mcp remove ken-ai` then re-add the MCP server." |
+| API auth error (401/403) | Tell user: "Ken AI authentication expired. Reconnect the ken-ai MCP server - in Claude Code re-add it via `claude mcp` or the /mcp UI; in Codex re-authenticate the server configured in `~/.codex/config.toml`." |
 | Empty export | Warn: "No contacts found matching filters. Try `--all-qualification` or `--all-emails` to broaden search." |
 | API fails after auth | Escalate to developer - do NOT attempt database export |
 

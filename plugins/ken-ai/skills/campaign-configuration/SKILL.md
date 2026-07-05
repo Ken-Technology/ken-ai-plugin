@@ -12,7 +12,7 @@ Push a plan folder to the Ken AI platform, entirely through ken-ai MCP tools. Th
 **Hard rule: every platform write goes through a ken-ai MCP tool.** Never fall back to curl, raw HTTP, `.env` files, or pasted API keys - if a tool call fails with an auth error, the fix is reconnecting the MCP server (`/mcp`), not a side channel.
 
 > **Platform reference**: for the current MCP tool surface, config knobs, enums, AI model defaults, and the
-> 6 supported KenSearch countries, see `${CLAUDE_PLUGIN_ROOT}/reference/platform-capabilities.md`.
+> 6 supported KenSearch countries, see `../../reference/platform-capabilities.md`.
 > That file is the single source of truth and is refreshed each platform-update cycle.
 
 ## Required Context
@@ -383,7 +383,7 @@ On retry, re-validate the plan folder, read existing ids from configuration.json
 
 ## Related platform tools (recent features)
 
-Not part of the default create flow. Full params in `${CLAUDE_PLUGIN_ROOT}/reference/platform-capabilities.md`.
+Not part of the default create flow. Full params in `../../reference/platform-capabilities.md`.
 
 - **Duplicate a campaign** - `api_campaign_duplicate(campaign_id=<src>, new_name=..., include_leads=False)` clones the full config into a fresh Draft. Faster than re-pushing a plan for a near-identical campaign.
 - **Email-sequence variant active toggle** - variants toggle active/inactive per step (`isActive`); deactivate rather than delete to stop sending a variant. At least one active version must remain per step.

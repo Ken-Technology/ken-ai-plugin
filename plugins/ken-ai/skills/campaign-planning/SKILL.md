@@ -340,7 +340,7 @@ campaign-configuration {plan_folder}
 ### Execution Modes
 
 **Parallel Execution (Auto Mode):**
-Launch all segment subagents simultaneously using multiple Task tool calls in a single message. This maximizes throughput.
+Launch all segment subagents simultaneously - dispatch them in parallel in a single step so they run concurrently. This maximizes throughput.
 
 **Sequential Execution (Approval Mode):**
 Run one segment at a time, pausing between segments for user approval.

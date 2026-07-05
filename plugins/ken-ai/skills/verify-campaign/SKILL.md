@@ -10,7 +10,7 @@ thinking: true
 Verify that a campaign is fully and correctly configured in Ken AI platform. Checks campaign settings, campaign lists, segments, AI model configs, and prompts against expected configuration.
 
 > **Platform reference**: current enums, config knobs, AI model defaults, and the 6 supported KenSearch
-> countries live in `${CLAUDE_PLUGIN_ROOT}/reference/platform-capabilities.md`.
+> countries live in `../../reference/platform-capabilities.md`.
 
 ## Required Context
 
@@ -322,7 +322,7 @@ Want me to apply the critical fixes?
 
 ### Status Label Map
 
-Use these labels for campaign status display. See `.claude/skills/campaign-configuration/references/campaign-status-enums.md` for the canonical reference and lifecycle.
+Use these labels for campaign status display. See `../campaign-configuration/references/campaign-status-enums.md` for the canonical reference and lifecycle.
 
 - 0 = Draft
 - 1 = Building

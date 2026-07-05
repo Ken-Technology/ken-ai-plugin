@@ -9,7 +9,7 @@ thinking: true
 
 Create search filters for the Ken 280M+ contact database. Validate result count is sufficient for the campaign.
 
-> **Platform reference**: see `${CLAUDE_PLUGIN_ROOT}/reference/platform-capabilities.md`
+> **Platform reference**: see `../../reference/platform-capabilities.md`
 > for the 6 supported countries and the full-phrase title-search behavior.
 
 ## Required Context

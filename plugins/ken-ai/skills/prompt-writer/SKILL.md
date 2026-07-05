@@ -101,7 +101,7 @@ Both halves are gated on Ken AI having the campaign configured.
 
 #### 3(a) Internal Text Review
 
-Use the Task tool to spawn a reviewer subagent:
+Dispatch a reviewer subagent:
 ```
 Task(
   description="Review AI prompts",
@@ -201,7 +201,7 @@ reason. Current defaults (verified 2026-06-06, re-check live):
 > stable system context caches better - use `api_ai_token_analysis(campaign_id, flow)` to check whether a
 > prompt is long enough to hit the cache. No action needed for normal prompts; this is just a lever for cost.
 
-See `${CLAUDE_PLUGIN_ROOT}/reference/platform-capabilities.md` for the live model
+See `../../reference/platform-capabilities.md` for the live model
 catalog and AI-flow details.
 
 ### Revision Limits
