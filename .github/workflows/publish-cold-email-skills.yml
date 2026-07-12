@@ -1,0 +1,43 @@
+name: Publish cold-email-skills
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'plugins/ken-ai/skills/**'
+      - 'free-distribution/**'
+      - 'scripts/build-free.mjs'
+      - 'scripts/build-free.test.mjs'
+      - '.github/workflows/publish-cold-email-skills.yml'
+concurrency:
+  group: publish-cold-email-skills
+  cancel-in-progress: true
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Test build script
+        run: node --test scripts/build-free.test.mjs
+      - name: Build free repo
+        run: node scripts/build-free.mjs --out build/cold-email-skills
+      - name: Publish to cold-email-skills
+        env:
+          DEPLOY_KEY: ${{ secrets.COLD_EMAIL_SKILLS_DEPLOY_KEY }}
+        run: |
+          mkdir -p ~/.ssh
+          printf '%s\n' "$DEPLOY_KEY" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -t ed25519 github.com >> ~/.ssh/known_hosts 2>/dev/null
+          export GIT_SSH_COMMAND="ssh -i ~/.ssh/deploy_key -o IdentitiesOnly=yes"
+          cd build/cold-email-skills
+          git init -q
+          git config user.name "ken-ai-bot"
+          git config user.email "development@getken.ai"
+          git add -A
+          git commit -q -m "build: sync from ken-ai-plugin@${GITHUB_SHA::7}"
+          git branch -M main
+          git remote add origin git@github.com:Ken-Technology/cold-email-skills.git
+          git push --force origin main
