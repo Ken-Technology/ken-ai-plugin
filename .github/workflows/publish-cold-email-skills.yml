@@ -35,7 +35,7 @@ jobs:
           cd build/cold-email-skills
           git init -q
           git config user.name "ken-ai-bot"
-          git config user.email "development@getken.ai"
+          git config user.email "development@ken.so"
           git add -A
           git commit -q -m "build: sync from ken-ai-plugin@${GITHUB_SHA::7}"
           git branch -M main

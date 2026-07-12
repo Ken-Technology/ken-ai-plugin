@@ -15,7 +15,7 @@ Entry point for the Ken AI campaign-creation workflow. Sets up the client worksp
 ### Step 1: Verify the Ken AI MCP connection
 
 Call `health_check`. If the tool is missing or returns an auth error:
-- Tell the user to connect the ken-ai MCP server: run `/mcp`, select `ken-ai`, and complete the browser OAuth flow (create an API key at app.getken.ai - Settings - API Keys, paste it once).
+- Tell the user to connect the ken-ai MCP server: run `/mcp`, select `ken-ai`, and complete the browser OAuth flow (create an API key at ken.so - Settings - API Keys, paste it once).
 - Stop until the connection works. Never ask for an API key in chat and never fall back to raw HTTP.
 
 ### Step 2: Pick the Ken client
