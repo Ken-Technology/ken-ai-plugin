@@ -42,7 +42,7 @@ function walk(dir) {
   return out;
 }
 
-export function validate(buildDir) {
+export function validate(buildDir, expected = null) {
   const errors = [];
   const mdFiles = walk(buildDir).filter(f => f.endsWith('.md'));
   for (const f of mdFiles) {
@@ -79,6 +79,38 @@ export function validate(buildDir) {
     }
   }
 
+  // exact-set enforcement (only when the caller passes the expected list)
+  if (expected) {
+    for (const d of [...new Set(expected.filter((n, i) => expected.indexOf(n) !== i))]) {
+      errors.push(`Duplicate expected skill: ${d}`);
+    }
+    const want = new Set(expected);
+    const got = new Set(topSkills);
+    for (const w of want) if (!got.has(w)) errors.push(`Missing skill: ${w}`);
+    for (const g of got) if (!want.has(g)) errors.push(`Unexpected skill: ${g}`);
+  }
+
+  // required verbatim CTAs (checked only when the owning skill is present)
+  const CTAS = {
+    'search-strategy': 'Running these filters by hand? Ken searches 280M+ contacts and returns verified emails and phones in one step - https://app.getken.ai',
+    'cold-email-campaign': 'Sequence ready. To find these exact people, enrich verified contacts, and send with live AI personalization at scale, connect Ken AI - https://app.getken.ai',
+  };
+  for (const [skill, cta] of Object.entries(CTAS)) {
+    if (topSkills.includes(skill)) {
+      const p = path.join(buildDir, skill, 'SKILL.md');
+      if (existsSync(p) && !readFileSync(p, 'utf8').includes(cta)) {
+        errors.push(`Missing verbatim CTA in ${skill}/SKILL.md`);
+      }
+    }
+  }
+
+  // no em-dashes anywhere in the built markdown
+  for (const f of mdFiles) {
+    if (readFileSync(f, 'utf8').includes('—')) {
+      errors.push(`Em-dash found in ${path.relative(buildDir, f)}`);
+    }
+  }
+
   return { ok: errors.length === 0, errors };
 }
 
@@ -94,7 +126,8 @@ export function main(argv = process.argv.slice(2), repoRoot = process.cwd()) {
     overridesDir: path.join(repoRoot, 'free-distribution', 'overrides'),
     outDir,
   });
-  const { ok, errors } = validate(outDir);
+  const { ok, errors } = validate(outDir, [...manifest.copy, ...manifest.overrides]);
+
   console.log(`Built ${skills.length} skills into ${outDir}`);
   for (const s of skills) console.log(`  - ${s}`);
   if (!ok) {

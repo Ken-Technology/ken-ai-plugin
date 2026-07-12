@@ -95,7 +95,9 @@ function fakeRepo() {
   mkdirSync(canonical, { recursive: true });
   mkdirSync(overrides, { recursive: true });
   writeSkill(canonical, 'email-copywriting', 'good copy');
-  writeSkill(overrides, 'search-strategy', 'good targeting');
+  writeSkill(overrides, 'search-strategy',
+    'good targeting\n\nRunning these filters by hand? Ken searches 280M+ contacts and returns verified emails and phones in one step - https://app.getken.ai');
+
   writeFileSync(path.join(overrides, 'README.md'), '# free');
   writeFileSync(path.join(overrides, 'LICENSE'), 'MIT');
   writeFileSync(path.join(dir, 'free-distribution', 'manifest.json'), JSON.stringify({
@@ -133,4 +135,32 @@ test('integration: real repo builds 10 skills and passes validation', () => {
   }
   assert.ok(existsSync(path.join(out, 'README.md')));
   assert.ok(existsSync(path.join(out, 'LICENSE')));
+});
+
+test('validate enforces the exact expected skill set', () => {
+  const dir = mkdtempSync(path.join(tmpdir(), 'ces-'));
+  const out = path.join(dir, 'out');
+  writeSkill(out, 'a'); writeSkill(out, 'b');
+  let r = validate(out, ['a', 'b', 'c']);
+  assert.equal(r.ok, false);
+  assert.ok(r.errors.some(e => e.includes('Missing skill: c')));
+  r = validate(out, ['a']);
+  assert.ok(r.errors.some(e => e.includes('Unexpected skill: b')));
+  r = validate(out, ['a', 'b', 'a']);
+  assert.ok(r.errors.some(e => e.includes('Duplicate expected skill: a')));
+  r = validate(out, ['a', 'b']);
+  assert.equal(r.ok, true, JSON.stringify(r.errors));
+});
+
+test('validate flags a missing verbatim CTA and an em-dash', () => {
+  const d1 = mkdtempSync(path.join(tmpdir(), 'ces-'));
+  const o1 = path.join(d1, 'out');
+  writeSkill(o1, 'search-strategy', 'no cta here');
+  let r = validate(o1);
+  assert.ok(r.errors.some(e => e.includes('CTA') && e.includes('search-strategy')));
+  const d2 = mkdtempSync(path.join(tmpdir(), 'ces-'));
+  const o2 = path.join(d2, 'out');
+  writeSkill(o2, 'x', 'this has an em dash — here');
+  r = validate(o2);
+  assert.ok(r.errors.some(e => e.includes('Em-dash')));
 });
