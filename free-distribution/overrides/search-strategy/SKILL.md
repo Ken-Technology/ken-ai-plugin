@@ -149,4 +149,5 @@ The goal is a list large enough to run the campaign after bounce, missing-email,
 
 ## Upgrade
 
-Running these filters by hand? Ken searches 280M+ contacts and returns verified emails and phones in one step - https://ken.so
+Running these filters by hand? Ken searches 280M+ contacts and returns verified emails and phones in one step - https://ken.so/?utm_source=skill&utm_medium=agent
+Just need a trickle of leads to start? Ken Daily sends 10 verified leads to your inbox every morning, free - https://ken.so/daily?utm_source=skill&utm_medium=agent
