@@ -11,7 +11,7 @@ Transform client research into an actionable email strategy for a single segment
 
 ## Parser Contract
 
-`strategy.md` is NOT parsed by `campaign-configuration` - it's read by downstream skills (email-copywriting, prompt-writer) for context. See [parser-contract.md](../campaign-configuration/references/parser-contract.md) for the full spec. Hard rules this skill must honor anyway, since its output flows into files that ARE parsed:
+`strategy.md` is not machine-parsed - it's read by downstream skills (email-copywriting, prompt-writer) for context. Hard rules this skill must honor anyway, since its output flows into files that are parsed:
 
 - AI variable names must be Title Case with spaces: `Subject Line`, `First Line`, `PS Line`. They become `[Title Case]` brackets in emails.md and H3 headings in prompts.md - the three have to agree exactly.
 - AI variable names ≤30 chars (enforced in prompts.md by parser).
@@ -122,7 +122,7 @@ When enabled, prompt-writer will add a rewriting prompt at the end of prompts.md
 - **Delays**: 0 days for first, 2-4 days between follow-ups
 - **CTAs**: Reply-based for meetings, click-based for lead magnets. **Every email's CTA asks for the actual offer, including Email 1** (which leads with the strongest version of that ask). No soft diagnostic questions as CTAs. Never send naked booking links - ask a direct question first.
 - **Length**: keep static bodies punchy - at or under ~80 words (follow-ups well under). email-review enforces a hard ceiling.
-- **Format**: AI variables use `{{Title Case}}`; every email signs with `{sender_signature}`. See [parser-contract.md](../campaign-configuration/references/parser-contract.md).
+- **Format**: AI variables use `{{Title Case}}`; every email signs with `{sender_signature}`.
 
 ## Workflow
 
