@@ -31,7 +31,7 @@ This skill receives a `{segment_folder}` path (e.g., `{workspace}/03-15 - plan 1
 ### Task 1: Load Context
 - [ ] Read `{segment_folder}/strategy.md` - Extract AI variables section
 - [ ] Read `{segment_folder}/emails_v2.md` - Reviewed email copy (fall back to `emails.md` if not found)
-- [ ] Read `{workspace}/research.md` - ICP, value prop, messaging themes, product info, case studies (`{workspace}` = the client campaign workspace, default `./ken-campaigns/{client-slug}/` under the current directory; free orchestrator may use `./cold-email/{slug}/`)
+- [ ] Read `{workspace}/research.md` - ICP, value prop, messaging themes, product info, case studies (`{workspace}` = the client campaign workspace, default `./cold-email/{slug}/` under the current directory)
 - [ ] Read `{workspace}/notes.md` (if exists) - Client-specific preferences
 
 ### Task 2: Build User Prompts

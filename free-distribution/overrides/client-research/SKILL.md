@@ -11,7 +11,7 @@ Synthesize multiple research sources into a comprehensive client strategy docume
 
 ## Required Context
 
-Before generating the research document, load all available client sources. `{workspace}` = the client campaign workspace (default `./ken-campaigns/{client-slug}/` under the current directory):
+Before generating the research document, load all available client sources. `{workspace}` = the client campaign workspace (default `./cold-email/{slug}/` under the current directory):
 
 **Directory Structure Reference:**
 ```
