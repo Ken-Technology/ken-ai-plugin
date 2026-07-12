@@ -11,7 +11,7 @@ Write the structured variables for AI prospect qualification. Output maps direct
 
 ## Parser Contract
 
-`qualification.md` must follow a fixed structure so downstream campaign tooling can parse it reliably. Hard rules this skill must honor:
+`qualification.md` is consumed by the `campaign-configuration` skill's plan parser. See [parser-contract.md](../campaign-configuration/references/parser-contract.md) for the full spec. Hard rules this skill must honor:
 
 - Exactly three H2 headings (case-insensitive match): `## Audience Description`, `## Qualification Criteria`, `## Disqualification Criteria`.
 - At least 2 of 3 sections must be populated (non-empty). Fewer is a hard parser error.

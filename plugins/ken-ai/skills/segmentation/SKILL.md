@@ -14,7 +14,7 @@ Write the audience description and segment-specific prompts for AI segmentation.
 
 ## Parser Contract
 
-`segmentation.md` must follow a fixed structure so downstream campaign tooling can parse it reliably. Hard rules this skill must honor:
+`segmentation.md` is consumed by the `campaign-configuration` skill's plan parser. See [parser-contract.md](../campaign-configuration/references/parser-contract.md) for the full spec. Hard rules this skill must honor:
 
 - `## Default Segment` H2 (or legacy `## General Audience`) - its body is the description pushed to the backend's auto-created Default segment.
 - `## Segments` H2 wraps all audience-segment H3s.

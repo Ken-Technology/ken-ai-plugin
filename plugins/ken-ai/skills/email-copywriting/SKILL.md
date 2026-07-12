@@ -9,7 +9,7 @@ thinking: true
 
 ## Parser Contract
 
-`emails_v2.md` (and `emails.md`) must follow a fixed structure so downstream campaign tooling can parse them reliably. Hard rules this skill must honor:
+`emails_v2.md` (and `emails.md`) is consumed by the `campaign-configuration` skill's plan parser. See [parser-contract.md](../campaign-configuration/references/parser-contract.md) for the full spec. Hard rules this skill must honor:
 
 - `## Email N: {Descriptive Title}` - the title becomes the EmailBison step name (truncated to 25 chars). Missing title → step name falls back to `Variant A`.
 - `### Variant A (desc)` / `### Variant B (desc)` - literal word `Variant`, never `Version` (parser warns on `Version`). Letter in `A..D`. Parenthetical description becomes the step-name suffix.
@@ -88,6 +88,7 @@ Before writing email copy, always load the client context:
     ├── filters.json                # List building filters
     ├── qualification.md            # Qualification criteria
     ├── segmentation.md             # Segmentation criteria
+    ├── configuration.json          # Ken AI configuration
     └── {n} - {segment-slug}/       # Segment folder (per-segment files)
         ├── strategy.md             # Email sequence blueprint
         ├── emails.md               # Email copy
