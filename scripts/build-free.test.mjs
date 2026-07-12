@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { mkdtempSync, mkdirSync, writeFileSync, existsSync, readFileSync as rf } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { loadManifest, assemble, validate, main } from './build-free.mjs';
 
 test('loadManifest parses the manifest json', () => {
@@ -117,4 +118,19 @@ test('main returns 1 when a skill leaks a forbidden marker', () => {
     'run api_client_manage(list) via mcp__ken-ai');
   const code = main([], dir);
   assert.equal(code, 1);
+});
+
+test('integration: real repo builds 10 skills and passes validation', () => {
+  const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+  const out = path.join(repoRoot, 'build', 'cold-email-skills');
+  const code = main(['--out', out], repoRoot);
+  assert.equal(code, 0);
+  const dirs = ['cold-email-campaign','search-strategy','qualification','segmentation',
+    'campaign-strategy','email-copywriting','email-review','prompt-writer',
+    'client-research','lead-magnet'];
+  for (const d of dirs) {
+    assert.ok(existsSync(path.join(out, d, 'SKILL.md')), `missing ${d}`);
+  }
+  assert.ok(existsSync(path.join(out, 'README.md')));
+  assert.ok(existsSync(path.join(out, 'LICENSE')));
 });
