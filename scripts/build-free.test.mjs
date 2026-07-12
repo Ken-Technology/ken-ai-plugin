@@ -67,3 +67,22 @@ test('validate passes a clean tree', () => {
   const res = validate(out);
   assert.equal(res.ok, true, JSON.stringify(res.errors));
 });
+
+test('validate flags a skill missing its description', () => {
+  const dir = mkdtempSync(path.join(tmpdir(), 'ces-'));
+  const out = path.join(dir, 'out');
+  mkdirSync(path.join(out, 'broken'), { recursive: true });
+  writeFileSync(path.join(out, 'broken', 'SKILL.md'), `---\nname: broken\n---\nbody\n`);
+  const res = validate(out);
+  assert.equal(res.ok, false);
+  assert.ok(res.errors.some(e => e.includes('description') && e.includes('broken')));
+});
+
+test('validate flags a link to a skill not in the build', () => {
+  const dir = mkdtempSync(path.join(tmpdir(), 'ces-'));
+  const out = path.join(dir, 'out');
+  writeSkill(out, 'orch', 'see [config](../campaign-configuration/ref.md) for details');
+  const res = validate(out);
+  assert.equal(res.ok, false);
+  assert.ok(res.errors.some(e => e.includes('campaign-configuration')));
+});
