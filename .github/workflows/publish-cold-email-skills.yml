@@ -6,7 +6,11 @@ on:
       - 'plugins/ken-ai/skills/**'
       - 'free-distribution/**'
       - 'scripts/build-free.mjs'
+      - 'scripts/build-free.test.mjs'
       - '.github/workflows/publish-cold-email-skills.yml'
+concurrency:
+  group: publish-cold-email-skills
+  cancel-in-progress: true
 jobs:
   publish:
     runs-on: ubuntu-latest

@@ -153,7 +153,7 @@ For service/agency offers where the lead magnet is embedded in the cold email it
 
 ### Step 1: Understand Client
 Load all available client data:
-- Read `{workspace}/research.md` - ICP, value prop, current offers, detailed research, pain points (`{workspace}` = the client campaign workspace, default `./ken-campaigns/{client-slug}/` under the current directory)
+- Read `{workspace}/research.md` - ICP, value prop, current offers, detailed research, pain points (`{workspace}` = the client campaign workspace folder (the orchestrator passes this path))
 - Read past plan folders in `{workspace}/` - Past campaigns and what offers were tested
 - Read supporting files in `{workspace}/` - Existing lead magnets, case studies
 

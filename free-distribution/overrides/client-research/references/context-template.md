@@ -76,8 +76,9 @@ Use this structure for the summary section at the top of `{workspace}/research.m
 ## Quick Links
 
 - **Website**: {company_website_url}
-- **ClickUp**: {clickup_project_link or "Not configured"}
-- **EmailBison**: {emailbison_link or "Not configured"}
+- **CRM / project tracker**: {crm_or_tracker_link or "Not configured"}
+- **Campaign platform**: {campaign_platform_link or "Not configured"}
+- **Other**: {other_relevant_client_links or "Not configured"}
 ```
 
 ---

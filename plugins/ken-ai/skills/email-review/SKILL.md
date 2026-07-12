@@ -16,7 +16,7 @@ Review email copy against critical copy rules, QA checklists, and client prefere
 ### Task 1: Load Context
 - [ ] Read `{segment_folder}/emails.md` - The email copy to review
 - [ ] Read `{segment_folder}/strategy.md` - Campaign strategy and goals
-- [ ] Read `{workspace}/research.md` - ICP, value proposition, messaging themes, product info, case studies (`{workspace}` = the client campaign workspace, default `./ken-campaigns/{client-slug}/` under the current directory)
+- [ ] Read `{workspace}/research.md` - ICP, value proposition, messaging themes, product info, case studies (`{workspace}` = the client campaign workspace folder (the orchestrator passes this path))
 - [ ] Read `{workspace}/notes.md` (if exists) - Client-specific preferences (HIGHEST PRIORITY)
 
 ### Task 2: Load Review Reference Material

@@ -56,42 +56,33 @@ If the campaign will run a rewrite pass on personalization outputs, write a shor
 
 Run an internal text review of the drafted prompts before saving. This is a quality pass over the draft - not a live run against contacts.
 
-Dispatch a reviewer subagent:
-```
-Task(
-  description="Review AI prompts",
-  subagent_type="general-purpose",
-  prompt="""
-  You are an AI prompt reviewer. Review the draft prompts against these priorities:
+Dispatch a subagent to review the drafted prompts (or run an internal review pass over the drafts). The reviewer should score and revise against these priorities:
 
-  1. HIGHEST PRIORITY - Client notes from {workspace}/notes.md (if exists)
-  2. Campaign strategy from {segment_folder}/strategy.md
-  3. CRITICAL: Prompt Customization Rules Checklist from review-workflow.md (MANDATORY)
-  4. Data source constraints from SKILL.md
+1. HIGHEST PRIORITY - Client notes from `{workspace}/notes.md` (if exists)
+2. Campaign strategy from `{segment_folder}/strategy.md`
+3. CRITICAL: Prompt Customization Rules Checklist from review-workflow.md (MANDATORY)
+4. Data source constraints from SKILL.md
 
-  Check:
-  - MANDATORY: Prompt Customization Rules Checklist (examples policy, PS line format, subject line guidelines)
-  - All AI variables from strategy.md have prompts
-  - NO invalid data sources (news, funding, events, social media, blogs)
-  - Prompts specify: what to generate, data sources, tone, constraints, fallbacks
-  - Variable names match strategy.md exactly (Title Case; same names as {{Title Case}} in the emails)
+Check:
+- MANDATORY: Prompt Customization Rules Checklist (examples policy, PS line format, subject line guidelines)
+- All AI variables from strategy.md have prompts
+- NO invalid data sources (news, funding, events, social media, blogs)
+- Prompts specify: what to generate, data sources, tone, constraints, fallbacks
+- Variable names match strategy.md exactly (Title Case; same names as `{{Title Case}}` in the emails)
 
-  REJECT any prompt that:
-  - References news articles, press releases, funding, events, social media (except LinkedIn), or blog content
-  - Adds examples to First Line, PS Line, or Subject Line prompts (unless heavily customized)
-  - Uses wrong PS format (must be "PS: " not "PS -" or "PS." or just "PS")
-  - Adds "Quick question" or typical outreach messaging to subject line
-  - Completely rewrites PS or Subject Line templates (only slight modifications allowed)
+REJECT any prompt that:
+- References news articles, press releases, funding, events, social media (except LinkedIn), or blog content
+- Adds examples to First Line, PS Line, or Subject Line prompts (unless heavily customized)
+- Uses wrong PS format (must be "PS: " not "PS -" or "PS." or just "PS")
+- Adds "Quick question" or typical outreach messaging to subject line
+- Completely rewrites PS or Subject Line templates (only slight modifications allowed)
 
-  Output a review with:
-  - Overall score (1-5)
-  - Prompt Customization Rules violations (if any)
-  - Data source violations (CRITICAL)
-  - Missing variables
-  - Required fixes
-  """
-)
-```
+Output a review with:
+- Overall score (1-5)
+- Prompt Customization Rules violations (if any)
+- Data source violations (CRITICAL)
+- Missing variables
+- Required fixes
 
 Then incorporate the reviewer feedback:
 - [ ] Fix all data source violations
