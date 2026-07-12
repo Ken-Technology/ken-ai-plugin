@@ -1,0 +1,18 @@
+{
+  "targetRepo": "Ken-Technology/cold-email-skills",
+  "copy": [
+    "email-copywriting",
+    "email-review",
+    "campaign-strategy",
+    "segmentation",
+    "qualification",
+    "lead-magnet"
+  ],
+  "overrides": [
+    "search-strategy",
+    "cold-email-campaign",
+    "client-research",
+    "prompt-writer"
+  ],
+  "repoFiles": ["README.md", "LICENSE"]
+}
