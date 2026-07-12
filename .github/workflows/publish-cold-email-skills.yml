@@ -25,8 +25,13 @@ jobs:
         run: node scripts/build-free.mjs --out build/cold-email-skills
       - name: Publish to cold-email-skills
         env:
-          DEPLOY_TOKEN: ${{ secrets.COLD_EMAIL_SKILLS_DEPLOY_TOKEN }}
+          DEPLOY_KEY: ${{ secrets.COLD_EMAIL_SKILLS_DEPLOY_KEY }}
         run: |
+          mkdir -p ~/.ssh
+          printf '%s\n' "$DEPLOY_KEY" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -t ed25519 github.com >> ~/.ssh/known_hosts 2>/dev/null
+          export GIT_SSH_COMMAND="ssh -i ~/.ssh/deploy_key -o IdentitiesOnly=yes"
           cd build/cold-email-skills
           git init -q
           git config user.name "ken-ai-bot"
@@ -34,4 +39,5 @@ jobs:
           git add -A
           git commit -q -m "build: sync from ken-ai-plugin@${GITHUB_SHA::7}"
           git branch -M main
-          git push --force "https://x-access-token:${DEPLOY_TOKEN}@github.com/Ken-Technology/cold-email-skills.git" main
+          git remote add origin git@github.com:Ken-Technology/cold-email-skills.git
+          git push --force origin main
