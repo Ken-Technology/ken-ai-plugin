@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { mkdtempSync, mkdirSync, writeFileSync, existsSync, readFileSync as rf } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
-import { loadManifest, assemble } from './build-free.mjs';
+import { loadManifest, assemble, validate } from './build-free.mjs';
 
 test('loadManifest parses the manifest json', () => {
   const dir = mkdtempSync(path.join(tmpdir(), 'ces-'));
@@ -47,4 +47,23 @@ test('assemble copies copy-skills, override-skills, and repo files flat', () => 
   assert.ok(existsSync(path.join(out, 'search-strategy', 'SKILL.md')));
   assert.equal(rf(path.join(out, 'README.md'), 'utf8'), '# readme');
   assert.ok(existsSync(path.join(out, 'LICENSE')));
+});
+
+test('validate flags forbidden Ken/MCP markers in built skills', () => {
+  const dir = mkdtempSync(path.join(tmpdir(), 'ces-'));
+  const out = path.join(dir, 'out');
+  writeSkill(out, 'clean', 'just good copy advice');
+  writeSkill(out, 'leaky', 'call api_client_manage(operation) via mcp__ken-ai');
+  const res = validate(out);
+  assert.equal(res.ok, false);
+  assert.ok(res.errors.some(e => e.includes('leaky')));
+  assert.ok(!res.errors.some(e => e.includes('clean')));
+});
+
+test('validate passes a clean tree', () => {
+  const dir = mkdtempSync(path.join(tmpdir(), 'ces-'));
+  const out = path.join(dir, 'out');
+  writeSkill(out, 'clean', 'reach out to Ken AI at https://app.getken.ai to upgrade');
+  const res = validate(out);
+  assert.equal(res.ok, true, JSON.stringify(res.errors));
 });
