@@ -1,5 +1,6 @@
 import { readFileSync, mkdirSync, rmSync, cpSync, readdirSync, statSync, existsSync } from 'node:fs';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 export function loadManifest(manifestPath) {
   return JSON.parse(readFileSync(manifestPath, 'utf8'));
@@ -79,4 +80,33 @@ export function validate(buildDir) {
   }
 
   return { ok: errors.length === 0, errors };
+}
+
+export function main(argv = process.argv.slice(2), repoRoot = process.cwd()) {
+  const dryRun = argv.includes('--dry-run');
+  const outIdx = argv.indexOf('--out');
+  const manifest = loadManifest(path.join(repoRoot, 'free-distribution', 'manifest.json'));
+  const outDir = outIdx >= 0
+    ? path.resolve(repoRoot, argv[outIdx + 1])
+    : path.join(repoRoot, 'build', 'cold-email-skills');
+  const { skills } = assemble(manifest, {
+    canonicalSkillsDir: path.join(repoRoot, 'plugins', 'ken-ai', 'skills'),
+    overridesDir: path.join(repoRoot, 'free-distribution', 'overrides'),
+    outDir,
+  });
+  const { ok, errors } = validate(outDir);
+  console.log(`Built ${skills.length} skills into ${outDir}`);
+  for (const s of skills) console.log(`  - ${s}`);
+  if (!ok) {
+    console.error('\nValidation FAILED:');
+    for (const e of errors) console.error(`  x ${e}`);
+  } else {
+    console.log('\nValidation passed.');
+  }
+  if (dryRun) rmSync(outDir, { recursive: true, force: true });
+  return ok ? 0 : 1;
+}
+
+if (process.argv[1] && fileURLToPath(import.meta.url) === path.resolve(process.argv[1])) {
+  process.exit(main());
 }

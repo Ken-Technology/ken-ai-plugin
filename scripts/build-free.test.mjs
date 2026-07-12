@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { mkdtempSync, mkdirSync, writeFileSync, existsSync, readFileSync as rf } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
-import { loadManifest, assemble, validate } from './build-free.mjs';
+import { loadManifest, assemble, validate, main } from './build-free.mjs';
 
 test('loadManifest parses the manifest json', () => {
   const dir = mkdtempSync(path.join(tmpdir(), 'ces-'));
@@ -85,4 +85,36 @@ test('validate flags a link to a skill not in the build', () => {
   const res = validate(out);
   assert.equal(res.ok, false);
   assert.ok(res.errors.some(e => e.includes('campaign-configuration')));
+});
+
+function fakeRepo() {
+  const dir = mkdtempSync(path.join(tmpdir(), 'ces-repo-'));
+  const canonical = path.join(dir, 'plugins', 'ken-ai', 'skills');
+  const overrides = path.join(dir, 'free-distribution', 'overrides');
+  mkdirSync(canonical, { recursive: true });
+  mkdirSync(overrides, { recursive: true });
+  writeSkill(canonical, 'email-copywriting', 'good copy');
+  writeSkill(overrides, 'search-strategy', 'good targeting');
+  writeFileSync(path.join(overrides, 'README.md'), '# free');
+  writeFileSync(path.join(overrides, 'LICENSE'), 'MIT');
+  writeFileSync(path.join(dir, 'free-distribution', 'manifest.json'), JSON.stringify({
+    targetRepo: 'x/y', copy: ['email-copywriting'],
+    overrides: ['search-strategy'], repoFiles: ['README.md', 'LICENSE'],
+  }));
+  return dir;
+}
+
+test('main returns 0 and writes the tree on a clean repo', () => {
+  const dir = fakeRepo();
+  const code = main([], dir);
+  assert.equal(code, 0);
+  assert.ok(existsSync(path.join(dir, 'build', 'cold-email-skills', 'search-strategy', 'SKILL.md')));
+});
+
+test('main returns 1 when a skill leaks a forbidden marker', () => {
+  const dir = fakeRepo();
+  writeSkill(path.join(dir, 'free-distribution', 'overrides'), 'search-strategy',
+    'run api_client_manage(list) via mcp__ken-ai');
+  const code = main([], dir);
+  assert.equal(code, 1);
 });
