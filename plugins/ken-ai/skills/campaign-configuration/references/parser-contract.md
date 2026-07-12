@@ -207,7 +207,7 @@ Hey {firstName},
 | `{snake_case}` (single braces) | System variable (resolved by the backend / sending inbox) | `{sender_signature}` |
 | `{{Title Case With Spaces}}` (double braces) | AI variable placeholder - **canonical authoring form** | `{{First Line}}`, `{{PS Line}}`, `{{Subject Line}}` |
 | `[Title Case With Spaces]` (square brackets) | AI variable placeholder - **legacy**, auto-converted to `{{...}}` | `[First Line]` → `{{First Line}}` |
-| Raw URLs or `[text](url)` | Tracking links, auto-converted to `{{tracking_link:url_N}}` | `https://getken.ai/case-study` |
+| Raw URLs or `[text](url)` | Tracking links, auto-converted to `{{tracking_link:url_N}}` | `https://ken.so/case-study` |
 
 AI variable rules:
 - **Write AI variables in double braces `{{Title Case}}`.** This is the canonical authoring form and matches exactly what Ken AI stores, renders, and pushes. `html_serialize.py` preserves `{{...}}` verbatim (no escaping), so what you write is what the app gets.

@@ -51,7 +51,7 @@ Before configuring, always load:
 ### Step 0: Verify Ken AI MCP is available
 
 Call `health_check`. If the tool is missing or errors with 401/403:
-- Ask the user to connect/re-authorize the ken-ai MCP server: run `/mcp`, pick `ken-ai`, complete the browser OAuth flow (create an API key at app.getken.ai - Settings - API Keys and paste it once).
+- Ask the user to connect/re-authorize the ken-ai MCP server: run `/mcp`, pick `ken-ai`, complete the browser OAuth flow (create an API key at ken.so - Settings - API Keys and paste it once).
 - Stop until the connection works. Do NOT work around it with curl or raw HTTP.
 
 ### Step 1: Validate the plan folder & auto-fix

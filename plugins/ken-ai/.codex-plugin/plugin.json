@@ -4,7 +4,7 @@
   "description": "End-to-end Ken AI campaign creation: ICP planning, KenSearch targeting, qualification and segmentation prompts, email copy with review loop, AI personalization prompts, and pure-MCP campaign configuration on the Ken AI platform.",
   "author": {
     "name": "Ken AI",
-    "email": "development@getken.ai"
+    "email": "development@ken.so"
   },
   "homepage": "https://github.com/Ken-Technology/ken-ai-plugin",
   "repository": "https://github.com/Ken-Technology/ken-ai-plugin",
@@ -18,7 +18,7 @@
     "developerName": "Ken AI",
     "category": "Developer Tools",
     "capabilities": ["Interactive", "Write"],
-    "websiteURL": "https://app.getken.ai",
+    "websiteURL": "https://ken.so",
     "defaultPrompt": [
       "Plan and configure a new Ken AI cold-email campaign for a client",
       "Show the enrichment status of my Ken AI campaign"

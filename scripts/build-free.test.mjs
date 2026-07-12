@@ -64,7 +64,7 @@ test('validate flags forbidden Ken/MCP markers in built skills', () => {
 test('validate passes a clean tree', () => {
   const dir = mkdtempSync(path.join(tmpdir(), 'ces-'));
   const out = path.join(dir, 'out');
-  writeSkill(out, 'clean', 'reach out to Ken AI at https://app.getken.ai to upgrade');
+  writeSkill(out, 'clean', 'reach out to Ken AI at https://ken.so to upgrade');
   const res = validate(out);
   assert.equal(res.ok, true, JSON.stringify(res.errors));
 });
@@ -96,7 +96,7 @@ function fakeRepo() {
   mkdirSync(overrides, { recursive: true });
   writeSkill(canonical, 'email-copywriting', 'good copy');
   writeSkill(overrides, 'search-strategy',
-    'good targeting\n\nRunning these filters by hand? Ken searches 280M+ contacts and returns verified emails and phones in one step - https://app.getken.ai');
+    'good targeting\n\nRunning these filters by hand? Ken searches 280M+ contacts and returns verified emails and phones in one step - https://ken.so');
 
   writeFileSync(path.join(overrides, 'README.md'), '# free');
   writeFileSync(path.join(overrides, 'LICENSE'), 'MIT');

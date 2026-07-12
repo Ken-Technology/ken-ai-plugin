@@ -1,6 +1,6 @@
 # ken-ai-plugin
 
-Plugin marketplace for the [Ken AI platform](https://app.getken.ai), for **Claude Code and OpenAI Codex CLI**. Ships the **ken-ai** plugin: an end-to-end cold-email campaign-creation workflow (planning, KenSearch targeting, copywriting with a review loop, AI personalization prompts, and a pure-MCP configuration push) plus the `/ken-ai:new-campaign`, `/ken-ai:campaign-status`, and `/ken-ai:export-campaign` commands. The same skills and commands run on both runtimes - see [Cross-runtime support](#cross-runtime-support).
+Plugin marketplace for the [Ken AI platform](https://ken.so), for **Claude Code and OpenAI Codex CLI**. Ships the **ken-ai** plugin: an end-to-end cold-email campaign-creation workflow (planning, KenSearch targeting, copywriting with a review loop, AI personalization prompts, and a pure-MCP configuration push) plus the `/ken-ai:new-campaign`, `/ken-ai:campaign-status`, and `/ken-ai:export-campaign` commands. The same skills and commands run on both runtimes - see [Cross-runtime support](#cross-runtime-support).
 
 ## Install (Claude Code)
 
@@ -17,7 +17,7 @@ codex plugin add https://github.com/Ken-Technology/ken-ai-plugin
 
 Point `codex plugin add` at the repo (or a local checkout path); Codex loads the plugin from `plugins/ken-ai`. The plugin's `.codex-plugin/` manifest wires up the skills, the three commands, and the ken-ai MCP server. Verify with `/plugins` in Codex.
 
-The plugin bundles the `ken-ai` MCP server (`https://mcp.getken.ai/ken-ai`). On first use your MCP client opens a browser OAuth flow - create an API key at app.getken.ai - Settings - API Keys, paste it once, and you're done. No `.env`, no local scripts, no pasted keys in chat.
+The plugin bundles the `ken-ai` MCP server (`https://mcp.getken.ai/ken-ai`). On first use your MCP client opens a browser OAuth flow - create an API key at ken.so - Settings - API Keys, paste it once, and you're done. No `.env`, no local scripts, no pasted keys in chat.
 
 ## What's here
 

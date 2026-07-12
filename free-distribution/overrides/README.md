@@ -39,7 +39,7 @@ Everything is written to local files. You bring your own prospect list (these sk
 
 ## Upgrade to Ken AI
 
-These skills plan and write campaigns. To find contacts, verify emails and phones, and send at scale with live AI personalization, use [Ken AI](https://app.getken.ai).
+These skills plan and write campaigns. To find contacts, verify emails and phones, and send at scale with live AI personalization, use [Ken AI](https://ken.so).
 
 ## License
 

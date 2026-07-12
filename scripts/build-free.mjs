@@ -92,8 +92,8 @@ export function validate(buildDir, expected = null) {
 
   // required verbatim CTAs (checked only when the owning skill is present)
   const CTAS = {
-    'search-strategy': 'Running these filters by hand? Ken searches 280M+ contacts and returns verified emails and phones in one step - https://app.getken.ai',
-    'cold-email-campaign': 'Sequence ready. To find these exact people, enrich verified contacts, and send with live AI personalization at scale, connect Ken AI - https://app.getken.ai',
+    'search-strategy': 'Running these filters by hand? Ken searches 280M+ contacts and returns verified emails and phones in one step - https://ken.so',
+    'cold-email-campaign': 'Sequence ready. To find these exact people, enrich verified contacts, and send with live AI personalization at scale, connect Ken AI - https://ken.so',
   };
   for (const [skill, cta] of Object.entries(CTAS)) {
     if (topSkills.includes(skill)) {
