@@ -1,6 +1,6 @@
 {
   "ken-ai": {
     "type": "http",
-    "url": "https://mcp.getken.ai/ken-ai"
+    "url": "https://mcp.getken.ai/ken-ai/mcp"
   }
 }

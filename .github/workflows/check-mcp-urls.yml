@@ -1,0 +1,25 @@
+name: Check MCP URLs
+on:
+  pull_request:
+  push:
+    branches: [main]
+  # Catches the other half of this bug class: the endpoint moving server-side
+  # while the repo still ships the old URL.
+  schedule:
+    - cron: '0 7 * * *'
+  workflow_dispatch:
+concurrency:
+  group: check-mcp-urls-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  check:
+    runs-on: blacksmith-2vcpu-ubuntu-2404
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Unit test the checker
+        run: node --test scripts/check-mcp-urls.test.mjs
+      - name: Verify every shipped MCP URL resolves to a live resource
+        run: node scripts/check-mcp-urls.mjs
