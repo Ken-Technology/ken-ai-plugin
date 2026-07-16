@@ -17,7 +17,7 @@ codex plugin add https://github.com/Ken-Technology/ken-ai-plugin
 
 Point `codex plugin add` at the repo (or a local checkout path); Codex loads the plugin from `plugins/ken-ai`. The plugin's `.codex-plugin/` manifest wires up the skills, the three commands, and the ken-ai MCP server. Verify with `/plugins` in Codex.
 
-The plugin bundles the `ken-ai` MCP server (`https://mcp.getken.ai/ken-ai`). On first use your MCP client opens a browser OAuth flow - create an API key at ken.so - Settings - API Keys, paste it once, and you're done. No `.env`, no local scripts, no pasted keys in chat.
+The plugin bundles the `ken-ai` MCP server (`https://mcp.getken.ai/ken-ai/mcp`). On first use your MCP client opens a browser OAuth flow - create an API key at ken.so - Settings - API Keys, paste it once, and you're done. No `.env`, no local scripts, no pasted keys in chat.
 
 ## What's here
 

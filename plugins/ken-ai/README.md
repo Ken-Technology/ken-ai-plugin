@@ -19,7 +19,7 @@ codex plugin add https://github.com/Ken-Technology/ken-ai-plugin
 
 Codex loads the plugin from `plugins/ken-ai` via its `.codex-plugin/` manifest; run `/plugins` to confirm "Ken AI" is listed. The same 13 skills and 3 commands are shared across both runtimes.
 
-The plugin bundles the ken-ai MCP server (Claude Code: `https://mcp.getken.ai/ken-ai`; Codex: `https://mcp.getken.ai/ken-ai/mcp`). On first use your MCP client opens a browser OAuth flow: create an API key at ken.so - Settings - API Keys, paste it once, done. If you already have the ken-ai server connected at user level (e.g. an existing `[mcp_servers.ken_ai]` in `~/.codex/config.toml`), both entries point at the same server - you can remove the user-level one or keep both.
+The plugin bundles the ken-ai MCP server (`https://mcp.getken.ai/ken-ai/mcp`, same URL for both runtimes). On first use your MCP client opens a browser OAuth flow: create an API key at ken.so - Settings - API Keys, paste it once, done. If you already have the ken-ai server connected at user level (e.g. an existing `[mcp_servers.ken_ai]` in `~/.codex/config.toml`), both entries point at the same server - you can remove the user-level one or keep both.
 
 ## Prerequisites
 

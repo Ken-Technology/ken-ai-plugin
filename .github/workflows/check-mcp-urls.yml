@@ -1,0 +1,33 @@
+name: Check MCP URLs
+on:
+  pull_request:
+  push:
+    branches: [main]
+  # Catches the other half of this bug class: the endpoint moving server-side
+  # while the repo still ships the old URL. Runs strict, so an unreachable host
+  # is reported here rather than silently blocking unrelated PRs.
+  schedule:
+    - cron: '0 7 * * *'
+  workflow_dispatch:
+concurrency:
+  # github.ref is `main` for both `push` and `schedule`, so without event_name a
+  # push would cancel the scheduled run - and the schedule is the only thing
+  # watching for server-side drift.
+  group: check-mcp-urls-${{ github.event_name }}-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  check:
+    runs-on: blacksmith-2vcpu-ubuntu-2404
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Unit test the checker
+        run: node --test scripts/check-mcp-urls.test.mjs
+      - name: Verify every shipped MCP URL resolves to a live resource
+        # Config drift always fails. An unreachable host fails only on the
+        # scheduled run, so an upstream blip cannot block every PR in the repo.
+        env:
+          MCP_CHECK_STRICT: ${{ github.event_name == 'schedule' && '1' || '0' }}
+        run: node scripts/check-mcp-urls.mjs
