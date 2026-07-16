@@ -1,6 +1,8 @@
 {
-  "ken-ai": {
-    "type": "http",
-    "url": "https://mcp.getken.ai/ken-ai/mcp"
+  "mcpServers": {
+    "ken-ai": {
+      "type": "http",
+      "url": "https://mcp.getken.ai/ken-ai/mcp"
+    }
   }
 }
