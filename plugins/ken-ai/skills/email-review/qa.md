@@ -90,7 +90,8 @@ Then, at the end, output the total score.
 
 #### 5. 3-6 Emails In sequence
 
-#### 6. Spell and grammar check
+#### 6. Spell and grammar check (favor-frame aware)
+   Names, companies, links, numbers, and offer claims must be perfect. Do NOT fail the copy for 1-2 deliberate casual imperfections per sequence (a lowercase start, a missing comma, shorthand like "btw"/"thats") - that's intended human voice, spec in `../email-copywriting/references/sound-human.md`. Fail only misplaced or excessive imperfections.
 
 ```
 

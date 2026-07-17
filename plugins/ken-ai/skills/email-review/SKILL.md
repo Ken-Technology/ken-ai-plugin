@@ -61,6 +61,13 @@ Scored against `gold-standard.md`:
 - [ ] **Concrete > abstract**: FLAG hype adjectives and abstract benefit language; every number must be real and specific.
 - [ ] **Shown, not claimed**: risk reversal as specific consequence beats "guarantee"; scarcity as a plain true reason beats "limited spots".
 
+#### One-on-One Favor Framing (REJECT marketing emails - HARD)
+The rendered email must read like one human typing a note to another to do them a favor - not a marketing email. Frame + tests in `../email-copywriting/references/sound-human.md`.
+- [ ] **The list test**: if the email would read the same sent to 500 people unchanged, REJECT - the static body must read like it was typed for this one reader.
+- [ ] **The favor test**: mentally delete every sentence about the sender's product/company; if nothing is left for the reader, REJECT. The email must hand the reader something - a free deliverable, a fix for a problem they have, information they'd want anyway.
+- [ ] **No feature/brochure framing**: REJECT feature lists and "we offer / our platform provides / our solution" framing. What THEY get in plain verbs; mechanism gets one clause at most.
+- [ ] **We/you balance**: FLAG any email where sender-focused sentences outnumber reader-focused ones.
+
 #### Sound Human / AI-Tells (REJECT if found)
 Full lexicon and structures in `../email-copywriting/references/sound-human.md`.
 - [ ] **No AI-tell vocabulary**: delve, leverage, streamline, seamless, robust, unlock, elevate, empower, transform, journey, landscape, game-changer, tailored solution, actionable insights...
@@ -68,6 +75,7 @@ Full lexicon and structures in `../email-copywriting/references/sound-human.md`.
 - [ ] **No AI-tell structures**: "It's not just X, it's Y" / "not only... but also"; tidy triads ("fast, reliable, and affordable"); three consecutive same-length sentences; "serves as"/"stands as"/"boasts" copula dodging; hedge chains; compliment-then-pitch seams.
 - [ ] **Passes the read-aloud test**: FLAG any phrase a real person would never say to the prospect's face.
 - [ ] **Human signals present**: contractions, varied sentence rhythm, plain first-person verbs; at most ONE personality flourish per email.
+- [ ] **Do NOT flag deliberate small imperfections** - a lowercase start, a missing comma, casual shorthand ("btw", "thats") at up to ~1 per email / ~2 per sequence is intended human roughness (spec in `sound-human.md`). Do NOT "correct" them in emails_v2.md. DO reject any imperfection in the prospect's name, their company, the client's company, links, numbers, or offer claims; FLAG scrambled-letter fake typos ("teh", "recieve") and more than ~2 imperfections per sequence.
 
 #### ICP Voice Match
 - [ ] **Voice Card exists** in emails.md `## Notes` (REJECT if missing) and is derived from client context, not generic.
@@ -179,6 +187,7 @@ Generate a structured review with:
 - Length & brevity: [per-email word counts; any email that fails the "30% shorter?" pass, with the tighter rewrite]
 - Spam-word budget: [per email: each spam word found as `word (tier)`, or "clean"]
 - One-breath test: [the offer sentence found in Email 1, or REJECT + compressed rewrite]
+- One-on-one favor check: [per email: does it pass the list test and favor test? any brochure/feature framing or we-heavy sentences]
 - AI-tell scan: [any lexicon words, dead phrases, or structures found, per email]
 - Voice Card match: [card present? copy in the ICP's language? any "never say" phrases used?]
 - Greeting check: [any follow-up missing a greeting (`Hey {firstName},` or bare `{firstName},`)]
@@ -192,7 +201,7 @@ Generate a structured review with:
 
 ### Task 7: Score Decision
 
-**Hard gate (overrides the score):** if ANY rule marked HARD or REJECT above is violated - a static body over 80 words (outside the one value-stack exception), a missing or weak offer CTA (including Email 1), a salesy follow-up ending ("Last note from me", "just following up", etc.), a `[bracket]` AI variable instead of `{{...}}`, `{sender_signature}`, a missing/malformed sender-name signature block, a NEVER-tier spam word, a blown spam budget (2+ HIGH or 3+ MEDIUM in one email, or any tiered word/`$`/`%` in a subject line), an Email 1 that fails the one-breath offer test, any AI-tell word or structure from `sound-human.md`, or a missing ICP Voice Card - the review **fails regardless of the numeric score**. Fix every HARD/REJECT violation (mechanically where possible: variable syntax, signature swap, trimming to the ceiling, swapping in the safe alternative from spam-words.md) and re-check before writing emails_v2.md.
+**Hard gate (overrides the score):** if ANY rule marked HARD or REJECT above is violated - a static body over 80 words (outside the one value-stack exception), a missing or weak offer CTA (including Email 1), a salesy follow-up ending ("Last note from me", "just following up", etc.), a `[bracket]` AI variable instead of `{{...}}`, `{sender_signature}`, a missing/malformed sender-name signature block, a NEVER-tier spam word, a blown spam budget (2+ HIGH or 3+ MEDIUM in one email, or any tiered word/`$`/`%` in a subject line), an Email 1 that fails the one-breath offer test, any AI-tell word or structure from `sound-human.md`, a failed list test or favor test (marketing-email / brochure framing), or a missing ICP Voice Card - the review **fails regardless of the numeric score**. Fix every HARD/REJECT violation (mechanically where possible: variable syntax, signature swap, trimming to the ceiling, swapping in the safe alternative from spam-words.md) and re-check before writing emails_v2.md.
 
 **If score >= 4.5 AND no HARD/REJECT violation remains:**
 - Apply all identified fixes to the email copy

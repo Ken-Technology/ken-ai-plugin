@@ -69,6 +69,7 @@ Authors write AI variables, lead variables, and sender-name variables **directly
 - [ ] Write initial email sequence following strategy blueprint, in the Voice Card's language
 - [ ] Insert AI variable placeholders where specified (e.g., `{{First Line}}`)
 - [ ] Create variants if A/B test defined - test the offer variable (metric, angle, guarantee), not wording
+- [ ] Run the list test + favor test on every email (one-on-one favor framing, `references/sound-human.md`) - reject your own draft if it reads like a marketing email
 - [ ] Run the compression test + spam-word budget count + AI-tell scan on every email before handing off
 
 ### Task 4: Output Final Copy
@@ -120,6 +121,13 @@ When sequence tests exist, the email-copywriting skill must produce variant emai
 
 ## Principles
 _The state of mind when you write_
+### The One-on-One Favor Mindset (READ FIRST)
+AI personalization renders every email as an individual message to one specific person - so write it as one. You are a human typing a short note to another human, because you found something that helps THEM.
+*   The posture is **doing them a favor, not asking for one** - you're handing them something free or fixing a problem they have. Write like the person who shows up with the thing, not the person who wants their time.
+*   A marketing email talks about the sender: features, "we do X", what the platform offers. A one-on-one note talks about the reader: their situation, what they're getting, what happens next. If most sentences start with "we", rewrite.
+*   **The list test:** if the exact email could go to 500 people unchanged and read the same, it's a marketing email. The static body is shared, but it must read like it was typed for this one reader.
+
+Full frame + tests in [`references/sound-human.md`](references/sound-human.md).
 ### Core Philosophy
 Contrary to what many people think, email copy is more about **what you say** than how you say it. Many focus on using or avoiding specific words, avoiding questions, or eliminating "passive language." But it's not about those rules - it's about:
 
@@ -196,6 +204,7 @@ The emails must read like a specific person typed them. Full AI-tell lexicon, ba
 - **Zero AI-tell vocabulary** (delve, leverage, streamline, seamless, robust, unlock, elevate, journey, landscape, game-changer, tailored solution...) and **zero dead cold-email phrases** ("I hope this email finds you well", "I came across", "I couldn't help but notice", "I was impressed by", "As a [title], you know...").
 - **No AI-tell structures:** no "It's not just X, it's Y", no tidy triads ("fast, reliable, and affordable"), no metronomic same-length sentences, no "serves as"/"boasts" copula dodging, no hedge chains.
 - **Do the human things:** contractions, jagged rhythm (a 3-word fragment next to a longer thought), plain first-person verbs ("I created", "we built"), one personality flourish per email max, and the read-aloud test - if you wouldn't say it to their face, delete it.
+- **Imperfection is allowed:** 1-2 small deliberate human imperfections per sequence (a lowercase start, a missing comma, casual shorthand like "btw"/"thats") - NEVER in names, companies, links, or numbers, and never scrambled-letter fake typos. Spec in `references/sound-human.md`. Don't polish the humanity out.
 
 ### Brevity & Punch (HARD - the #1 recurring failure)
 - **The default draft is always too long.** Operator feedback, repeatedly: even copy that went through the full review workflow still ships too long. Cut harder than feels natural - assume your first instinct is 30%+ over.

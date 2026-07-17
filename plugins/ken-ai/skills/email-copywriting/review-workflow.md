@@ -140,7 +140,7 @@ Use this checklist to evaluate email copy quality. Grade each criterion from 1 t
 3. **Length (HARD 80-word ceiling)** - Static body ≤80 words per email (one value-stack email may reach ~100 as a numbered list of real numbers); follow-ups ≤55
 4. **Mobile-Friendly** - Short lines, scannable, lots of whitespace
 5. **3-6 Emails** - In sequence
-6. **Spell and grammar check** - No typos
+6. **Spell and grammar check** - names, companies, links, numbers, and offer claims perfect; 1-2 deliberate casual imperfections per sequence are intended human voice (`references/sound-human.md`), not typos to fix
 
 ### Self-Review Questions
 

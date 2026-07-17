@@ -1,6 +1,12 @@
 ## Email Copywriting
 _How to write email copy_
 
+**0. The frame: a one-on-one favor, not a marketing email**
+
+*   AI personalization renders every email as an individual note to one person - write it as one human typing to another because you found something that helps them.
+*   You're doing them a favor: handing over something free or fixing a problem they have. Features and "we offer / our platform provides" framing are marketing-email tells - say what THEY get, in plain verbs.
+*   Full frame, tests, and the deliberate-imperfection spec in `references/sound-human.md`.
+
 **1. Value Proposition Compression (the core skill)**
 
 *   Write the offer as ONE plain sentence first: concrete deliverable + who it's for + what they get. "We'll send 3,000 personalized emails to your ideal clients on us." If you can't write that sentence, you don't understand the offer yet - go back to the research.
@@ -138,7 +144,7 @@ The body primarily provides supporting statements for the hook. If the hook is p
 *   Outcomes
 *   Bold claims
 *   Pain points
-*   Solutions, features, and benefits
+*   Solutions and outcomes (never a feature list - the mechanism gets one plain clause at most)
 *   Stories
 
 **Power of Direct Value Props:**
@@ -264,6 +270,7 @@ If body discusses offer, PS can add quick social proof - two different ideas tha
 ## What to avoid
 
 - Avoid all salesy and marketing language at all costs. 
+- Never write from the marketer's chair. If the email is a list of what "we" do or offer, it's a brochure - rewrite it as a note about what this one reader gets (the favor frame in `references/sound-human.md`).
 - Skip straight to the topic and to the best piece of information you have. Instead of "Quick follow-up - most advisors know retention beats acquisition", use "Retention beats acquisition".
 - Don't ever use Quick follow-up, Noticed that, Just wanted to share, and all other usual salesy language.
 - **In the last email, never announce it as a follow-up or last attempt.** Banned: "Last email", "Last note from me", "Just following up", "Following up", "Circling back", "Checking in", "Wanted to follow up", "Bumping this", "One last try". This rule keeps getting violated - email-review rejects on it. The final email opens on a real idea and closes on the offer CTA.
