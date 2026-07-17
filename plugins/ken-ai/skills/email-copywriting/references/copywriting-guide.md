@@ -1,4 +1,4 @@
-> **DEPRECATED - do not follow this file.** It is an older duplicate, referenced by no skill. The canonical copy rules live in `email_copywriting.md` and `SKILL.md` in this skill. In particular, the rules below are out of date: AI variables now use double braces `{{First Line}}` (not `[First Line]`); signatures use the `{sender_signature}` variable on every email (not a hand-written social-proof block); bodies have a hard ~80-word ceiling; every email's CTA asks for the real offer including Email 1; and final emails never use "Last note from me" / "just following up" endings.
+> **DEPRECATED - do not follow this file.** It is an older duplicate, referenced by no skill. The canonical copy rules live in `email_copywriting.md` and `SKILL.md` in this skill. In particular, the rules below are out of date: AI variables now use double braces `{{First Line}}` (not `[First Line]`); `{sender_signature}` is deprecated and forbidden; signatures now use `{sender_first_name} {sender_last_name}` plus a linked client company; bodies have a hard ~80-word ceiling; every email's CTA asks for the real offer including Email 1; and final emails never use "Last note from me" / "just following up" endings.
 
 ## Email Copywriting
 _How to write email copy_
@@ -200,111 +200,15 @@ Follow the CTA approach specified in the Campaign Strategy. If strategy says "re
 
 ### Signature
 
-#### Signature Strategy by Email Position
-
-**CRITICAL RULE:** Signature complexity should match email position in sequence:
-- **Email 1 (Initial Contact):** Use social proof signature to establish authority
-- **Emails 2-5+ (Follow-ups):** Use minimal signature with full name only
-
-**Signature Name Source:** Use the `{sender_signature}` platform variable (resolved per sending mailbox at send time). When a literal name is needed in copy, use the client's primary contact name from `{workspace}/research.md`, or ask the user.
-
----
-
-#### First Email: Social Proof Signatures
-
-Your first email signature should be semi-casual but include your biggest credibility marker. This instantly establishes authority without being pushy.
+**Current rule:** every email signs off with a two-line signature block using only `{sender_first_name}` and `{sender_last_name}` as sender variables. `{sender_signature}` is deprecated and must never be used in new campaign copy.
 
 **Formula:**
-```
-[Signoff]
-[First name] [Last Name]
-[Position] at [Company]
-[Biggest social proof/credibility marker]
+```markdown
+[Greeting - Best, Best regards, Cheers, etc.]
+{sender_first_name} {sender_last_name} - [title] at [Client company name](https://best-client-link.example)
 ```
 
-**Signoff Options:**
-*   Best,
-*   Cheers,
-*   Best regards,
-
-**Social Proof Examples:**
-
-*Exit/Revenue:*
-*   "$169M exit"
-*   "8-figure founder"
-*   "$50M ARR"
-
-*Client Results:*
-*   "273 companies scaled"
-*   "1,000+ clients served"
-*   "Generated $2.3M for SaaS companies"
-
-*Credibility Markers:*
-*   "Ex-Google"
-*   "YC W21"
-*   "Forbes 30 Under 30"
-
-*Industry Recognition:*
-*   "#1 Cold Email Agency"
-*   "Top 10 Marketing Expert - Inc"
-*   "TechCrunch Featured"
-
-**Complete Example:**
-```
-Cheers,
-Ryan Allis
-Founder of SaasRise
-$169M exit
-```
-
-**What to Avoid:**
-*   Long titles or multiple credentials
-*   Weak social proof ("5 years experience")
-*   Generic descriptions ("Marketing Expert")
-*   Multiple social proof points (pick your strongest ONE)
-
----
-
-#### Follow-up Emails: Minimal Signatures
-
-Follow-up emails should use simple signatures without social proof. Authority was established in Email 1 - repeating it feels salesy.
-
-**Formula:**
-```
-[Signoff]
-[Full Name]
-```
-
-**Signoff Selection by Audience:**
-Match the signoff formality to your ICP:
-
-| Audience Type | Recommended Signoffs |
-|---------------|---------------------|
-| Enterprise / C-Suite / Finance / Legal | Best regards, Best, |
-| Mid-market / Technical / SaaS | Best, Cheers, |
-| SMB / Startups / Creative | Cheers, Best, |
-
-**Examples:**
-```
-Best regards,
-Ryan Allis
-```
-
-```
-Best,
-Sarah Chen
-```
-
-```
-Cheers,
-Michael Torres
-```
-
-**Why minimal signatures work for follow-ups:**
-*   Maintains conversational tone appropriate to continued dialogue
-*   Avoids repetition of credibility already established
-*   Keeps focus on the email content
-*   Feels like continued conversation, not repeated pitch
+Use the client's best link as a markdown link on the company name so campaign-configuration converts it into a tracking link.
 
 ### PS Line
 #### The Power of PS
@@ -381,4 +285,3 @@ After reading strategy.md, identify the `funnel_type` field and apply the corres
 - Skip straight to the topic and to the best piece of information you have. Instead of "Quick follow-up - most advisors know retention beats acquisition", use "Retention beats acquisition".
 - Don't ever use Quick follow-up, Noticed that, Just wanted to share, and all other usual salesy language.
 - In the last email, never say "Last email", "Last note from me", etc.
-

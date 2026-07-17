@@ -246,6 +246,8 @@ Prompt names must be short, plain text with Title Case. No underscores, colons, 
 - Good: "First Line", "Subject Line", "PS Line"
 - Bad: "personalized_first_line", "campaign_name:company_context", "subject_line"
 
+**One prompt = one value per LEAD, not per email (HARD).** Ken generates a single value per prompt per lead; every email that references the same token renders the identical text. If the copy reuses `{{First Line}}` in Emails 1-3, the same opening sentence sends three times (the approval portal shows it filled on Email 1 and blank on later emails - blank means reused, not missing). Each email that needs its own opener gets its own distinct-named prompt: "First Line", "Bump First Line", "Nudge First Line". Reuse is correct only when the identical value is wanted on every step (`{{Subject Line}}` in every subject). If emails.md reuses a body token across emails, flag it back to email-copywriting instead of writing one shared prompt.
+
 Generate `prompts.md` with this structure:
 
 ```markdown

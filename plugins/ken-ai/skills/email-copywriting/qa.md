@@ -60,32 +60,17 @@ Then, at the end, output the total score.
 
 #### 5. Word Choice
 
-   **Completely avoid these spam words:**
-   * marketing
-   * investment
-   * finance
-   * return
-   * success
-   * chance
-   * for you
-   * outreach
-   * sales
-   * get
-   * offer
-   * free
-   * save money
-   * money
-   * guarantee
-   * promise
-   * ad
-   * buy
-   * income
-   * earn
+   **Spam words are tiered and budgeted** - the full policy lives in `references/spam-words.md`. Summary:
+   * NEVER tier ("free", "credit card", phishing vocabulary, scam cluster) = automatic fail
+   * HIGH tier (guarantee, discount, limited time, act now, click here, special offer...) = aim for zero; 2+ in one email = fail
+   * MEDIUM tier (cost, price, offer, deal, opportunity, ROI, marketing, sales, money, income, earn...) = max 1-2 per email
+   * Subject lines: zero tiered words, no `$`/`%`/stacked numbers
 
    **Additional restrictions:**
-   * Do not use dollar signs, percentage symbols, or write out those symbols
+   * `$`/`%` symbols: never in subject lines; in body, a single specific figure is fine, stacking figures with urgency/deal language is not
    * Avoid superlatives like "impressive," "fascinating," "revolutionary," "remarkable," "inspiring," "caught my attention," or "caught my eye"
-   * Do not use buzzwords
+   * No buzzwords, no AI-tell vocabulary or structures (`references/sound-human.md`)
+   * **No false offer claims** - verify every offer claim against the client's real offer
 
 ---
 
@@ -93,10 +78,11 @@ Then, at the end, output the total score.
 
 #### 1. Has Personalization Variables
 
-#### 2. Has Signature (Variable)
+#### 2. Has Signature (sender first + last name, linked client company)
+   Every email has the two-line signature block. Reject `{sender_signature}`. Required shape: signoff line, then `{sender_first_name} {sender_last_name} - [title] at [Client Company](best client link)`.
 
-#### 3. 50-150 Words Length
-   Per email
+#### 3. Length (HARD ceiling 80 words)
+   Static body per email is at most 80 words (prose + CTA, excluding the greeting, the `{{...}}` AI-variable lines, and the signature block). Over 80 = fail, except one value-stack email per sequence which may reach ~100 words as a numbered list of real numbers. Follow-ups target under 55.
 
 #### 4. Mobile-Friendly
    Short lines, scannable format, lots of spaces

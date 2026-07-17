@@ -22,6 +22,10 @@ Review email copy against critical copy rules, QA checklists, and client prefere
 ### Task 2: Load Review Reference Material
 - [ ] Read `qa.md` from this skill folder - QA checklists and scoring criteria
 - [ ] Read `extra_info.md` from this skill folder - Exercises, tips, common mistakes
+- [ ] Read `../email-copywriting/references/gold-standard.md` - the 9/10 bar the copy is scored against
+- [ ] Read `../email-copywriting/references/spam-words.md` - tiered spam-word policy (NEVER/HIGH/MEDIUM + budget rule)
+- [ ] Read `../email-copywriting/references/sound-human.md` - AI-tell lexicon/structures and the Voice Card spec
+- [ ] Find the ICP Voice Card in the `## Notes` section of `emails.md` - FLAG its absence as a violation
 
 ### Task 3: Review Against Critical Copy Rules Checklist
 
@@ -39,21 +43,48 @@ Review email copy against critical copy rules, QA checklists, and client prefere
 - [ ] No typical sales clichés that scream "cold email"
 - [ ] **Final-email salesy endings (REJECT)** - the last email must NOT announce itself as a follow-up or last attempt. REJECT "Last note from me", "Last email", "Just following up", "Following up", "Circling back", "Checking in", "Wanted to follow up", "Bumping this", "One last try". This is the salesy ending operators flag most - check the final email specifically, every time.
 
-#### Spam Words & False Claims (REJECT if found)
-- [ ] **No "free"** anywhere in body copy - hurts deliverability (reframe: "trial", "no-cost look")
-- [ ] **No "credit card"** anywhere in body copy
-- [ ] **No false/unverifiable offer claims** - e.g. "no credit card" when a card is actually required, or implying a trial is unlimited when it isn't. Cross-check every offer claim against `{workspace}/research.md`; FLAG anything you cannot verify.
-- [ ] Other spam words from `qa.md` (marketing, investment, money, guarantee, etc.) avoided
+#### Spam Words - Budgeted (count and report per email - HARD)
+Policy and full tiers in `../email-copywriting/references/spam-words.md`.
+- [ ] **Count every spam word per email and report `word (tier)` in the review output.**
+- [ ] **NEVER tier = REJECT**: "free", "credit card", phishing vocabulary (verify your account, action required...), fake `Re:`/`Fwd:`, scam cluster (winner, no obligation, risk-free, 100% guaranteed...).
+- [ ] **HIGH tier**: more than one HIGH word in an email = REJECT; even one = FLAG with the safe alternative from the reference table.
+- [ ] **MEDIUM tier**: more than 2 in one email = REJECT; two from the same cluster in one sentence = FLAG.
+- [ ] **Subject lines**: any tiered word, `$`, `%`, or stacked numbers = REJECT.
+- [ ] **Structural triggers**: ALL CAPS, more than one `!`, 2+ links, URL shorteners, attachments = REJECT.
+- [ ] **No false/unverifiable offer claims** - e.g. "no card needed" when a card is actually required, or implying a trial is unlimited when it isn't. Cross-check every offer claim against `{workspace}/research.md`; FLAG anything you cannot verify.
+
+#### Value-Prop Compression (the 9/10 bar - HARD)
+Scored against `gold-standard.md`:
+- [ ] **The one-breath test**: Email 1 must contain a single plain sentence carrying the whole offer (deliverable + who + what they get). If the offer is smeared across three sentences, REJECT with the compressed rewrite.
+- [ ] **Repeatability**: after one skim, could the prospect repeat the deal to a colleague in their own words? If they'd say "some [category] thing", the value prop failed - show a rewrite.
+- [ ] **Dead-sentence scan**: delete each sentence mentally; FLAG every sentence whose removal changes nothing (industry observations, restated pain, throat-clearing).
+- [ ] **Concrete > abstract**: FLAG hype adjectives and abstract benefit language; every number must be real and specific.
+- [ ] **Shown, not claimed**: risk reversal as specific consequence beats "guarantee"; scarcity as a plain true reason beats "limited spots".
+
+#### Sound Human / AI-Tells (REJECT if found)
+Full lexicon and structures in `../email-copywriting/references/sound-human.md`.
+- [ ] **No AI-tell vocabulary**: delve, leverage, streamline, seamless, robust, unlock, elevate, empower, transform, journey, landscape, game-changer, tailored solution, actionable insights...
+- [ ] **No dead cold-email phrases**: "I hope this email finds you well", "I came across", "I couldn't help but notice", "I was impressed by", "Congratulations on your recent funding" (as formula), "As a [title], you know..."
+- [ ] **No AI-tell structures**: "It's not just X, it's Y" / "not only... but also"; tidy triads ("fast, reliable, and affordable"); three consecutive same-length sentences; "serves as"/"stands as"/"boasts" copula dodging; hedge chains; compliment-then-pitch seams.
+- [ ] **Passes the read-aloud test**: FLAG any phrase a real person would never say to the prospect's face.
+- [ ] **Human signals present**: contractions, varied sentence rhythm, plain first-person verbs; at most ONE personality flourish per email.
+
+#### ICP Voice Match
+- [ ] **Voice Card exists** in emails.md `## Notes` (REJECT if missing) and is derived from client context, not generic.
+- [ ] **Copy matches the card**: vocabulary the ICP uses daily, none of the card's "never say" phrases, formality level consistent with how the ICP talks to peers.
+- [ ] **Per-segment re-voicing**: if this segment's copy differs from a sibling segment only by an industry-noun swap, FLAG it - the offer must be re-framed in this ICP's terms, not re-labeled.
+- [ ] **Proof type matches the ICP**: the evidence offered is the kind this reader believes (peer names, benchmarks, revenue math - per the card).
 
 #### Greetings (Check EVERY email, including follow-ups)
-- [ ] **Every email opens with a greeting** - `Hey {firstName},` followed by an empty line
+- [ ] **Every email opens with a greeting** followed by an empty line. Email 1: `Hey {firstName},`. Follow-ups: `Hey {firstName},` OR the bare `{firstName},` (both valid - the bare form reads like a continuing conversation; do NOT flag it)
 - [ ] **FLAG follow-ups that jump straight into the body with no greeting** - threading off Email 1 does not excuse a missing greeting
 
 #### Variables & Signature (Format - REJECT)
 - [ ] **AI variables use double braces `{{Title Case}}`** - REJECT any `[square bracket]` AI variable (`[First Line]`, `[PS Line]`, `[Subject Line]`). The double-brace form is what renders correctly in the app on push.
-- [ ] **Every email signs off with `{sender_signature}`** - REJECT any hand-written sign-off (a typed closer + name + title + tagline). The signature must be the `{sender_signature}` variable on every email.
+- [ ] **One AI variable = one value per LEAD, not per email - REJECT unintended reuse.** The same body token in multiple emails renders the IDENTICAL text in each (e.g. `{{First Line}}` in Emails 1-3 = the same sentence sent three times). Each email's opener must be a distinct-named variable (`{{First Line}}`, `{{Bump First Line}}`, `{{Nudge First Line}}`) with a matching H3 in `prompts.md`. `{{Subject Line}}` reused in every subject is intentional and correct - do not flag it. Diagnostic: in the approval portal, a highlighted variable filled on Email 1 but blank on later emails means REUSED, not missing.
+- [ ] **Every email signs off with the sender-name signature block** - REJECT `{sender_signature}` or any signature missing `{sender_first_name} {sender_last_name} - [title] at [linked Client Company]`.
 - [ ] **Lead variables use `{camelCase}`** - `{firstName}`, not `{first_name}`.
-- [ ] PS variable (`{{PS Line}}` / `{{Final PS Line}}`) sits on its own line after `{sender_signature}`.
+- [ ] PS variable (`{{PS Line}}` / `{{Final PS Line}}`) sits on its own line after the signature block.
 
 #### Formatting Requirements
 - [ ] **Short paragraphs only**: 1-3 sentences max per paragraph
@@ -61,7 +92,7 @@ Review email copy against critical copy rules, QA checklists, and client prefere
 - [ ] **Never ALL CAPS** for emphasis (use structure or italics only)
 
 #### Brevity & Punch (HARD - cold emails are almost always too long; the #1 operator complaint)
-- [ ] **Count the static body words of every email** (body = prose + CTA, excluding the `Hey {firstName},` greeting, the `{{...}}` AI-variable lines, and `{sender_signature}`). **Hard ceiling 80 words. REJECT any email over 80** - this is a fail, not a flag. Follow-ups should land well under (target ≤55). Report the per-email count.
+- [ ] **Count the static body words of every email** (body = prose + CTA, excluding the greeting, the `{{...}}` AI-variable lines, and the signature block; a static PS is also excluded but capped at ~35 words in at most 1-2 emails). **Hard ceiling 80 words. REJECT any email over 80** - this is a fail, not a flag - EXCEPT one value-stack email per sequence, which may reach ~100 words if the overage is a numbered list where every line carries a real number (gold-standard.md Email 2). Follow-ups should land well under (target ≤55; closes 35-45). Report the per-email count.
 - [ ] **Run the "cut at least 30%" pass** on every email - if it can be cut ~30% without losing meaning, it is bloated: REJECT and show the tighter version.
 - [ ] **Prefer short sentences** - flag long, multi-clause sentences.
 - [ ] **Punchy, not staccato** - flag jittery one-sentence-per-line fragments ("It just runs."); copy should keep full thoughts grouped into 1-2 short paragraphs.
@@ -146,7 +177,11 @@ Generate a structured review with:
 - Tightening opportunities: [lines that can lose words]
 - Awkward phrasing: [flagged from read aloud test]
 - Length & brevity: [per-email word counts; any email that fails the "30% shorter?" pass, with the tighter rewrite]
-- Greeting check: [any follow-up missing a `Hey {firstName},` greeting]
+- Spam-word budget: [per email: each spam word found as `word (tier)`, or "clean"]
+- One-breath test: [the offer sentence found in Email 1, or REJECT + compressed rewrite]
+- AI-tell scan: [any lexicon words, dead phrases, or structures found, per email]
+- Voice Card match: [card present? copy in the ICP's language? any "never say" phrases used?]
+- Greeting check: [any follow-up missing a greeting (`Hey {firstName},` or bare `{firstName},`)]
 - First-line bridge: [any email where the body's first sentence jumps away from the personalized `{{First Line}}`]
 
 ### Priority Improvements
@@ -157,7 +192,7 @@ Generate a structured review with:
 
 ### Task 7: Score Decision
 
-**Hard gate (overrides the score):** if ANY rule marked HARD or REJECT above is violated - a static body over 80 words, a missing or weak offer CTA (including Email 1), a salesy follow-up ending ("Last note from me", "just following up", etc.), a `[bracket]` AI variable instead of `{{...}}`, or a hand-written signature instead of `{sender_signature}` - the review **fails regardless of the numeric score**. Fix every HARD/REJECT violation (mechanically where possible: variable syntax, signature swap, trimming to the ceiling) and re-check before writing emails_v2.md.
+**Hard gate (overrides the score):** if ANY rule marked HARD or REJECT above is violated - a static body over 80 words (outside the one value-stack exception), a missing or weak offer CTA (including Email 1), a salesy follow-up ending ("Last note from me", "just following up", etc.), a `[bracket]` AI variable instead of `{{...}}`, `{sender_signature}`, a missing/malformed sender-name signature block, a NEVER-tier spam word, a blown spam budget (2+ HIGH or 3+ MEDIUM in one email, or any tiered word/`$`/`%` in a subject line), an Email 1 that fails the one-breath offer test, any AI-tell word or structure from `sound-human.md`, or a missing ICP Voice Card - the review **fails regardless of the numeric score**. Fix every HARD/REJECT violation (mechanically where possible: variable syntax, signature swap, trimming to the ceiling, swapping in the safe alternative from spam-words.md) and re-check before writing emails_v2.md.
 
 **If score >= 4.5 AND no HARD/REJECT violation remains:**
 - Apply all identified fixes to the email copy

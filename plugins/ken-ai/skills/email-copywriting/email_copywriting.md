@@ -1,14 +1,13 @@
 ## Email Copywriting
 _How to write email copy_
 
-**1. Value Proposition Expansion**
+**1. Value Proposition Compression (the core skill)**
 
-*   Start with a clear value proposition
-*   Expand based on that foundation
-*   Ask: What angles can I put on this?
-*   What case studies support this?
-*   What social proof building blocks can I use?
-*   Build outward from the core value
+*   Write the offer as ONE plain sentence first: concrete deliverable + who it's for + what they get. "We'll send 3,000 personalized emails to your ideal clients on us." If you can't write that sentence, you don't understand the offer yet - go back to the research.
+*   That sentence is the spine of Email 1. Everything else in the sequence supports it: proof, risk reversal, close.
+*   Explore angles, case studies, and social proof building blocks - then compress each back to its fewest words. The best value prop and use case in as few words as possible IS the job.
+*   Concrete nouns and numbers over adjectives, mechanism in verbs ("we write the copy, build the list, handle everything"), objections killed in one line ("You don't need to pay anything, just sign up if you want it").
+*   Study `references/gold-standard.md` - the two operator-written campaigns are the bar.
 
 **2. Campaign Strategy Driven (When Strategy Provided)**
 
@@ -211,109 +210,28 @@ Follow the CTA approach specified in the Campaign Strategy. If strategy says "re
 
 ### Signature
 
-**HARD RULE: every email signs off with the single token `{sender_signature}`** on its own line, in place of the closer + name + title. Do not hand-type "Best,", a name, a title, or a tagline as a literal signature in the body. The sending inbox owns its signature and injects it through `{sender_signature}`, which keeps sends consistent across inboxes and lets sender identity vary at the inbox layer. Use it on **every** email, not just the first.
-
-Placement: `{sender_signature}` goes where the sign-off was, after the CTA. A PS variable (`{{PS Line}}` / `{{Final PS Line}}`) goes on its own line **after** `{sender_signature}`.
-
-Because the same inbox signature renders on every email, the older position-based strategy (heavy social-proof signature on Email 1, minimal on follow-ups) no longer applies. Keep the inbox signature clean and consistent, and put any credibility in the **body**, where it can vary by email. The formulas below describe what a good **inbox signature** should contain (configured once per inbox) - they are not something you paste into each email body.
-
-#### What a good inbox signature contains
-
----
-
-If the inbox signature includes a credential, keep it semi-casual with one biggest credibility marker. This establishes authority without being pushy.
+**HARD RULE: every email signs off with a two-line signature block using only `{sender_first_name}` and `{sender_last_name}` as sender variables.** `{sender_signature}` is deprecated and must never be used in new campaign copy.
 
 **Formula:**
-```
-[Signoff]
-[First name] [Last Name]
-[Position] at [Company]
-[Biggest social proof/credibility marker]
+```markdown
+[Greeting - Best, Best regards, Cheers, etc.]
+{sender_first_name} {sender_last_name} - [title] at [Client company name](https://best-client-link.example)
 ```
 
-**Signoff Options:**
-*   Best,
-*   Cheers,
-*   Best regards,
+The title, client company name, and link are literal campaign/client values from context, not sender variables. Use the client's best link as a markdown link on the company name so campaign-configuration converts it into a tracking link.
 
-**Social Proof Examples:**
-
-*Exit/Revenue:*
-*   "$169M exit"
-*   "8-figure founder"
-*   "$50M ARR"
-
-*Client Results:*
-*   "273 companies scaled"
-*   "1,000+ clients served"
-*   "Generated $2.3M for SaaS companies"
-
-*Credibility Markers:*
-*   "Ex-Google"
-*   "YC W21"
-*   "Forbes 30 Under 30"
-
-*Industry Recognition:*
-*   "#1 Cold Email Agency"
-*   "Top 10 Marketing Expert - Inc"
-*   "TechCrunch Featured"
-
-**Complete Example:**
-```
+**Example:**
+```markdown
 Cheers,
-Ryan Allis
-Founder of SaasRise
-$169M exit
+{sender_first_name} {sender_last_name} - CEO at [Acme](https://acme.com)
 ```
 
-**What to Avoid:**
-*   Long titles or multiple credentials
-*   Weak social proof ("5 years experience")
-*   Generic descriptions ("Marketing Expert")
-*   Multiple social proof points (pick your strongest ONE)
+**Placement:** the signature block goes after the CTA. A PS variable (`{{PS Line}}` / `{{Final PS Line}}`) goes on its own line **after** the signature block.
 
----
-
-#### Keep it minimal
-
-A clean inbox signature beats a busy one. One credential at most. Authority is better carried in the body than repeated under every email.
-
-**Formula:**
-```
-[Signoff]
-[Full Name]
-```
-
-**Signoff Selection by Audience:**
-Match the signoff formality to your ICP:
-
-| Audience Type | Recommended Signoffs |
-|---------------|---------------------|
-| Enterprise / C-Suite / Finance / Legal | Best regards, Best, |
-| Mid-market / Technical / SaaS | Best, Cheers, |
-| SMB / Startups / Creative | Cheers, Best, |
-
-**Examples:**
-```
-Best regards,
-Ryan Allis
-```
-
-```
-Best,
-Sarah Chen
-```
-
-```
-Cheers,
-Michael Torres
-```
-
-**Why minimal signatures work for follow-ups:**
-*   Maintains conversational tone appropriate to continued dialogue
-*   Avoids repetition of credibility already established
-*   Keeps focus on the email content
-*   Feels like continued conversation, not repeated pitch
+**What to avoid:**
+*   `{sender_signature}` or any other sender variable besides first and last name
+*   Extra social-proof lines, taglines, phone numbers, or multiple links
+*   Different signature complexity by email position
 
 ### PS Line
 #### The Power of PS
@@ -349,7 +267,6 @@ If body discusses offer, PS can add quick social proof - two different ideas tha
 - Skip straight to the topic and to the best piece of information you have. Instead of "Quick follow-up - most advisors know retention beats acquisition", use "Retention beats acquisition".
 - Don't ever use Quick follow-up, Noticed that, Just wanted to share, and all other usual salesy language.
 - **In the last email, never announce it as a follow-up or last attempt.** Banned: "Last email", "Last note from me", "Just following up", "Following up", "Circling back", "Checking in", "Wanted to follow up", "Bumping this", "One last try". This rule keeps getting violated - email-review rejects on it. The final email opens on a real idea and closes on the offer CTA.
-- **Never use the words "free" or "credit card"** in body copy - both hurt deliverability. Reframe ("trial" not "free trial").
-- **Never make a false offer claim** - e.g. don't write "no credit card" if a card is actually required. Every claim must match the client's real offer.
-- The full spam-word list (marketing, investment, finance, return, success, free, money, guarantee, etc.) lives in `email-review/qa.md`. Avoid those words while drafting, not just at review time.
-
+- **Spam words are budgeted, not vibes**: the tiered policy (NEVER / HIGH / MEDIUM, max 1-2 MEDIUM per email, subject lines fully clean) plus safe alternatives lives in `references/spam-words.md`. "free" and "credit card" are hard-banned. Apply it while drafting, not just at review time.
+- **Never make a false offer claim** - e.g. don't write "no card needed" if a card is actually required. Every claim must match the client's real offer.
+- **No AI-tells**: the lexicon (delve, leverage, seamless, "I hope this email finds you well"...), the structures ("It's not just X, it's Y", tidy triads, metronomic sentences), and the human-voice techniques live in `references/sound-human.md`. Draft in the ICP's language per the Voice Card, and read every email aloud before handing it off.
