@@ -7,21 +7,27 @@ Lead variables are auto-resolved from contact data when emails are sent. Use the
 | Type | Syntax | Example | Source |
 |------|--------|---------|--------|
 | Lead variable | `{variableName}` (single braces, camelCase) | `{firstName}`, `{company}` | Contact data |
-| System variable | `{snake_case}` (single braces) | `{sender_signature}` | Sending inbox / backend |
+| Sender variable | `{sender_snake_case}` (single braces) | `{sender_first_name}` | Sending inbox / backend |
 | AI variable | `{{Variable Name}}` (double braces, Title Case) | `{{First Line}}`, `{{PS Line}}` | AI personalization prompts |
 | Tracking link | `{{tracking_link:ID}}` | `{{tracking_link:116}}` | Redirect links |
 
-## System Variables
+## Sender Variables
 
-System (sender) variables resolve to the **sending mailbox**, not the contact - EmailBison rotates inboxes
-at send time, so these are filled per-sender at launch. Single braces, snake_case (canonical). Legacy
-double-brace `{{sender_*}}` tokens are still accepted by the backend but don't author with them.
+Sender variables resolve to the **sending mailbox**, not the contact - EmailBison rotates inboxes
+at send time, so these are filled per-sender at launch. Single braces, snake_case (canonical).
+Only `{sender_first_name}` and `{sender_last_name}` are allowed in actual campaign copy.
 
 | Variable | Syntax | Description |
 |----------|--------|-------------|
-| sender_signature | `{sender_signature}` | Injects the sending inbox's configured signature block. **Use it on every email in place of a hand-written sign-off** (closer + name + title). Passes through verbatim - no prompt, not cross-referenced. |
-| sender_first_name | `{sender_first_name}` | The sending mailbox's first name. Use when you want to reference the sender by name in the body (e.g. an intro or sign-off line) without hardcoding it. |
-| sender_last_name | `{sender_last_name}` | The sending mailbox's last name. Rarely needed on its own - `{sender_signature}` already carries the full sign-off. |
+| sender_first_name | `{sender_first_name}` | The sending mailbox's first name. Required in the signature block. |
+| sender_last_name | `{sender_last_name}` | The sending mailbox's last name. Required in the signature block. |
+
+`{sender_signature}` is deprecated and forbidden in new campaign copy. Use the explicit signature formula instead:
+
+```markdown
+Best,
+{sender_first_name} {sender_last_name} - Founder at [Client Company](https://best-client-link.example)
+```
 
 ## Common Mistakes
 

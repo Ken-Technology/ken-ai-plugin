@@ -121,21 +121,23 @@ Use this checklist to evaluate email copy quality. Grade each criterion from 1 t
 
 #### Word Choice
 
-**Never use these spam trigger words:**
-- marketing, investment, finance, return, success, chance
-- outreach, sales, get, offer, free, save money, money
-- guarantee, promise, ad, buy, income, earn, for you
+**Spam words are tiered and budgeted** (full policy: `references/spam-words.md`):
+- NEVER tier ("free", "credit card", phishing vocabulary, scam cluster) = automatic fail
+- HIGH tier (guarantee, discount, limited time, act now, click here, special offer...) = aim for zero; 2+ in one email = fail
+- MEDIUM tier (cost, price, offer, deal, opportunity, ROI, marketing, sales, money, income, earn...) = max 1-2 per email
+- Subject lines: zero tiered words, no `$`/`%`/stacked numbers
+- Count and report spam words per email as `word (tier)`
 
 **Also avoid:**
-- Dollar signs or percentage symbols
+- `$`/`%` in subject lines (single specific body figures are fine; stacked figures + urgency are not)
 - Superlatives: "impressive," "fascinating," "revolutionary," "remarkable," "caught my attention"
-- Buzzwords
+- Buzzwords, AI-tell vocabulary and structures (`references/sound-human.md`)
 
 #### Email Formatting
 
 1. **Has Personalization Variables** - AI variables present
 2. **Has Signature Variable** - Proper signature handling
-3. **50-150 Words Length** - Per email
+3. **Length (HARD 80-word ceiling)** - Static body ≤80 words per email (one value-stack email may reach ~100 as a numbered list of real numbers); follow-ups ≤55
 4. **Mobile-Friendly** - Short lines, scannable, lots of whitespace
 5. **3-6 Emails** - In sequence
 6. **Spell and grammar check** - No typos

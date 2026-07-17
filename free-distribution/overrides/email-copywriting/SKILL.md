@@ -42,6 +42,7 @@ Authors write AI variables, lead variables, and the signature variable **directl
 **Rules:**
 - **AI variables use double braces `{{Title Case}}`** - write them in this form so personalization tools and LLMs resolve them correctly. Use `{{Subject Line}}`, `{{First Line}}`, `{{PS Line}}`, `{{Final PS Line}}`. Never `{{first_line}}`, `{{Subject line}}`, or alternate spellings. The legacy `[Title Case]` square-bracket form still often auto-converts so old files keep working, but do not author new variables that way.
 - Lead variables use camelCase: `{firstName}`, `{company}`, `{title}`. Never `{first_name}` or `{company_name}`.
+- **One AI variable = one value per LEAD, not one per email.** Personalization tooling generates a single value per prompt per lead; wherever you place that token, the identical text renders. Reusing `{{First Line}}` in Emails 1-3 means the same opening sentence sends three times. Give each email its own distinct-named opener - `{{First Line}}`, `{{Bump First Line}}`, `{{Nudge First Line}}` - each with its own H3 in `prompts.md`. Reuse on purpose is fine ONLY when you want the identical value on every step (`{{Subject Line}}` in every subject is correct and expected).
 - **Signatures use `{sender_signature}`** on every email - see the Signature rule. Never hand-write the closer, name, and title as a literal signature. `{sender_first_name}` and `{sender_last_name}` are also available if you need to name the sender inside the body (they resolve to the sending mailbox at launch). Full list in [`references/lead-variables.md`](references/lead-variables.md).
 - Links: write raw transparent URLs or markdown links. Never write `{{tracking_link:ID}}` or any tracking placeholder in local copy.
 
@@ -54,6 +55,8 @@ Authors write AI variables, lead variables, and the signature variable **directl
 - [ ] Read `{segment_folder}/strategy.md` (if workflow mode) - Email sequence blueprint
 - [ ] Read `{workspace}/notes.md` (if exists) - Client-specific preferences
 - [ ] Read `references/lead-variables.md` - Correct lead variable names and syntax
+- [ ] Read `references/gold-standard.md` - the 9/10 bar and the 12 patterns
+- [ ] Skim `references/spam-words.md` (tiers + alternatives) and `references/sound-human.md` (AI-tells + voice card spec)
 
 ### Task 2: Check for A/B Tests
 - [ ] Search strategy.md for `## Sequence Tests` section
@@ -61,9 +64,12 @@ Authors write AI variables, lead variables, and the signature variable **directl
 
 ### Task 3: Generate Draft Email Copy
 - [ ] Read `email_copywriting.md` for tactical guidance
-- [ ] Write initial email sequence following strategy blueprint
+- [ ] Write the offer as ONE plain sentence (deliverable + who + what they get) - this is the spine of Email 1; if it can't be written, return to research
+- [ ] Write the 6-line ICP Voice Card (spec in `references/sound-human.md`) from client context + segment definition
+- [ ] Write initial email sequence following strategy blueprint, in the Voice Card's language
 - [ ] Insert AI variable placeholders where specified (e.g., `{{First Line}}`)
-- [ ] Create variants if A/B test defined
+- [ ] Create variants if A/B test defined - test the offer variable (metric, angle, guarantee), not wording
+- [ ] Run the compression test + spam-word budget count + AI-tell scan on every email before handing off
 
 ### Task 4: Output Final Copy
 - [ ] Write `emails.md` to campaign folder (workflow mode) OR return inline (standalone)
@@ -146,6 +152,18 @@ In your copy, your main job is to determine which combination of these 4 will wo
 
 These rules are **non-negotiable** and must be followed in every email sequence.
 
+### The 9/10 Standard (READ FIRST)
+
+The default AI draft is a 6-7/10. The gap to 9-10/10 is closed by compression, not polish. Read [`references/gold-standard.md`](references/gold-standard.md) - two operator-written exemplar campaigns with the 12 patterns extracted - before drafting anything.
+
+The core discipline: **lay out the best possible value proposition and use case in as few words as possible.**
+
+- **The offer fits in one breath.** Before drafting, write the client's offer as ONE plain sentence: concrete deliverable + who it's for + what they get ("We'll send 3,000 personalized emails to your ideal clients on us"). If you can't, go back to the research - the email isn't ready. That sentence IS the email's spine; everything else supports it.
+- **Concrete nouns and numbers do the selling.** Every adjective must carry information ("qualified", "personalized") - zero hype adjectives, zero abstract benefit language.
+- **Mechanism in verbs:** "We write the copy, build the list, handle everything" - never "end-to-end done-for-you solution".
+- **The compression test on every draft:** could the prospect repeat the offer to a colleague after one skim? Delete each sentence and check what breaks; anything whose removal changes nothing is dead weight.
+- **Show, don't claim.** Risk reversal is a specific consequence ("I'll send you a bottle of TOST Rose"), not the word "guarantee". Scarcity is a plain true reason ("each one takes real time from our team"), not "limited spots".
+
 ### Transitions (Smooth First-Line Bridge - CRITICAL)
 - **Never have abrupt transitions** from personalized first line to body content. This is a top failure mode.
 - When an email opens with an AI-personalized `{{First Line}}`, the first sentence of static body **MUST continue that thought**. Never jump from a personalized line straight into a generic statement like "Scaling a SaaS company..." - that abrupt jump reads like two unrelated emails stitched together.
@@ -153,18 +171,36 @@ These rules are **non-negotiable** and must be followed in every email sequence.
 - Add transitional context or ensure the first line topic connects to the body.
 
 ### Greetings (Every Email)
-- **Every email in the sequence, including follow-ups, MUST open with a greeting** - `Hey {firstName},`
+- **Every email in the sequence, including follow-ups, MUST open with a greeting.** Email 1 opens `Hey {firstName},`. Follow-ups in the same thread may use the full `Hey {firstName},` or the bare `{firstName},` - the bare form reads like a real person continuing a conversation (see gold-standard.md pattern 12).
 - Follow-ups that jump straight into the body with no greeting are wrong, even though they thread off Email 1.
 - The greeting is always followed by an empty line, then the `{{First Line}}` or body.
 
-### Spam Words & False Claims
-- **Never use the words "free" or "credit card" in body copy.** Both hurt deliverability. Reframe: instead of "free trial" use "trial" or "no-cost look"; instead of "no credit card required" just describe how fast they can start.
-- **Never make an offer claim that is not true.** If a card is actually required, do not say "no credit card." If a trial has limits, do not imply it is unlimited. Every claim must be verifiable against the client's actual offer in `{workspace}/research.md`.
-- See `email_copywriting.md` for the full spam-word list inherited from QA.
+### Spam Words & False Claims (Budgeted - HARD)
+The full tiered list, structural triggers, and safe-alternatives table live in [`references/spam-words.md`](references/spam-words.md). Consult it while drafting, not just at review. The budget rule:
+- **NEVER tier = zero occurrences**: "free", "credit card", phishing vocabulary (verify your account, action required...), fake `Re:`/`Fwd:`, and the scam cluster (winner, no obligation, risk-free, 100% guaranteed...).
+- **HIGH tier = aim for zero** (guarantee, discount, limited time, act now, click here, special offer...): one HIGH word spends the email's entire spam budget.
+- **MEDIUM tier = max 1-2 per email total** (cost, price, offer, deal, opportunity, ROI...): remove every one with a natural alternative; never two from the same cluster in one sentence.
+- **Subject lines: zero spam words, no `$`/`%`/stacked numbers** - subjects are weighted heavier than body.
+- **Never make an offer claim that is not true.** If a card is actually required, do not say "no card needed." If a trial has limits, do not imply it is unlimited. Every claim must be verifiable against the client's actual offer in `{workspace}/research.md`.
+
+### Voice: Write in the ICP's Language (MANDATORY)
+Every ICP has its own language - a platform engineer, a healthcare administrator, and an agency founder do not read the same email. Adjust tone of voice to the ICP and the client persona:
+- **Write a 6-line ICP Voice Card before drafting** (spec in [`references/sound-human.md`](references/sound-human.md)): who exactly reads it, 5-8 terms they use daily, 3-5 phrases that mark you as an outsider, their peer-to-peer formality level, the sender persona, and which proof they believe.
+- Derive it from `{workspace}/research.md` and the segment definition. A client founder voice profile in notes/memory overrides the generic persona.
+- **Copy the finished Voice Card into the `## Notes` terminator section of `emails.md`** so the review pass can score the copy against it.
+- Re-voice per segment: if two segments' emails differ only by an industry-noun swap, the voice card wasn't used.
+
+### Sound Human (HARD)
+The emails must read like a specific person typed them. Full AI-tell lexicon, banned structures, and human techniques in [`references/sound-human.md`](references/sound-human.md). Non-negotiables while drafting:
+- **Zero AI-tell vocabulary** (delve, leverage, streamline, seamless, robust, unlock, elevate, journey, landscape, game-changer, tailored solution...) and **zero dead cold-email phrases** ("I hope this email finds you well", "I came across", "I couldn't help but notice", "I was impressed by", "As a [title], you know...").
+- **No AI-tell structures:** no "It's not just X, it's Y", no tidy triads ("fast, reliable, and affordable"), no metronomic same-length sentences, no "serves as"/"boasts" copula dodging, no hedge chains.
+- **Do the human things:** contractions, jagged rhythm (a 3-word fragment next to a longer thought), plain first-person verbs ("I created", "we built"), one personality flourish per email max, and the read-aloud test - if you wouldn't say it to their face, delete it.
 
 ### Brevity & Punch (HARD - the #1 recurring failure)
 - **The default draft is always too long.** Operator feedback, repeatedly: even copy that went through the full review workflow still ships too long. Cut harder than feels natural - assume your first instinct is 30%+ over.
-- **Hard ceiling: each email's static body is ≤80 words** (body = prose + CTA, not counting the greeting, the AI-variable lines, or `{sender_signature}`). Tighter is better. The first email may sit near the ceiling because it carries the offer; follow-ups should land well under it (aim ≤55 words).
+- **Hard ceiling: each email's static body is ≤80 words** (body = prose + CTA, not counting the greeting, the AI-variable lines, or `{sender_signature}`). Tighter is better. The first email may sit near the ceiling because it carries the offer (gold standard: ~72 words); follow-ups should land well under it (aim ≤55; closes run 35-45).
+- **Value-stack exception:** ONE email per sequence may reach ~100 words IF the overage is a numbered value/proof stack where every line carries a real number (see gold-standard.md Email 2). Prose never gets that budget.
+- A static PS line is excluded from the body count but capped at ~35 words, in at most 1-2 emails of the sequence.
 - After drafting, run a mandatory "cut at least 30%" pass: delete every word not earning its place, every restated idea, every throat-clearing clause. Then count the body words and confirm it is under the ceiling before moving on.
 - **Punchy, not staccato.** Punchy means lean and direct. It does NOT mean one-sentence-per-line fragments ("It just runs.") - those read jittery and AI-generated. Keep full thoughts and group related ideas into a paragraph; break only when the beat genuinely changes. Target one or two short paragraphs plus the CTA.
 - Remember AI personalization adds 1-2 sentences on top of the static body, so keep the static copy tight enough that the rendered email still breathes.
@@ -189,6 +225,7 @@ Never use these phrases or patterns:
 - "No worries if timing isn't right" (or any apologetic/defensive language)
 - "Quick insight:" prefix - just state the insight directly
 - Any typical sales clichés that scream "cold email"
+- Any AI-tell word, dead phrase, or structure from `references/sound-human.md`
 
 **Final-email endings (HARD).** The last email in a sequence must NOT announce itself as a follow-up or a last attempt. Never use "Last note from me", "Last email", "Just following up", "Following up", "Circling back", "Checking in", "Wanted to follow up", "Bumping this", or "One last try". These are the salesy endings operators flag most, and they keep slipping through - the email-review skill rejects them. The final email earns its open with a real idea or value beat and closes on the offer CTA; it never leans on the fact that it is a follow-up.
 
@@ -375,6 +412,9 @@ When invoked with a segment folder path:
 For detailed guidance on specific topics, see the following reference files:
 
 - **email_copywriting.md** - How to write email copy including hooks, body, CTAs, signatures, and PS lines
+- **references/gold-standard.md** - The 9/10 bar: two operator-written exemplar campaigns + the 12 patterns + the compression test
+- **references/spam-words.md** - Tiered spam-word policy (NEVER/HIGH/MEDIUM budget rule), structural triggers, safe alternatives
+- **references/sound-human.md** - AI-tell lexicon and structures to reject, human-voice techniques, ICP Voice Card spec
 
 **Moved to other skills:**
 - AI personalization prompts → `prompt-writer` skill

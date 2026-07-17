@@ -121,21 +121,23 @@ Use this checklist to evaluate email copy quality. Grade each criterion from 1 t
 
 #### Word Choice
 
-**Never use these spam trigger words:**
-- marketing, investment, finance, return, success, chance
-- outreach, sales, get, offer, free, save money, money
-- guarantee, promise, ad, buy, income, earn, for you
+**Spam words are tiered and budgeted** (full policy: `references/spam-words.md`):
+- NEVER tier ("free", "credit card", phishing vocabulary, scam cluster) = automatic fail
+- HIGH tier (guarantee, discount, limited time, act now, click here, special offer...) = aim for zero; 2+ in one email = fail
+- MEDIUM tier (cost, price, offer, deal, opportunity, ROI, marketing, sales, money, income, earn...) = max 1-2 per email
+- Subject lines: zero tiered words, no `$`/`%`/stacked numbers
+- Count and report spam words per email as `word (tier)`
 
 **Also avoid:**
-- Dollar signs or percentage symbols
+- `$`/`%` in subject lines (single specific body figures are fine; stacked figures + urgency are not)
 - Superlatives: "impressive," "fascinating," "revolutionary," "remarkable," "caught my attention"
-- Buzzwords
+- Buzzwords, AI-tell vocabulary and structures (`references/sound-human.md`)
 
 #### Email Formatting
 
 1. **Has Personalization Variables** - AI variables present
-2. **Has Signature Variable** - Proper signature handling
-3. **50-150 Words Length** - Per email
+2. **Has Sender-Name Signature** - Proper signature handling
+3. **Length (HARD 80-word ceiling)** - Static body ≤80 words per email (one value-stack email may reach ~100 as a numbered list of real numbers); follow-ups ≤55
 4. **Mobile-Friendly** - Short lines, scannable, lots of whitespace
 5. **3-6 Emails** - In sequence
 6. **Spell and grammar check** - No typos
@@ -199,9 +201,9 @@ Use this checklist to evaluate email copy quality. Grade each criterion from 1 t
 - [ ] **Final-email salesy endings (REJECT)** - no "Last note from me", "Last email", "Just following up", "Following up", "Circling back", "Checking in", "Wanted to follow up", "Bumping this", "One last try". Check the final email every time.
 
 ### Brevity & Variables (REJECT)
-- [ ] **Static body <=80 words** per email (prose + CTA, excluding the greeting, `{{...}}` lines, and `{sender_signature}`). Over 80 = fail. Follow-ups target <=55.
+- [ ] **Static body <=80 words** per email (prose + CTA, excluding the greeting, `{{...}}` lines, and the signature block). Over 80 = fail. Follow-ups target <=55.
 - [ ] **AI variables use `{{Title Case}}`** - reject any `[bracket]` AI variable.
-- [ ] **Every email signs with `{sender_signature}`** - reject any hand-written sign-off.
+- [ ] **Every email signs with the sender-name signature block** - reject `{sender_signature}` and reject signatures missing `{sender_first_name} {sender_last_name} - [title] at [linked Client Company]`.
 
 ### Formatting Requirements
 - [ ] **Short paragraphs only**: 1-3 sentences max per paragraph
@@ -238,8 +240,7 @@ Use this checklist to evaluate email copy quality. Grade each criterion from 1 t
 - [ ] **If no relevant case study**, use generic metric without company name
 
 ### Subject Line Threading
-- [ ] **Email 1**: Uses AI-generated subject line (or tested static alternative)
-- [ ] **Follow-up emails (2-5+)**: Subject line left empty to maintain threading
+- [ ] **Every email uses `{{Subject Line}}`** - operator standard (2026-06-03): all steps carry the AI subject, including follow-ups. Do not leave follow-up subjects empty and do not flag a follow-up that has `{{Subject Line}}`.
 
 ---
 

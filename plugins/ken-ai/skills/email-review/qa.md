@@ -60,34 +60,18 @@ Then, at the end, output the total score.
 
 #### 5. Word Choice
 
-   **Completely avoid these spam words:**
-   * marketing
-   * investment
-   * finance
-   * return
-   * success
-   * chance
-   * for you
-   * outreach
-   * sales
-   * get
-   * offer
-   * free
-   * save money
-   * money
-   * guarantee
-   * promise
-   * ad
-   * buy
-   * income
-   * earn
+   **Spam words are tiered and budgeted** - the full policy lives in `../email-copywriting/references/spam-words.md` and is enforced as a HARD checklist item in SKILL.md. Summary:
+   * NEVER tier ("free", "credit card", phishing vocabulary, scam cluster) = automatic fail
+   * HIGH tier (guarantee, discount, limited time, act now, click here, special offer...) = aim for zero; 2+ in one email = fail
+   * MEDIUM tier (cost, price, offer, deal, opportunity, ROI, marketing, sales, money, income, earn...) = max 1-2 per email
+   * Subject lines: zero tiered words, no `$`/`%`/stacked numbers
+   * Count and report every spam word per email as `word (tier)`
 
    **Additional restrictions:**
-   * Do not use dollar signs, percentage symbols, or write out those symbols
+   * `$`/`%` symbols: never in subject lines; in body, a single specific figure is fine ("$1,850 in value"), stacking figures with urgency/deal language is not
    * Avoid superlatives like "impressive," "fascinating," "revolutionary," "remarkable," "inspiring," "caught my attention," or "caught my eye"
-   * Do not use buzzwords
-   * **Never use "free" or "credit card"** in body copy - both hurt deliverability
-   * **No false offer claims** - e.g. do not say "no credit card" if a card is actually required. Verify every offer claim against the client's real offer before passing it
+   * No buzzwords, no AI-tell vocabulary or structures (`../email-copywriting/references/sound-human.md`)
+   * **No false offer claims** - e.g. do not say "no card needed" if a card is actually required. Verify every offer claim against the client's real offer before passing it
 
 ---
 
@@ -95,10 +79,11 @@ Then, at the end, output the total score.
 
 #### 1. Has Personalization Variables
 
-#### 2. Has Signature (`{sender_signature}` variable on every email, never hand-written)
+#### 2. Has Signature (sender first + last name, linked client company)
+   Every email has the two-line signature block. Reject `{sender_signature}`. Required shape: signoff line, then `{sender_first_name} {sender_last_name} - [title] at [Client Company](best client link)`.
 
 #### 3. Length (HARD ceiling 80 words)
-   Static body per email is at most 80 words (prose + CTA, excluding the greeting, the `{{...}}` AI-variable lines, and `{sender_signature}`). Over 80 = fail. Follow-ups target under 55. Punchy, not staccato.
+   Static body per email is at most 80 words (prose + CTA, excluding the greeting, the `{{...}}` AI-variable lines, and the signature block). Over 80 = fail. Follow-ups target under 55. Punchy, not staccato.
 
 #### 4. Mobile-Friendly
    Short lines, scannable format, lots of spaces

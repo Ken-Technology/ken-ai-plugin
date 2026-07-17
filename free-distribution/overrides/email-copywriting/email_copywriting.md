@@ -348,8 +348,8 @@ If body discusses offer, PS can add quick social proof - two different ideas tha
 - Avoid all salesy and marketing language at all costs. 
 - Skip straight to the topic and to the best piece of information you have. Instead of "Quick follow-up - most advisors know retention beats acquisition", use "Retention beats acquisition".
 - Don't ever use Quick follow-up, Noticed that, Just wanted to share, and all other usual salesy language.
-- **In the last email, never announce it as a follow-up or last attempt.** Banned: "Last email", "Last note from me", "Just following up", "Following up", "Circling back", "Checking in", "Wanted to follow up", "Bumping this", "One last try". This rule keeps getting violated - email-review rejects on it. The final email opens on a real idea and closes on the offer CTA.
-- **Never use the words "free" or "credit card"** in body copy - both hurt deliverability. Reframe ("trial" not "free trial").
-- **Never make a false offer claim** - e.g. don't write "no credit card" if a card is actually required. Every claim must match the client's real offer.
-- The full spam-word list (marketing, investment, finance, return, success, free, money, guarantee, etc.) lives in `email-review/qa.md`. Avoid those words while drafting, not just at review time.
+- **In the last email, never announce it as a follow-up or last attempt.** Banned: "Last email", "Last note from me", "Just following up", "Following up", "Circling back", "Checking in", "Wanted to follow up", "Bumping this", "One last try". This rule keeps getting violated - the review pass rejects on it. The final email opens on a real idea and closes on the offer CTA.
+- **Spam words are budgeted, not vibes**: the tiered policy (NEVER / HIGH / MEDIUM, max 1-2 MEDIUM per email, subject lines fully clean) plus safe alternatives lives in `references/spam-words.md`. "free" and "credit card" are hard-banned. Apply it while drafting, not just at review time.
+- **Never make a false offer claim** - e.g. don't write "no card needed" if a card is actually required. Every claim must match the client's real offer.
+- **No AI-tells**: the lexicon (delve, leverage, seamless, "I hope this email finds you well"...), the structures ("It's not just X, it's Y", tidy triads, metronomic sentences), and the human-voice techniques live in `references/sound-human.md`. Draft in the ICP's language per the Voice Card, and read every email aloud before handing it off.
 
