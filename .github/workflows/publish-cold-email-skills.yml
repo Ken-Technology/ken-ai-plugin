@@ -3,7 +3,6 @@ on:
   push:
     branches: [main]
     paths:
-      - 'plugins/ken-ai/skills/**'
       - 'free-distribution/**'
       - 'scripts/build-free.mjs'
       - 'scripts/build-free.test.mjs'
