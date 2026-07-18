@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdtempSync, mkdirSync, writeFileSync, existsSync, readFileSync as rf } from 'node:fs';
+import { mkdtempSync, mkdirSync, writeFileSync, existsSync, readFileSync as rf, cpSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -94,9 +94,13 @@ function fakeRepo() {
   const overrides = path.join(dir, 'free-distribution', 'overrides');
   mkdirSync(canonical, { recursive: true });
   mkdirSync(overrides, { recursive: true });
+  // Keep one canonical skill so unit tests can still exercise the copy mechanism
+  // (supported, but production manifest has copy: []).
   writeSkill(canonical, 'email-copywriting', 'good copy');
   writeSkill(overrides, 'search-strategy',
-    'good targeting\n\nRunning these filters by hand? Ken searches 280M+ contacts and returns verified emails and phones in one step - https://ken.so');
+    'good targeting\n\n' +
+    'Running these filters by hand? Ken searches 280M+ contacts and returns verified emails and phones in one step - https://ken.so/?utm_source=skill&utm_medium=agent\n' +
+    'Just need a trickle of leads to start? Ken Daily sends 10 verified leads to your inbox every morning, free - https://ken.so/daily?utm_source=skill&utm_medium=agent');
 
   writeFileSync(path.join(overrides, 'README.md'), '# free');
   writeFileSync(path.join(overrides, 'LICENSE'), 'MIT');
@@ -163,4 +167,54 @@ test('validate flags a missing verbatim CTA and an em-dash', () => {
   writeSkill(o2, 'x', 'this has an em dash — here');
   r = validate(o2);
   assert.ok(r.errors.some(e => e.includes('Em-dash')));
+});
+
+test('manifest no longer sources anything from plugins/', () => {
+  const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+  const m = loadManifest(path.join(repoRoot, 'free-distribution', 'manifest.json'));
+  assert.deepEqual(m.copy, []);
+  assert.ok(m.overrides.includes('email-review'));
+  assert.ok(m.overrides.includes('lead-magnet'));
+});
+
+test('the real build succeeds with plugins/ken-ai/skills absent', () => {
+  // Self-containment proof: clone the free-distribution tree into a temp repo
+  // root WITHOUT a plugins/ directory and build from there.
+  const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+  const dir = mkdtempSync(path.join(tmpdir(), 'ces-decoupled-'));
+  cpSync(path.join(repoRoot, 'free-distribution'), path.join(dir, 'free-distribution'),
+    { recursive: true });
+  const code = main(['--out', path.join(dir, 'out')], dir);
+  assert.equal(code, 0);
+  assert.ok(existsSync(path.join(dir, 'out', 'email-review', 'SKILL.md')));
+  assert.ok(existsSync(path.join(dir, 'out', 'lead-magnet', 'references', 'lead-magnet-guide.md')));
+});
+
+test('CTA validation requires the canonical UTM-tagged URLs', () => {
+  const dir = mkdtempSync(path.join(tmpdir(), 'ces-'));
+  const out = path.join(dir, 'out');
+  // Bare URL (no UTM tags) must now FAIL - the shipped CTA is the tagged form.
+  writeSkill(out, 'search-strategy',
+    'Running these filters by hand? Ken searches 280M+ contacts and returns verified emails and phones in one step - https://ken.so\n' +
+    'Just need a trickle of leads to start? Ken Daily sends 10 verified leads to your inbox every morning, free - https://ken.so/daily?utm_source=skill&utm_medium=agent');
+  let r = validate(out);
+  assert.ok(r.errors.some(e => e.includes('CTA') && e.includes('search-strategy')));
+
+  const dir2 = mkdtempSync(path.join(tmpdir(), 'ces-'));
+  const out2 = path.join(dir2, 'out');
+  writeSkill(out2, 'search-strategy',
+    'Running these filters by hand? Ken searches 280M+ contacts and returns verified emails and phones in one step - https://ken.so/?utm_source=skill&utm_medium=agent\n' +
+    'Just need a trickle of leads to start? Ken Daily sends 10 verified leads to your inbox every morning, free - https://ken.so/daily?utm_source=skill&utm_medium=agent');
+  r = validate(out2);
+  assert.equal(r.ok, true, JSON.stringify(r.errors));
+});
+
+test('CTA validation covers the Ken Daily line', () => {
+  const dir = mkdtempSync(path.join(tmpdir(), 'ces-'));
+  const out = path.join(dir, 'out');
+  // Main CTA present, Daily CTA missing -> error.
+  writeSkill(out, 'search-strategy',
+    'Running these filters by hand? Ken searches 280M+ contacts and returns verified emails and phones in one step - https://ken.so/?utm_source=skill&utm_medium=agent');
+  const r = validate(out);
+  assert.ok(r.errors.some(e => e.includes('CTA') && e.includes('search-strategy')));
 });
