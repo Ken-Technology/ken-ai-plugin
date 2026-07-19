@@ -29,9 +29,19 @@ test('shimmed plugin ships only SKILL.md per skill and no dead relative links', 
   }
   for (const f of walk(pluginRoot).filter(f => f.endsWith('.md'))) {
     const text = readFileSync(f, 'utf8');
-    for (const m of text.matchAll(/\]\((\.{1,2}\/[^)#]+)/g)) {
-      const target = path.resolve(path.dirname(f), m[1]);
-      assert.ok(existsSync(target), `dead link ${m[1]} in ${path.relative(repoRoot, f)}`);
+    // Catch ANY relative markdown link target, not just ones prefixed ./ or ../
+    // (e.g. `](references/foo.md)`). Skip URLs, anchors, and site-absolute
+    // paths - only local relative file targets are resolved and existence-checked.
+    for (const m of text.matchAll(/\]\(([^)]+)\)/g)) {
+      let target = m[1].trim().split(/\s+/)[0]; // drop any `"title"` after the path
+      const hash = target.indexOf('#');
+      if (hash !== -1) target = target.slice(0, hash); // drop `#anchor` fragment
+      if (!target) continue; // pure anchor or empty
+      if (/^[a-z][a-z0-9+.-]*:/i.test(target)) continue; // http:, https:, mailto:, ...
+      if (target.startsWith('//')) continue; // protocol-relative URL
+      if (target.startsWith('/')) continue; // site-absolute path, not a repo file
+      const resolved = path.resolve(path.dirname(f), target);
+      assert.ok(existsSync(resolved), `dead link ${target} in ${path.relative(repoRoot, f)}`);
     }
   }
 });
