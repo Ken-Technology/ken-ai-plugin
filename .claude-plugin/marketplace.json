@@ -9,7 +9,7 @@
     {
       "name": "ken-ai",
       "source": "./plugins/ken-ai",
-      "description": "Ken AI campaign creation workflow: plan, target, write, review, and push cold email campaigns to the Ken AI platform via MCP."
+      "description": "DEPRECATED - use the Ken MCP server directly. Ken AI campaign creation workflow: plan, target, write, review, and push cold email campaigns to the Ken AI platform via MCP."
     }
   ]
 }
