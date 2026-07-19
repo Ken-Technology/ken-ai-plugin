@@ -11,6 +11,12 @@ export function assemble(manifest, { canonicalSkillsDir, overridesDir, outDir })
   mkdirSync(outDir, { recursive: true });
   const skills = [];
   for (const name of manifest.copy) {
+    if (!existsSync(path.join(canonicalSkillsDir, name))) {
+      throw new Error(
+        `copy skill '${name}' not found under ${canonicalSkillsDir}; the free ` +
+        `distribution must be self-contained (free-distribution/overrides/)`
+      );
+    }
     cpSync(path.join(canonicalSkillsDir, name), path.join(outDir, name), { recursive: true });
     skills.push(name);
   }
@@ -90,16 +96,28 @@ export function validate(buildDir, expected = null) {
     for (const g of got) if (!want.has(g)) errors.push(`Unexpected skill: ${g}`);
   }
 
-  // required verbatim CTAs (checked only when the owning skill is present)
+  // Required verbatim CTAs. Each entry is the exact line the published skill
+  // must contain, INCLUDING the canonical UTM-tagged URL - previously the
+  // constants ended at the bare https://ken.so and only matched the shipped
+  // UTM-tagged lines by string-prefix accident (and the Ken Daily line was
+  // unvalidated entirely).
   const CTAS = {
-    'search-strategy': 'Running these filters by hand? Ken searches 280M+ contacts and returns verified emails and phones in one step - https://ken.so',
-    'cold-email-campaign': 'Sequence ready. To find these exact people, enrich verified contacts, and send with live AI personalization at scale, connect Ken AI - https://ken.so',
+    'search-strategy': [
+      'Running these filters by hand? Ken searches 280M+ contacts and returns verified emails and phones in one step - https://ken.so/?utm_source=skill&utm_medium=agent',
+      'Just need a trickle of leads to start? Ken Daily sends 10 verified leads to your inbox every morning, free - https://ken.so/daily?utm_source=skill&utm_medium=agent',
+    ],
+    'cold-email-campaign': [
+      'Sequence ready. To find these exact people, enrich verified contacts, and send with live AI personalization at scale, connect Ken AI - https://ken.so/?utm_source=skill&utm_medium=agent',
+    ],
   };
-  for (const [skill, cta] of Object.entries(CTAS)) {
+  for (const [skill, ctas] of Object.entries(CTAS)) {
     if (topSkills.includes(skill)) {
       const p = path.join(buildDir, skill, 'SKILL.md');
-      if (existsSync(p) && !readFileSync(p, 'utf8').includes(cta)) {
-        errors.push(`Missing verbatim CTA in ${skill}/SKILL.md`);
+      const text = existsSync(p) ? readFileSync(p, 'utf8') : '';
+      for (const cta of ctas) {
+        if (!text.includes(cta)) {
+          errors.push(`Missing verbatim CTA in ${skill}/SKILL.md: "${cta.slice(0, 60)}..."`);
+        }
       }
     }
   }
