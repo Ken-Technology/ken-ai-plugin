@@ -252,8 +252,11 @@ already the convention in this repo.
 - A user with only a BYO CSV can go plan → copy → review → personalization prompts entirely in
   files.
 - The build fails loudly if any Ken/MCP reference leaks into a free skill.
-- Editing a shared skill in `plugins/ken-ai/skills/` and pushing to `main` republishes the free
-  repo automatically; the free repo is never hand-edited.
+- ~~Editing a shared skill in `plugins/ken-ai/skills/` and pushing to `main` republishes the free
+  repo automatically; the free repo is never hand-edited.~~ Superseded 2026-07-18 (task 11): the
+  free distro is self-contained under `free-distribution/overrides/` and no longer sources from
+  `plugins/ken-ai/skills/`; editing the paid plugin does NOT republish the free repo. See the
+  decision note below.
 - The paid `ken-ai` plugin is byte-unchanged.
 
 ## Open Questions / Deferred
