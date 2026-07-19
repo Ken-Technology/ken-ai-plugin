@@ -1,7 +1,7 @@
 {
   "name": "ken-ai",
-  "version": "0.1.0",
-  "description": "End-to-end Ken AI campaign creation: ICP planning, KenSearch targeting, qualification and segmentation prompts, email copy with review loop, AI personalization prompts, and pure-MCP campaign configuration on the Ken AI platform.",
+  "version": "1.0.0",
+  "description": "DEPRECATED - use the Ken MCP server directly. End-to-end Ken AI campaign creation: ICP planning, KenSearch targeting, qualification and segmentation prompts, email copy with review loop, AI personalization prompts, and pure-MCP campaign configuration on the Ken AI platform.",
   "author": {
     "name": "Ken AI",
     "email": "development@ken.so"
@@ -13,8 +13,8 @@
   "mcpServers": "./.codex-plugin/mcp.json",
   "interface": {
     "displayName": "Ken AI",
-    "shortDescription": "Plan, target, write, review, and push cold-email campaigns",
-    "longDescription": "Use Ken AI to run the full cold-email campaign-creation workflow on the Ken AI platform: plan a broad ICP with segments, build KenSearch prospect targeting, write qualification and segmentation prompts, draft and review email copy, generate AI personalization prompts, and push everything to the platform through the ken-ai MCP server's OAuth session. No API keys to paste, no local scripts.",
+    "shortDescription": "DEPRECATED - Ken AI workflows now live in the Ken MCP server",
+    "longDescription": "DEPRECATED - this plugin is retired. The full cold-email campaign-creation workflow now runs natively on the Ken MCP server (https://mcp.getken.ai/ken-ai/mcp): plan a broad ICP with segments, build KenSearch prospect targeting, write qualification and segmentation prompts, draft and review email copy, generate AI personalization prompts, and push everything to the platform. Connect the ken-ai MCP server in your client and call list_skills to see everything available. This plugin version ships only deprecation shims plus the bundled MCP server config.",
     "developerName": "Ken AI",
     "category": "Developer Tools",
     "capabilities": ["Interactive", "Write"],

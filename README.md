@@ -1,47 +1,36 @@
 # ken-ai-plugin
 
-Plugin marketplace for the [Ken AI platform](https://ken.so), for **Claude Code and OpenAI Codex CLI**. Ships the **ken-ai** plugin: an end-to-end cold-email campaign-creation workflow (planning, KenSearch targeting, copywriting with a review loop, AI personalization prompts, and a pure-MCP configuration push) plus the `/ken-ai:new-campaign`, `/ken-ai:campaign-status`, and `/ken-ai:export-campaign` commands. The same skills and commands run on both runtimes - see [Cross-runtime support](#cross-runtime-support).
+**DEPRECATED** - this plugin is retired. All Ken AI agent workflows are served natively by the Ken MCP server.
 
-## Install (Claude Code)
+This repository is archived and receives no updates. The final published version ships only thin deprecation shims plus the bundled MCP server config.
 
-```
-/plugin marketplace add Ken-Technology/ken-ai-plugin
-/plugin install ken-ai@ken-ai-plugin
-```
+## What to use instead
 
-## Install (Codex CLI)
+Connect the Ken MCP server in any MCP client (Claude, ChatGPT, Cursor, Gemini, Grok, Manus):
 
 ```
-codex plugin add https://github.com/Ken-Technology/ken-ai-plugin
+https://mcp.getken.ai/ken-ai/mcp
 ```
 
-Point `codex plugin add` at the repo (or a local checkout path); Codex loads the plugin from `plugins/ken-ai`. The plugin's `.codex-plugin/` manifest wires up the skills, the three commands, and the ken-ai MCP server. Verify with `/plugins` in Codex.
+Your client opens a browser OAuth flow on first use - create an API key at [app.ken.so](https://app.ken.so) under Settings - API Keys and paste it once. Once connected, call `list_skills()` to see every workflow the MCP serves (campaign planning, targeting, copywriting, review, personalization, workspace setup, and infrastructure), and `load_skill("<name>")` to run one.
 
-The plugin bundles the `ken-ai` MCP server (`https://mcp.getken.ai/ken-ai/mcp`). On first use your MCP client opens a browser OAuth flow - create an API key at ken.so - Settings - API Keys, paste it once, and you're done. No `.env`, no local scripts, no pasted keys in chat.
+Or follow the in-app guide at [app.ken.so](https://app.ken.so) under Settings - Integrations - AI Agents.
 
-## What's here
+## What this final version contains
+
+- **Deprecation shims** - every skill and command now points you at the Ken MCP instead of running locally.
+- **The bundled MCP server config** (`plugins/ken-ai/.mcp.json` and `plugins/ken-ai/.codex-plugin/mcp.json`) - this is the one part that keeps working value: it wires your client to `https://mcp.getken.ai/ken-ai/mcp`.
+
+Nothing else here is maintained. Do not follow any cached or historical version of a skill or command in this repo - the MCP-served versions are the only maintained ones.
+
+## Free, platform-independent skills
+
+If you want the cold-email planning and writing skills with no Ken account, no MCP, and no API keys (files-only, MIT licensed), use the free open-source repo:
 
 ```
-.claude-plugin/marketplace.json   # Claude Code marketplace manifest (this repo)
-plugins/ken-ai/                    # the ken-ai plugin
-├── .claude-plugin/plugin.json     # Claude Code plugin manifest
-├── .codex-plugin/                 # Codex CLI plugin manifest + MCP config
-│   ├── plugin.json
-│   └── mcp.json                   # ken-ai MCP server, Codex format
-├── .mcp.json                      # bundled ken-ai MCP server (Claude Code format)
-├── commands/                      # /ken-ai:new-campaign, campaign-status, export-campaign
-├── skills/                        # campaign-planning, ken-search, copywriting, ... (13 skills)
-├── reference/                     # platform-capabilities
-└── README.md                      # full usage, workspace layout, safety model
+Ken-Technology/cold-email-skills
 ```
 
-## Cross-runtime support
-
-Skills, commands, and reference docs are **shared** across both runtimes - there is one source of truth. Each runtime loads it through its own manifest:
-
-- **Claude Code** reads `.claude-plugin/plugin.json` + `.mcp.json` (auto-discovers `skills/` and `commands/`).
-- **Codex CLI** reads `.codex-plugin/plugin.json`, which points at `skills/` and `.codex-plugin/mcp.json` (and auto-discovers `commands/`).
-
-Skill content avoids runtime-specific assumptions: reference links are relative paths, and subagent steps are written as plain "dispatch a subagent" actions that each runtime maps to its own mechanism (Claude Code's `Task`, Codex's `spawn_agent`).
-
-See [`plugins/ken-ai/README.md`](plugins/ken-ai/README.md) for the full workflow, workspace layout, and troubleshooting.
+```bash
+npx skills add Ken-Technology/cold-email-skills
+```

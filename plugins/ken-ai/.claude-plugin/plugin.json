@@ -1,7 +1,7 @@
 {
   "name": "ken-ai",
-  "version": "0.1.1",
-  "description": "End-to-end Ken AI campaign creation: ICP planning, KenSearch targeting, qualification and segmentation prompts, email copy with review loop, AI personalization prompts, and pure-MCP campaign configuration on the Ken AI platform.",
+  "version": "1.0.0",
+  "description": "DEPRECATED - use the Ken MCP server directly. End-to-end Ken AI campaign creation: ICP planning, KenSearch targeting, qualification and segmentation prompts, email copy with review loop, AI personalization prompts, and pure-MCP campaign configuration on the Ken AI platform.",
   "author": {
     "name": "Ken AI",
     "email": "development@ken.so"
