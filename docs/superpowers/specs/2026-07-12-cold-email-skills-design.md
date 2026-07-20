@@ -1,5 +1,7 @@
 # cold-email-skills - Free Open-Source Skills Repo
 
+> **Retired (2026-07):** the ken-ai plugin described here as the canonical repo is retired - Ken AI agent workflows now live in the Ken MCP server (https://mcp.getken.ai/ken-ai/mcp). This document is kept as history; see `docs/RETIREMENT.md`.
+
 **Date:** 2026-07-12
 **Status:** Approved design, ready for implementation plan
 **Canonical repo:** `Ken-Technology/ken-ai-plugin` (this repo)
@@ -105,51 +107,46 @@ Codex/Cursor/etc.), so the repo is runtime-neutral with no manifests.
 
 ### Verbatim (byte-identical, `copy` in manifest)
 
-Authored in `plugins/ken-ai/skills/`, copied unchanged into the free repo:
+As shipped (2026-07-18), **no skill is byte-identical-copied from the plugin tree**. The free
+build is fully self-contained under `free-distribution/overrides/`; `manifest.json` has
+`"copy": []`.
 
-- `email-copywriting`
-- `email-review`
-- `campaign-strategy`
-- `segmentation`
-- `qualification`
-- `lead-magnet`
+Historically, `email-review` and `lead-magnet` were the last verbatim `copy` sources from
+`plugins/ken-ai/skills/`. They were relocated into `free-distribution/overrides/` on
+2026-07-18 (still byte-identical at move time) so retiring the plugin cannot break the free
+build. The remaining skills were always adapted (see below) because the canonical plugin
+bodies reference `api_*`/MCP tooling that cannot pass the forbidden-marker validator.
 
-**Requirement:** these must contain no `mcp__`/Ken-only references (validated by the build -
-see Build & Validation). If any do today, they are generalized in place in the canonical repo
-(the paid plugin does not depend on Ken coupling inside these, so this is safe).
+The `copy` mechanism remains in `scripts/build-free.mjs` (empty list is a no-op) so the
+pipeline still documents the original intent of shared-source skills.
 
 ### Adapted (authored in `overrides/`, replace the canonical version in the free build)
 
-**`client-research`** - Drop the "Update Ken AI companyContext" step
-(canonical `SKILL.md` ~lines 146-180: the `api_client_manage` list/update calls and the
-"Pushed companyContext to Ken AI" message). Everything else (synthesizing pasted transcripts,
-call notes, website text into `research.md`) is generic and stays. Meeting-source examples
-(Fireflies/Otter/Gong) remain as illustrative BYO sources.
+All ten free skills ship from `free-distribution/overrides/`:
 
-**`prompt-writer`** - Most Ken-entangled. Keep the prompt-**writing** technique (how to author
-strong AI personalization prompts, the internal text review). Remove:
-- the live campaign test half (`api_campaign_prompt_test`, `api_ai_supported_models`,
-  `api_ai_token_analysis`),
-- the `configuration.json` / `campaign_id` gating and graceful-degradation branch,
-- `references/configuration.md` (the "Ken AI Campaign Configuration Reference").
-
-Reframe output from "prompts for Ken AI's personalization engine" to "AI personalization
-prompts you can paste into any personalization tool or LLM." Keep `{{Title Case}}` variable
-convention (it is a generic templating choice, not Ken-specific).
-
-### New (authored in `overrides/`)
-
-**`search-strategy`** - the free replacement for `ken-search`. Tool-agnostic. Turns the ICP
-into concrete, portable filter definitions (titles, seniority, industries, headcount/revenue
-bands, geo, technographic/intent signals, keywords, exclusions) that the user runs in
-**Apollo / Sales Navigator / Clay / ZoomInfo / etc.**, plus a **BYO-list CSV shape** helper
-(required columns: name, email, company, title, …). Output: `search-strategy.md`. Ends with a
-tasteful Ken CTA (see Upgrade Touchpoints). Replaces the `filters.json` artifact in the flow.
-
-**`cold-email-campaign`** - free orchestrator skill (variant of `campaign-planning`, authored
-fresh because the canonical one is coupled to the platform parser contract, `api_client_manage`,
-`filters.json`, `configuration.json`, and a final `campaign-configuration` push). Keeps the
-planning model (1 broad ICP + 1 offer + N segments). Chain:
+- **`email-review`**, **`lead-magnet`** - self-contained copies (formerly `copy` from plugin).
+- **`email-copywriting`**, **`qualification`**, **`campaign-strategy`**, **`segmentation`** -
+  adapted from plugin bodies with Ken-only tool calls stripped so they pass the
+  forbidden-marker validator.
+- **`client-research`** - Drop the "Update Ken AI companyContext" step (canonical `SKILL.md`
+  ~lines 146-180: the `api_client_manage` list/update calls and the "Pushed companyContext to
+  Ken AI" message). Everything else (synthesizing pasted transcripts, call notes, website text
+  into `research.md`) is generic and stays. Meeting-source examples (Fireflies/Otter/Gong)
+  remain as illustrative BYO sources.
+- **`prompt-writer`** - Most Ken-entangled. Keep the prompt-**writing** technique (how to
+  author strong AI personalization prompts, the internal text review). Remove: the live
+  campaign test half (`api_campaign_prompt_test`, `api_ai_supported_models`,
+  `api_ai_token_analysis`); the `configuration.json` / `campaign_id` gating and
+  graceful-degradation branch; `references/configuration.md` (the "Ken AI Campaign
+  Configuration Reference"). Reframe output from "prompts for Ken AI's personalization engine"
+  to "AI personalization prompts you can paste into any personalization tool or LLM." Keep
+  `{{Title Case}}` variable convention (it is a generic templating choice, not Ken-specific).
+- **`search-strategy`** - free replacement for `ken-search`. Tool-agnostic. Turns the ICP into
+  concrete, portable filter definitions for Apollo / Sales Navigator / Clay / ZoomInfo / etc.,
+  plus a BYO-list CSV shape helper. Output: `search-strategy.md`. Ends with a tasteful Ken CTA
+  (see Upgrade Touchpoints).
+- **`cold-email-campaign`** - free orchestrator skill (variant of `campaign-planning`, authored
+  fresh because the canonical one is coupled to the platform parser contract). Chain:
 
 ```
 search-strategy → qualification → segmentation
@@ -187,18 +184,29 @@ No `configuration.json` (no platform state to journal).
 ```json
 {
   "targetRepo": "Ken-Technology/cold-email-skills",
-  "copy": ["email-copywriting", "email-review", "campaign-strategy",
-           "segmentation", "qualification", "lead-magnet"],
-  "overrides": ["search-strategy", "cold-email-campaign", "client-research", "prompt-writer"],
+  "copy": [],
+  "overrides": [
+    "search-strategy",
+    "cold-email-campaign",
+    "client-research",
+    "prompt-writer",
+    "email-copywriting",
+    "qualification",
+    "campaign-strategy",
+    "segmentation",
+    "email-review",
+    "lead-magnet"
+  ],
   "repoFiles": ["README.md", "LICENSE"]
 }
 ```
 
 `scripts/build-free.mjs`:
 
-1. Assemble a build tree: copy each `copy` skill from `plugins/ken-ai/skills/<name>` and each
-   `overrides` skill from `free-distribution/overrides/<name>` into top-level folders, plus the
-   `repoFiles`.
+1. Assemble a build tree: copy each `copy` skill from `plugins/ken-ai/skills/<name>` (empty in
+   production) and each `overrides` skill from `free-distribution/overrides/<name>` into
+   top-level folders, plus the `repoFiles`. The free build must succeed with no `plugins/`
+   tree present.
 2. **Validate (fail the build on any violation):**
    - No file in any free skill contains `mcp__`, `api_` MCP tool calls, `ken-ai MCP`, or other
      Ken-only markers (allowlist the deliberate marketing CTA strings + the word "Ken AI" in
@@ -246,8 +254,11 @@ already the convention in this repo.
 - A user with only a BYO CSV can go plan → copy → review → personalization prompts entirely in
   files.
 - The build fails loudly if any Ken/MCP reference leaks into a free skill.
-- Editing a shared skill in `plugins/ken-ai/skills/` and pushing to `main` republishes the free
-  repo automatically; the free repo is never hand-edited.
+- ~~Editing a shared skill in `plugins/ken-ai/skills/` and pushing to `main` republishes the free
+  repo automatically; the free repo is never hand-edited.~~ Superseded 2026-07-18 (task 11): the
+  free distro is self-contained under `free-distribution/overrides/` and no longer sources from
+  `plugins/ken-ai/skills/`; editing the paid plugin does NOT republish the free repo. See the
+  decision note below.
 - The paid `ken-ai` plugin is byte-unchanged.
 
 ## Open Questions / Deferred
@@ -256,3 +267,15 @@ already the convention in this repo.
   does not block the build since `npx skills add owner/repo` works immediately.
 - Whether to later add an optional CSV/clipboard export skill.
 - Final CTA copy wording (marketing to approve).
+
+## Decision note - 2026-07-18 (AI-first onboarding, task 11)
+
+The shipped manifest diverged from this design: `email-copywriting`,
+`qualification`, `campaign-strategy`, and `segmentation` ship as adapted
+`overrides/` (the canonical plugin bodies reference `api_*`/MCP tooling and
+cannot pass the forbidden-marker validator), and `lead-magnet` was added.
+Resolution: the manifest is authoritative. Additionally, the free build is now
+fully self-contained - `copy` is empty, every skill sources from
+`free-distribution/overrides/`, and the build verifies with no
+`plugins/ken-ai/skills/` directory present - so retiring the plugin
+(spec D12) cannot break the free distribution.
