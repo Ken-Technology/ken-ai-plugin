@@ -14,7 +14,7 @@
   "interface": {
     "displayName": "Ken AI",
     "shortDescription": "DEPRECATED - Ken AI workflows now live in the Ken MCP server",
-    "longDescription": "DEPRECATED - this plugin is retired. The full cold-email campaign-creation workflow now runs natively on the Ken MCP server (https://mcp.getken.ai/ken-ai/mcp): plan a broad ICP with segments, build KenSearch prospect targeting, write qualification and segmentation prompts, draft and review email copy, generate AI personalization prompts, and push everything to the platform. Connect the ken-ai MCP server in your client and call list_skills to see everything available. This plugin version ships only deprecation shims plus the bundled MCP server config.",
+    "longDescription": "DEPRECATED - this plugin is retired. The full cold-email campaign-creation workflow now runs natively on the Ken MCP server (https://mcp.ken.so/mcp): plan a broad ICP with segments, build KenSearch prospect targeting, write qualification and segmentation prompts, draft and review email copy, generate AI personalization prompts, and push everything to the platform. Connect the ken-ai MCP server in your client and call list_skills to see everything available. This plugin version ships only deprecation shims plus the bundled MCP server config.",
     "developerName": "Ken AI",
     "category": "Developer Tools",
     "capabilities": ["Interactive", "Write"],

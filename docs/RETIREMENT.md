@@ -1,7 +1,7 @@
 # Ken AI Plugin Retirement
 
 This plugin is retired. Every skill and command in it is now a deprecation shim
-that points at the Ken MCP server (`https://mcp.getken.ai/ken-ai/mcp`), which
+that points at the Ken MCP server (`https://mcp.ken.so/mcp`), which
 serves the workflows natively via `list_skills()` / `load_skill("<name>")` and
 the typed `api_campaign_status` / `api_campaign_export` tools. The only artifact
 here that keeps working value is the bundled MCP server config
@@ -20,7 +20,7 @@ be verified from this repo, the row says so and is marked "to verify by owner".
 |---|---|---|---|---|
 | ken-frontend `src/features/settings/constants/ai-agents.ts` (+ `src/features/settings/components/integrations/ai-agents-setup.tsx`) | plugin repo install steps and `github.com/Ken-Technology/ken-ai-plugin` link | drop the plugin install path so the panel shows MCP-only instructions (this program's Task 07, Layer 1) | frontend | To verify by owner. Actual paths differ from the original task template (which named `.../integrations/ai-agents/constants/ai-agents.ts`). On the ken-frontend `main` checkout the plugin refs are still present: `ai-agents.ts` lines 30, 72-73, 94, 147-148 (plus its `.test.ts`). Task 07 lands these edits on the ken-frontend `ai-onboarding/integration` branch. Confirm in the shipped app (Settings - Integrations - AI Agents) once that branch reaches production. |
 | `Ken-Technology/cold-email-skills` README (published from `free-distribution/overrides/README.md`) | any plugin-repo mention | rewrite to an MCP pointer if present | this repo | No change needed. Searched `free-distribution/overrides/README.md` for `plugin` and `ken-ai-plugin`: no plugin-repo mention exists. It references only the free repo (`Ken-Technology/cold-email-skills`) and ken.so UTM links, which Task 11's validator pins and this task must not touch. |
-| GitHub repo About/description for `Ken-Technology/ken-ai-plugin` | current tagline | set to `DEPRECATED - use the Ken MCP: mcp.getken.ai/ken-ai` | repo admin (manual) | To verify by owner. Cannot be set from the repo tree; it is a GitHub settings field. |
+| GitHub repo About/description for `Ken-Technology/ken-ai-plugin` | current tagline | set to `DEPRECATED - use the Ken MCP: mcp.ken.so` | repo admin (manual) | To verify by owner. Cannot be set from the repo tree; it is a GitHub settings field. |
 | Help-center / KB articles referencing the plugin install | install steps ("plugin", "ken-ai-plugin", "marketplace add") | rewrite to the MCP connect flow | support (ticketed) | To verify by owner. The only help-center search tool reachable from this repo targets the Twenty CRM documentation, not the Ken AI KB. A search for "ken-ai-plugin marketplace install AI agents plugin" returned only Twenty CRM "AI Agents" articles, none about this plugin. The Ken KB could not be searched here; support must sweep the KB for the three terms and rewrite any hits. |
 | Claude Code / Codex marketplace listing entries cached by users | old plugin description | superseded by the 1.0.0 manifest push | automatic | Automatic on update. The `1.0.0` manifests carry the `DEPRECATED -` prefix; a `/plugin marketplace update` or reinstall picks it up. |
 | `docs/superpowers/*` in this repo | historical design/plan docs | leave as history; add a one-line retirement pointer at the top of `2026-07-12-cold-email-skills-design.md` | this repo | Done. A retirement blockquote was added at the top of `docs/superpowers/specs/2026-07-12-cold-email-skills-design.md`. The plan doc `docs/superpowers/plans/2026-07-12-cold-email-skills.md` is left untouched as history. |
@@ -30,7 +30,7 @@ be verified from this repo, the row says so and is marked "to verify by owner".
 Ordered. Do not archive the GitHub repo until every item above the archive step
 is checked.
 
-- [ ] MCP parity re-verified on production (`list_skills`: exact set equality on all 17 names - 13 workflow + `setup-workspace` + 3 infra (`infra-planning`, `domain-selection`, `inbox-configuration`); one `load_skill` body per migration wave; `api_campaign_status` / `api_campaign_export` callable) - date + verifier. **Local parity verified 2026-07-19 against `ai-onboarding/integration` @ `db18e8efa6e4ff985142ebc8e32b84bc9ac54b24`; this item MUST be re-run against `https://mcp.getken.ai/ken-ai/mcp` after ken-ai-mcp PR #402 deploys, before archiving.** (See the Verification appendix for the local evidence.)
+- [ ] MCP parity re-verified on production (`list_skills`: exact set equality on all 17 names - 13 workflow + `setup-workspace` + 3 infra (`infra-planning`, `domain-selection`, `inbox-configuration`); one `load_skill` body per migration wave; `api_campaign_status` / `api_campaign_export` callable) - date + verifier. **Local parity verified 2026-07-19 against `ai-onboarding/integration` @ `db18e8efa6e4ff985142ebc8e32b84bc9ac54b24`; this item MUST be re-run against `https://mcp.ken.so/mcp` after ken-ai-mcp PR #402 deploys, before archiving.** (See the Verification appendix for the local evidence.)
 - [ ] Final shim version `1.0.0` merged to main and the marketplace update visible in a fresh `/plugin marketplace add Ken-Technology/ken-ai-plugin`.
 - [ ] Fresh-install verification passed (see the Verification appendix: interactive install still pending-human; the non-interactive equivalents pass).
 - [ ] Free distribution rebuilt and republished from main AFTER the shim merge; `cold-email-skills` repo diff reviewed (must be empty - the free build no longer reads `plugins/`).
@@ -43,7 +43,7 @@ is checked.
 
 The shims still ship the MCP URL, so `scripts/check-mcp-urls.mjs` retains value
 until the moment of archive: its offline layer keeps the two runtime configs in
-agreement, and its network layer keeps proving `https://mcp.getken.ai/ken-ai/mcp`
+agreement, and its network layer keeps proving `https://mcp.ken.so/mcp`
 resolves to a live RFC 9728 protected resource. Leave
 `.github/workflows/check-mcp-urls.yml` enabled. A GitHub-archived repo stops
 running scheduled workflows automatically, so no deletion or edit is needed; the
@@ -124,8 +124,8 @@ node scripts/build-free.mjs --dry-run           # exit 0; 10 skills built from o
 grep -rn "db_execute\|SELECT \|api.getken.ai/v1" plugins/   # clean (no matches)
 ```
 
-The `check-mcp-urls.mjs` doc sweep now covers every rewritten file; the only MCP
-URL any of them ships is `https://mcp.getken.ai/ken-ai/mcp`, which verified live
+The `check-mcp-urls.mjs` doc sweep covered every rewritten file; as of that run
+the only MCP URL any of them shipped was `https://mcp.getken.ai/ken-ai/mcp`, which verified live <!-- mcp-url-ignore -->
 (RFC 9728 protected-resource metadata `resource` matched). The free-distro build
 is unaffected by the shim rewrite because `free-distribution/manifest.json` has
 `copy: []` and sources everything from `free-distribution/overrides/` - the

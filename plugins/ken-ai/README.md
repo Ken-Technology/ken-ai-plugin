@@ -7,7 +7,7 @@
 Connect the Ken MCP server in any MCP client (Claude, ChatGPT, Cursor, Gemini, Grok, Manus):
 
 ```
-https://mcp.getken.ai/ken-ai/mcp
+https://mcp.ken.so/mcp
 ```
 
 On first use your client opens a browser OAuth flow - create an API key at [app.ken.so](https://app.ken.so) under Settings - API Keys and paste it once. Then:
@@ -18,4 +18,4 @@ On first use your client opens a browser OAuth flow - create an API key at [app.
 
 Or follow the in-app guide at [app.ken.so](https://app.ken.so) under Settings - Integrations - AI Agents.
 
-The bundled MCP server config in this plugin (`.mcp.json` and `.codex-plugin/mcp.json`) already points at `https://mcp.getken.ai/ken-ai/mcp` - that is the one artifact here that keeps working value.
+The bundled MCP server config in this plugin (`.mcp.json` and `.codex-plugin/mcp.json`) already points at `https://mcp.ken.so/mcp` - that is the one artifact here that keeps working value.
