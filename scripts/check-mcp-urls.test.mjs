@@ -12,14 +12,18 @@ import {
   verifyResource
 } from './check-mcp-urls.mjs';
 
-// Mirrors the real mcp.getken.ai as observed on 2026-07-16:
-//   /ken-ai/mcp -> the protected RESOURCE (the MCP endpoint)
-//   /ken-ai     -> the AUTHORIZATION SERVER base: a real URL, but not an endpoint
+// Mirrors the post-migration mcp.ken.so layout (MCP served at host root):
+//   /mcp  -> the protected RESOURCE (the streamable-HTTP MCP endpoint)
+//   /     -> the AUTHORIZATION SERVER base: a real URL, but not an endpoint
 //   everything else 404s at the metadata layer
-// Both /ken-ai/mcp and /mcp return an identical 401 at the endpoint itself,
-// which is exactly why this check reads metadata instead.
-const RESOURCE = 'https://mcp.getken.ai/ken-ai/mcp';
-const METADATA = 'https://mcp.getken.ai/.well-known/oauth-protected-resource/ken-ai/mcp';
+//
+// Note: under the old mcp.getken.ai/ken-ai mount, /ken-ai/mcp was the resource
+// and /mcp was a false path that 401'd identically at the endpoint. After the
+// move, /mcp IS the resource - so the "reject bare /mcp" regression is inverted
+// into "reject the legacy /ken-ai/mcp path".
+const RESOURCE = 'https://mcp.ken.so/mcp';
+const METADATA = 'https://mcp.ken.so/.well-known/oauth-protected-resource/mcp';
+const AUTH_SERVER = 'https://mcp.ken.so';
 
 function fakeFetch(url) {
   const live = url === METADATA;
@@ -29,7 +33,7 @@ function fakeFetch(url) {
       if (!live) throw new Error('Not Found');
       return {
         resource: RESOURCE,
-        authorization_servers: ['https://mcp.getken.ai/ken-ai']
+        authorization_servers: [AUTH_SERVER]
       };
     }
   });
@@ -65,31 +69,31 @@ test('metadataUrlFor inserts the well-known suffix between host and path', () =>
 test('metadataUrlFor removes only the slash following the host (RFC 9728 3.1)', () => {
   // Root: the terminating slash after the host IS removed.
   assert.equal(
-    metadataUrlFor('https://mcp.getken.ai/'),
-    'https://mcp.getken.ai/.well-known/oauth-protected-resource'
+    metadataUrlFor('https://mcp.ken.so/'),
+    'https://mcp.ken.so/.well-known/oauth-protected-resource'
   );
   assert.equal(
-    metadataUrlFor('https://mcp.getken.ai'),
-    'https://mcp.getken.ai/.well-known/oauth-protected-resource'
+    metadataUrlFor('https://mcp.ken.so'),
+    'https://mcp.ken.so/.well-known/oauth-protected-resource'
   );
   // A slash inside the path is significant and must survive: /a/ != /a.
   assert.equal(
-    metadataUrlFor('https://mcp.getken.ai/ken-ai/mcp/'),
-    'https://mcp.getken.ai/.well-known/oauth-protected-resource/ken-ai/mcp/'
+    metadataUrlFor('https://mcp.ken.so/mcp/'),
+    'https://mcp.ken.so/.well-known/oauth-protected-resource/mcp/'
   );
 });
 
 test('metadataUrlFor preserves the query component', () => {
   assert.equal(
-    metadataUrlFor('https://mcp.getken.ai/ken-ai/mcp?tenant=1'),
-    'https://mcp.getken.ai/.well-known/oauth-protected-resource/ken-ai/mcp?tenant=1'
+    metadataUrlFor('https://mcp.ken.so/mcp?tenant=1'),
+    'https://mcp.ken.so/.well-known/oauth-protected-resource/mcp?tenant=1'
   );
 });
 
 test('metadataUrlFor keeps a non-default port', () => {
   assert.equal(
-    metadataUrlFor('https://mcp.getken.ai:8443/ken-ai/mcp'),
-    'https://mcp.getken.ai:8443/.well-known/oauth-protected-resource/ken-ai/mcp'
+    metadataUrlFor('https://mcp.ken.so:8443/mcp'),
+    'https://mcp.ken.so:8443/.well-known/oauth-protected-resource/mcp'
   );
 });
 
@@ -106,8 +110,8 @@ test('findMcpUrls extracts URLs from config JSON and markdown prose', () => {
 // Regression: a ported URL used to match only the bare origin, so the checker
 // verified a URL nobody ships while the real one went unchecked.
 test('findMcpUrls keeps the port and path intact', () => {
-  assert.deepEqual(findMcpUrls('https://mcp.getken.ai:8443/ken-ai/mcp'), [
-    'https://mcp.getken.ai:8443/ken-ai/mcp'
+  assert.deepEqual(findMcpUrls('https://mcp.ken.so:8443/mcp'), [
+    'https://mcp.ken.so:8443/mcp'
   ]);
 });
 
@@ -139,9 +143,10 @@ test('readConfiguredUrls reads the url each runtime declares', async () => {
 });
 
 // Regression: THE original bug. Offline, deterministic, no network needed.
+// Auth-server base (origin only) vs real streamable-HTTP endpoint.
 test('findConfigDisagreements catches the Claude/Codex URL drift', async () => {
   const dir = await makeRepo({
-    'plugins/ken-ai/.mcp.json': claudeConfig('https://mcp.getken.ai/ken-ai'),
+    'plugins/ken-ai/.mcp.json': claudeConfig(AUTH_SERVER),
     'plugins/ken-ai/.codex-plugin/mcp.json': codexConfig(RESOURCE)
   });
   try {
@@ -189,17 +194,19 @@ test('verifyResource accepts the live endpoint', async () => {
   assert.equal((await verifyResource(RESOURCE, fakeFetch)).ok, true);
 });
 
-// Regression: the URL that actually shipped - the auth-server base.
+// Regression: the URL that actually shipped - the auth-server base (origin only).
 test('verifyResource rejects the auth-server base', async () => {
-  const result = await verifyResource('https://mcp.getken.ai/ken-ai', fakeFetch);
+  const result = await verifyResource(AUTH_SERVER, fakeFetch);
   assert.equal(result.ok, false);
   assert.equal(result.transient, false);
   assert.match(result.reason, /not a registered MCP resource/);
 });
 
-// Regression: the "fix" a debugging agent inferred from the endpoint's 401.
-test('verifyResource rejects the bare /mcp path', async () => {
-  const result = await verifyResource('https://mcp.getken.ai/mcp', fakeFetch);
+// Regression: under the old /ken-ai mount, /mcp was a false path that 401'd
+// identically. After the root-path migration, /mcp is the live endpoint and the
+// legacy /ken-ai/mcp path is the false one that must not be accepted.
+test('verifyResource rejects the legacy /ken-ai/mcp path', async () => {
+  const result = await verifyResource('https://mcp.ken.so/ken-ai/mcp', fakeFetch);
   assert.equal(result.ok, false);
   assert.match(result.reason, /not a registered MCP resource/);
 });
@@ -248,7 +255,7 @@ test('verifyResource does not retry a definitive 404', async () => {
     calls++;
     return fakeFetch(url);
   };
-  await verifyResource('https://mcp.getken.ai/ken-ai', counting);
+  await verifyResource(AUTH_SERVER, counting);
   assert.equal(calls, 1);
 });
 
@@ -256,7 +263,7 @@ test('verifyResource does not retry a definitive 404', async () => {
 
 test('main fails when the runtime configs disagree, without any network', async () => {
   const dir = await makeRepo({
-    'plugins/ken-ai/.mcp.json': claudeConfig('https://mcp.getken.ai/ken-ai'),
+    'plugins/ken-ai/.mcp.json': claudeConfig(AUTH_SERVER),
     'plugins/ken-ai/.codex-plugin/mcp.json': codexConfig(RESOURCE)
   });
   try {

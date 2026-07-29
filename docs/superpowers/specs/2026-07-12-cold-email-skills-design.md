@@ -1,6 +1,6 @@
 # cold-email-skills - Free Open-Source Skills Repo
 
-> **Retired (2026-07):** the ken-ai plugin described here as the canonical repo is retired - Ken AI agent workflows now live in the Ken MCP server (https://mcp.getken.ai/ken-ai/mcp). This document is kept as history; see `docs/RETIREMENT.md`.
+> **Retired (2026-07):** the ken-ai plugin described here as the canonical repo is retired - Ken AI agent workflows now live in the Ken MCP server (https://mcp.getken.ai/ken-ai/mcp). This document is kept as history; see `docs/RETIREMENT.md`. <!-- mcp-url-ignore -->
 
 **Date:** 2026-07-12
 **Status:** Approved design, ready for implementation plan

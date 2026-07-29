@@ -9,7 +9,7 @@ This repository is archived and receives no updates. The final published version
 Connect the Ken MCP server in any MCP client (Claude, ChatGPT, Cursor, Gemini, Grok, Manus):
 
 ```
-https://mcp.getken.ai/ken-ai/mcp
+https://mcp.ken.so/mcp
 ```
 
 Your client opens a browser OAuth flow on first use - create an API key at [app.ken.so](https://app.ken.so) under Settings - API Keys and paste it once. Once connected, call `list_skills()` to see every workflow the MCP serves (campaign planning, targeting, copywriting, review, personalization, workspace setup, and infrastructure), and `load_skill("<name>")` to run one.
@@ -19,7 +19,7 @@ Or follow the in-app guide at [app.ken.so](https://app.ken.so) under Settings - 
 ## What this final version contains
 
 - **Deprecation shims** - every skill and command now points you at the Ken MCP instead of running locally.
-- **The bundled MCP server config** (`plugins/ken-ai/.mcp.json` and `plugins/ken-ai/.codex-plugin/mcp.json`) - this is the one part that keeps working value: it wires your client to `https://mcp.getken.ai/ken-ai/mcp`.
+- **The bundled MCP server config** (`plugins/ken-ai/.mcp.json` and `plugins/ken-ai/.codex-plugin/mcp.json`) - this is the one part that keeps working value: it wires your client to `https://mcp.ken.so/mcp`.
 
 Nothing else here is maintained. Do not follow any cached or historical version of a skill or command in this repo - the MCP-served versions are the only maintained ones.
 

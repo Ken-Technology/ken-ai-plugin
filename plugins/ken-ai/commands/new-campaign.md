@@ -12,7 +12,7 @@ from this plugin - it now runs through the Ken MCP server's skills.
 **To run it now:**
 
 1. Make sure the `ken-ai` MCP server is connected (this plugin already bundles
-   it: `https://mcp.getken.ai/ken-ai/mcp` - your client opens a browser OAuth
+   it: `https://mcp.ken.so/mcp` - your client opens a browser OAuth
    flow; create an API key at app.ken.so under Settings - API Keys).
 2. Call `load_skill("campaign-planning")` on the ken-ai MCP and follow it. When
    it finishes it returns an ORDERED list of downstream skill names for your

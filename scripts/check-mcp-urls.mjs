@@ -4,17 +4,19 @@
 // 1. AGREEMENT (offline, deterministic). The two runtime configs must declare
 //    the identical URL. This is what catches the bug this script was written
 //    for: .mcp.json shipped the OAuth authorization-server base
-//    (https://mcp.getken.ai/ken-ai) while .codex-plugin/mcp.json shipped the
-//    real endpoint (.../ken-ai/mcp). Two files, one truth, and nothing tying
-//    them together. This layer needs no network and cannot flake.
+//    (https://mcp.ken.so) while .codex-plugin/mcp.json shipped the real
+//    endpoint (https://mcp.ken.so/mcp). Two files, one truth, and nothing
+//    tying them together. This layer needs no network and cannot flake.
 //
 // 2. LIVENESS (network). Each configured URL must resolve to a live MCP
 //    resource. A reachability or "does it 401?" probe is NOT sufficient and
-//    that is the whole point: mcp.getken.ai blanket-401s unknown paths, so a
+//    that is the whole point: the MCP host may blanket-401 unknown paths, so a
 //    dead URL and a live one return byte-identical 401s with the same
 //    www-authenticate header. Only the RFC 9728 protected-resource metadata
 //    discriminates - it must exist AND its `resource` field must equal the URL
-//    we ship.
+//    we ship. (Under the old mcp.getken.ai/ken-ai mount this was observed
+//    directly; the same class of failure exists for any OAuth-protected MCP
+//    that 401s before routing, so the metadata check stays regardless of host.)
 //
 // The check is anchored on the config files, never on whatever a regex sweeps
 // out of prose. An earlier inventory-driven version reported "1/1 verified" on

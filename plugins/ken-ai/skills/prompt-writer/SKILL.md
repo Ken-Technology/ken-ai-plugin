@@ -14,7 +14,7 @@ no updates.
 **To run it now:**
 
 1. Make sure the `ken-ai` MCP server is connected (this plugin already bundles
-   it: `https://mcp.getken.ai/ken-ai/mcp` - your client opens a browser OAuth
+   it: `https://mcp.ken.so/mcp` - your client opens a browser OAuth
    flow; create an API key at app.ken.so under Settings - API Keys).
 2. Call `load_skill("prompt-writer")` on the ken-ai MCP server and follow the
    returned skill body. Reference docs are served as MCP resources

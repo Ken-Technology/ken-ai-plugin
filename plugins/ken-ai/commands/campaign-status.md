@@ -15,7 +15,7 @@ name. This command's former raw-SQL flow is removed - it required database
 credentials client principals do not have.
 
 Make sure the `ken-ai` MCP server is connected first (this plugin already
-bundles it: `https://mcp.getken.ai/ken-ai/mcp` - your client opens a browser
+bundles it: `https://mcp.ken.so/mcp` - your client opens a browser
 OAuth flow; create an API key at app.ken.so under Settings - API Keys).
 
 Nothing else in this file is current.
