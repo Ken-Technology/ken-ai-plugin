@@ -124,8 +124,8 @@ node scripts/build-free.mjs --dry-run           # exit 0; 10 skills built from o
 grep -rn "db_execute\|SELECT \|api.getken.ai/v1" plugins/   # clean (no matches)
 ```
 
-The `check-mcp-urls.mjs` doc sweep now covers every rewritten file; the only MCP
-URL any of them ships is `https://mcp.getken.ai/ken-ai/mcp`, which verified live <!-- mcp-url-ignore -->
+The `check-mcp-urls.mjs` doc sweep covered every rewritten file; as of that run
+the only MCP URL any of them shipped was `https://mcp.getken.ai/ken-ai/mcp`, which verified live <!-- mcp-url-ignore -->
 (RFC 9728 protected-resource metadata `resource` matched). The free-distro build
 is unaffected by the shim rewrite because `free-distribution/manifest.json` has
 `copy: []` and sources everything from `free-distribution/overrides/` - the
