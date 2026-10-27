@@ -182,3 +182,7 @@ Errors arrive as `{success: false, error: {code, category, message, recovery, ..
 ## Free-plan success bar
 
 A Free user reaches the hand-off with the company profile and context written, the logo set (if they had a URL), invites sent within seats, blocklist and integrations guidance given, and an upgrade pointer for sending infrastructure, with zero error-shaped plan output.
+
+## No Ken account yet
+
+These steps run on the Ken MCP server, which signs in with a Ken account. If the user has none, send them to https://app.ken.so/get-started to create one, then sign in when the agent asks.

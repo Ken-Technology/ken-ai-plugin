@@ -64,3 +64,7 @@ Forward to the client's own external email only:
 | `INBOX_LIMIT_REACHED` | Show `used` / `limit` / `remaining`. Offer: stay within remaining allocation (or rebalance limits), or upgrade. |
 
 If they need more daily send than they have, load `infra-planning`. When headroom is zero, help them get more from existing inboxes instead of framing it as a system error.
+
+## No Ken account yet
+
+These steps run on the Ken MCP server, which signs in with a Ken account. If the user has none, send them to https://app.ken.so/get-started to create one, then sign in when the agent asks.

@@ -43,11 +43,11 @@ Start with the counts, then the To Reply tab:
 
 `threads(operation="counts", tab="to_reply")`
 
-`threads(operation="list", tab="to_reply", limit=50)`
+`threads(operation="list", tab="to_reply", sort="oldest_waiting", limit=50)`
 
 - Tabs: `to_reply`, `other`, `automated`, `not_interested`, `saved`, `done`, `sent`, `all`. Narrow with `campaign_id`, `channel` (`email` or `linkedin`), `interest`, `is_read`, `has_reminder` or `q` (text search). Page with `cursor` while `pagination.hasMore` is true.
 - Each row has `direction`: `inbound` when the contact wrote last, `outbound` when you did. Only `inbound` rows wait for an answer.
-- There is no "oldest unanswered first" filter yet. Sort the rows yourself by the newest message time and answer the oldest interested ones first.
+- `sort="oldest_waiting"` lists the thread whose newest message is oldest first, across pages, and an `inbound` row carries `waitingSince`, when that message arrived. Answer in that order, so the replies that waited longest go first.
 
 Done when you have every `inbound` thread in To Reply (or the scope the user named), with its `interest`.
 
@@ -147,9 +147,12 @@ An interested contact who stopped answering is the cheapest meeting you will fin
 
 ## What this skill cannot do yet
 
-- No needs-reply queue by age: sort the list yourself (Step 1).
 - A booking is not a held meeting. Held meetings are not tracked yet, so never report bookings as meetings held.
-- Starting a new thread (for example to a referral) is `replies(operation="threads-create")`, open only to staff where `agent_send` is on. Everyone else: draft the email and the person sends it from their own mail.
+- Starting a new thread (for example to a referral) is `replies(operation="threads-create")`, listed only where the workspace's `agent_send` flag is on, for every seat that can reply. Send only the text the person approved, from a shared cold inbox: an `inboxes(operation="list", role="sending", status="active")` entry with no `ownerMemberId`, on a cold sending domain. Where it is not listed, or it answers 404 (the flag is off) or 409 `client_approval_required`: draft the email and the person sends it from their own mail.
 - No op books a meeting for the contact: they book through the link.
 
 `references/situations.md` holds the playbook per situation with example drafts. `references/inbox-fields.md` holds the thread fields, tab and interest values, and every send error. Open one with `load_skill("reply-handling", reference="references/situations.md")`.
+
+## No Ken account yet
+
+These steps run on the Ken MCP server, which signs in with a Ken account. If the user has none, send them to https://app.ken.so/get-started to create one, then sign in when the agent asks.

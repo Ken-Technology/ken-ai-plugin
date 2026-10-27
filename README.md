@@ -2,9 +2,13 @@
 
 > **Generated - do not edit the skills here by hand.** Everything in `plugins/ken-ai/` except `.codex-plugin/` is generated from the Ken MCP skills, `mcp/src/ken_mcp/skills` in ken-backend, by `mcp/scripts/build_skill_packages.py`. Change a skill there and regenerate (see [Updating](#updating)).
 
-The Claude Code marketplace for Ken AI. Its one plugin, `ken-ai`, carries the skills Ken's own agents run, for your Ken workspace: build campaigns, handle replies, report results and keep sending healthy. It connects the Ken MCP server (`https://mcp.ken.so/mcp`); sign in with your Ken account when Claude Code asks.
+Ken AI skills for Claude Code, Cursor, Codex, GitHub Copilot, VS Code and any coding agent. The one plugin here, `ken-ai`, carries the skills Ken's own agents run, for your Ken workspace: build campaigns, handle replies, report results and keep sending healthy. It connects the Ken MCP server (`https://mcp.ken.so/mcp`); sign in with your Ken account when your agent asks.
+
+No Ken account yet? Create one at https://app.ken.so/get-started.
 
 ## Install
+
+Claude Code:
 
 ```
 /plugin marketplace add Ken-Technology/ken-ai-plugin
@@ -13,7 +17,21 @@ The Claude Code marketplace for Ken AI. Its one plugin, `ken-ai`, carries the sk
 
 Already installed? `/plugin marketplace update ken-ai-plugin` picks up the new version.
 
-The skill list is in [plugins/ken-ai/README.md](plugins/ken-ai/README.md).
+Cursor, Codex, GitHub Copilot CLI, VS Code, Grok Build and any other agent it finds on your machine, skills and Ken MCP server together:
+
+```
+npx plugins add Ken-Technology/ken-ai-plugin
+```
+
+Skills only, into any agent that reads Agent Skills:
+
+```
+npx skills add Ken-Technology/ken-ai-plugin
+```
+
+This copies the skills but not the server: also add the Ken MCP server, `https://mcp.ken.so/mcp`, to your agent ([steps for each agent](https://ken.so/mcp)).
+
+The skill list is in [plugins/ken-ai/README.md](plugins/ken-ai/README.md). Every skill asks before it sends, launches or changes a live campaign. MIT licensed, see [LICENSE](LICENSE).
 
 ## Updating
 

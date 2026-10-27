@@ -112,3 +112,7 @@ After each change, read it back (`campaigns(operation="get", campaign_id=42)`, `
 - Gate bounces per domain. Ken AI pauses inboxes, campaigns and domains on its own for the reasons in the reference, but no per-domain bounce-rate gate exists yet.
 - Check SPF, DKIM and DMARC on their own. Domain health shows DNS state, but there is no dedicated record check.
 - Run placement tests for every caller. They are for workspace members only.
+
+## No Ken account yet
+
+These steps run on the Ken MCP server, which signs in with a Ken account. If the user has none, send them to https://app.ken.so/get-started to create one, then sign in when the agent asks.

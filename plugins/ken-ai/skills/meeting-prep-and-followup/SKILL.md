@@ -133,7 +133,7 @@ Pick the first that applies:
 
 1. **There is an email thread with the contact** (`threads(operation="list", contact_id=5512)`): save the draft on it with `threads(operation="replace-draft", thread_id="thr_...", body="...")`. The person sends it from `https://app.ken.so/replies`, or approves that text in chat and you send it with `threads(operation="create-message", thread_id="thr_...", body="...", sender_email_id=88, idempotency_key="followup-mtg_812-v1")`.
 2. **The account is in Accounts**: create it as a touch to the attendee's stakeholder (`stakeholderId` on the brief or the participant), which waits for a person's approval in Today: `account_touches(operation="create", account_id=101, stakeholder_id=4401, channel="email", due_at="2026-10-28T09:00:00Z", reason="manual", subject="Next steps from today", body="Hi Maya, ...", rationale="Follow-up to the Oct 27 call")`. A 422 `guardrail_violation` means a Contact limits rule: move `due_at` to the `nextAllowedAt` it names.
-3. **Neither**: show the draft in chat for the person to send from their own mail. Starting a new email thread from here is `replies(operation="threads-create")`, open only to staff where `agent_send` is on, and only with the text the person approved.
+3. **Neither**: show the draft in chat for the person to send from their own mail. Where the workspace's `agent_send` flag is on, every seat that can reply can instead start the thread with the text the person approved, from a shared cold inbox (an `inboxes(operation="list", role="sending", status="active")` entry with no `ownerMemberId`, on a cold sending domain): `replies(operation="threads-create", sender_inbox_id=91, to="maya@acme.com", subject="Next steps from today", body="Hi Maya, ...", idempotency_key="followup-mtg_812-v1")`. A 404 (the flag is off) or a 409 `client_approval_required` means the person sends it.
 
 When the next meeting is agreed with a time, offer the calendar invite and create it on the user's yes: `meetings(operation="events-create", title="Acme - decision call", starts_at="2026-11-04T15:00:00Z", ends_at="2026-11-04T15:30:00Z", guests=["maya@acme.com"])`. An invite to anyone outside the workspace waits for the member's approval in Today (`write.status` `waiting_approval`): tell them, and never say it was sent.
 
@@ -151,3 +151,7 @@ When the next meeting is agreed with a time, offer the calendar invite and creat
 - Held meetings are not tracked yet: a booking or a calendar event is not proof the meeting happened.
 
 `references/prep-template.md` and `references/followup-template.md` hold the layouts and checks. Open one with `load_skill("meeting-prep-and-followup", reference="references/followup-template.md")`.
+
+## No Ken account yet
+
+These steps run on the Ken MCP server, which signs in with a Ken account. If the user has none, send them to https://app.ken.so/get-started to create one, then sign in when the agent asks.

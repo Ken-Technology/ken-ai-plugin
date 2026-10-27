@@ -100,3 +100,7 @@ If checkout fails because remaining is too small on a hard cap, show `remaining`
 - Inbox tuning belongs in `inbox-configuration`.
 - Sizing against daily send and credits belongs in `infra-planning`.
 - Importing owned domains belongs in `connect-domains`.
+
+## No Ken account yet
+
+These steps run on the Ken MCP server, which signs in with a Ken account. If the user has none, send them to https://app.ken.so/get-started to create one, then sign in when the agent asks.

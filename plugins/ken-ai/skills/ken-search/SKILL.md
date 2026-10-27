@@ -108,3 +108,7 @@ Validate and count as for any search. A candidate audience is smaller than a buy
 ## Errors
 
 If a step errors, continue when possible and note it. On `plan_limit` or `billing`, surface `error.message` and `error.recovery.summary`; never retry blindly.
+
+## No Ken account yet
+
+These steps run on the Ken MCP server, which signs in with a Ken account. If the user has none, send them to https://app.ken.so/get-started to create one, then sign in when the agent asks.

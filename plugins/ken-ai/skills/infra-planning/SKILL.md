@@ -101,3 +101,7 @@ If remaining is 0 on a hard cap, say so from the capacity payload. Offer to work
 
 - `domains` writes here: `update` / `delete` only after explicit user approval (admin). Search and checkout live in `domain-selection`. Import is `connect-domains`.
 - Connecting external inboxes / OAuth is a dashboard flow, not this skill.
+
+## No Ken account yet
+
+These steps run on the Ken MCP server, which signs in with a Ken account. If the user has none, send them to https://app.ken.so/get-started to create one, then sign in when the agent asks.

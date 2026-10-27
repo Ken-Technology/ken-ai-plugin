@@ -38,7 +38,7 @@ Ask what the user sells and what change makes a company need it. Then pick the s
 
 | The user says | One-off list (Mode B) | Always on (Mode A trigger `signal_type`) |
 |---|---|---|
-| "companies hiring SDRs / AEs / RevOps" | `job_postings` search on the titles | `hiring_surge` (net adds in a function) |
+| "companies hiring SDRs / AEs / RevOps" | `job_postings` search on the titles | `open_roles` (open posts that match the titles), or `hiring_surge` (net adds in a function) |
 | "companies that just raised" | `triggers` funding-rounds-search | `fundraising` |
 | "new VP Sales / new CRO" | `search` search-companies with `leadershipChange` | `new_in_seat` (people new in their seat) |
 | "people who used us and changed jobs" | - | `job_change` |
@@ -129,5 +129,8 @@ Report the signal, the gate funnel, who you picked and why, the campaign and tri
 - No gate dry-run with a cost: count with the free searches and say it is charged per lead.
 - No bulk fit classifier: judge fit from the company data yourself, in batches, and keep a reason per company.
 - No email find outside the people search's six countries.
-- No always-on trigger on job postings themselves from here: `hiring_surge` follows headcount by function, not postings. Use Mode B weekly for postings.
 - No test fire for a trigger.
+
+## No Ken account yet
+
+These steps run on the Ken MCP server, which signs in with a Ken account. If the user has none, send them to https://app.ken.so/get-started to create one, then sign in when the agent asks.

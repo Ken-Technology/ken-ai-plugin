@@ -120,3 +120,7 @@ Tracking links on each sending domain are set in `domain-selection`.
 - Check SPF, DKIM and DMARC on their own. Domain health shows DNS state, but there is no dedicated record check.
 - Run inbox placement tests for every caller. That read is for workspace members only.
 - Claim warmed inboxes, connect sending providers or track domain orders for callers outside the workspace's members, or while their flags are off.
+
+## No Ken account yet
+
+These steps run on the Ken MCP server, which signs in with a Ken account. If the user has none, send them to https://app.ken.so/get-started to create one, then sign in when the agent asks.

@@ -181,3 +181,7 @@ Open with `load_skill("studio-asset", reference="references/<file>")`:
 - One fill guide per starter: `rd-doc.md`, `rd-ken-native.md`, `rd-your-product.md`, `audit-rewrites.md`, `benchmark-report.md`, `case-study.md`, `event-invite.md`, `roi-calculator.md`, `role-pitch.md`, `roles-for-you.md`.
 - `studio-fill.md`: filling a page with your own model, from prepare to submit, with a worked example.
 - `sample-campaign-for-prospect.md`: the whole sample-campaign recipe, from the reply to the draft.
+
+## No Ken account yet
+
+These steps run on the Ken MCP server, which signs in with a Ken account. If the user has none, send them to https://app.ken.so/get-started to create one, then sign in when the agent asks.

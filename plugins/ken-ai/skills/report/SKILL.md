@@ -103,3 +103,7 @@ Return the report and the cover email as text in your reply.
 - Render an HTML or PDF deck. The report is text.
 - Compare against a benchmark. There is no benchmark field yet, so benchmarks are N/A.
 - Count meetings held, or read the reader's CRM pipeline. Both are N/A until the reader gives them.
+
+## No Ken account yet
+
+These steps run on the Ken MCP server, which signs in with a Ken account. If the user has none, send them to https://app.ken.so/get-started to create one, then sign in when the agent asks.

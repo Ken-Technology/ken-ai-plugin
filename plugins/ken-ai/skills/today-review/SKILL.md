@@ -144,3 +144,7 @@ Report back: what waits for the member (by group, with counts), what you changed
 | `already_written` on draft | the touch has a body | rewrite or edit it instead |
 | `not_draftable` on draft | that channel cannot be drafted | the member writes it |
 | 409 `nothing_to_undo` or `concurrent_change` on undo | something else changed the touch | read it and tell the member |
+
+## No Ken account yet
+
+These steps run on the Ken MCP server, which signs in with a Ken account. If the user has none, send them to https://app.ken.so/get-started to create one, then sign in when the agent asks.

@@ -116,3 +116,7 @@ The proof level sets your words: below `proven`, never say won, beat, proven or 
 - Test significance between two arms. There is no significance helper, so only an experiments finding at `proven` is a winner.
 - Count held meetings. Meetings booked are on the performance rows. Meetings held are not tracked yet.
 - Split steps by variant for every caller. That read is staff or `generative_ui` only.
+
+## No Ken account yet
+
+These steps run on the Ken MCP server, which signs in with a Ken account. If the user has none, send them to https://app.ken.so/get-started to create one, then sign in when the agent asks.

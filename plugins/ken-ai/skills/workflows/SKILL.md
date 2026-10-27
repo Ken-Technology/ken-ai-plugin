@@ -77,6 +77,10 @@ The result is `valid`, `mode` and `issues`, each with `severity`, `path` (a JSON
 |---|---|
 | `limits_required` | Add `limits` with `creditsPerMonth`, `creditsPerRun`, `runsPerDay` and `atLimit`. Publish mode. |
 | `missing_secret` | The user creates the secret under Settings > Workflows > Secrets in Ken AI. `workflows(operation="workflow-secrets-list", client_id=...)` lists the names that exist. |
+| `secret_header_only` | A step other than `code.run@1` names a header-only secret, which only a Run code step can use. Use a plain secret there. A secret stays header-only until the user deletes it and creates it again without the mark. |
+| `secret_host_not_listed` | A `code.run@1` step names a header-only secret whose host its `allowedHosts` does not cover. Add the host `fix` names to `allowedHosts`. |
+| `secret_header_conflict` | Two header-only secrets of one `code.run@1` step set the same header on the same host. Keep one of them in `secrets`. |
+| `too_many_hosts` | A `code.run@1` step's `allowedHosts` plus the hosts its wildcards cover for header-only secrets pass 20. Replace the wildcard with the exact host, or remove a host. |
 | `app_not_connected` | The user connects Slack (for `slack.message@1`) or a CRM, HubSpot or Salesforce (for `crm.*` steps), under Settings > Integrations, or removes the step. `workflows(operation="workflow-slack-connection-get", client_id=...)` checks Slack; the CRM connection is on Settings > Integrations > CRM. |
 | `feature_disabled` | The step needs a flag that is off for this workspace: remove the step, or ask Ken AI to turn the flag on. |
 | `unknown_reference` | A reference names a step, root or output field that does not exist. Use the step's `exampleOutput` from `workflows(operation="step-types-get", client_id=..., type="ai.qualify@1")`. |
@@ -252,3 +256,7 @@ Send `patch` (RFC 6902 operations) or the whole `definition`. A stale `base_vers
 - Set or confirm a spend limit before you publish (step 5), and quote only the credits and dollars the tools return.
 - A campaign workflow on a client's campaign decides who that campaign sends to. Publishing, unpublishing or bulk-cancelling one needs a yes that names that client, with its source (who said it, where and when).
 - Never retry a call that answered 404 on every id (step 0).
+
+## No Ken account yet
+
+These steps run on the Ken MCP server, which signs in with a Ken account. If the user has none, send them to https://app.ken.so/get-started to create one, then sign in when the agent asks.

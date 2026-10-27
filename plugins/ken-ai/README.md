@@ -1,13 +1,31 @@
-# Ken AI for Claude Code
+# Ken AI skills for coding agents
 
-The skills Ken's own agents run, for your Ken workspace: build campaigns, handle replies, report results and keep sending healthy. The plugin connects the Ken MCP server (`https://mcp.ken.so/mcp`); sign in with your Ken account when Claude Code asks. Each skill runs on the Ken tools your role can use, and asks before it sends, launches or changes a live campaign.
+The skills Ken's own agents run, for your Ken workspace: build campaigns, handle replies, report results and keep sending healthy. The plugin connects the Ken MCP server (`https://mcp.ken.so/mcp`); sign in with your Ken account when your agent asks. Each skill runs on the Ken tools your role can use, and asks before it sends, launches or changes a live campaign.
+
+No Ken account yet? Create one at https://app.ken.so/get-started. For cold email skills that need no account, see [Ken-Technology/cold-email-skills](https://github.com/Ken-Technology/cold-email-skills).
 
 ## Install
+
+Claude Code:
 
 ```
 /plugin marketplace add Ken-Technology/ken-ai-plugin
 /plugin install ken-ai@ken-ai-plugin
 ```
+
+Cursor, Codex, GitHub Copilot CLI, VS Code, Grok Build and any other agent it finds on your machine, skills and Ken MCP server together:
+
+```
+npx plugins add Ken-Technology/ken-ai-plugin
+```
+
+Skills only, into any agent that reads Agent Skills:
+
+```
+npx skills add Ken-Technology/ken-ai-plugin
+```
+
+This copies the skills but not the server: also add the Ken MCP server, `https://mcp.ken.so/mcp`, to your agent ([steps for each agent](https://ken.so/mcp)).
 
 ## Skills
 
