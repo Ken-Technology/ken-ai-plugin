@@ -66,7 +66,10 @@ export function findMcpUrls(text) {
   for (const line of text.split('\n')) {
     if (line.includes(IGNORE_MARKER)) continue;
     for (const match of line.matchAll(MCP_URL_RE)) {
-      const candidate = match[0].replace(/[.,;:!?]+$/, '');
+      // A query or fragment in prose is a connection parameter, not another
+      // resource: `https://mcp.ken.so/mcp?workspace=<id>` connects to the
+      // `/mcp` resource. Config URLs are read whole by readConfiguredUrls.
+      const candidate = match[0].replace(/[?#].*$/, '').replace(/[.,;:!?]+$/, '');
       try {
         new URL(candidate);
       } catch {
