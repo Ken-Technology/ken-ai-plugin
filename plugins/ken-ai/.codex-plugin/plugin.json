@@ -1,27 +1,27 @@
 {
   "name": "ken-ai",
-  "version": "1.0.0",
-  "description": "DEPRECATED - use the Ken MCP server directly. End-to-end Ken AI campaign creation: ICP planning, KenSearch targeting, qualification and segmentation prompts, email copy with review loop, AI personalization prompts, and pure-MCP campaign configuration on the Ken AI platform.",
+  "version": "2.0.0",
+  "description": "Ken AI skills: build cold email campaigns, handle replies, report results and keep sending healthy in your Ken workspace, through the Ken MCP server.",
   "author": {
     "name": "Ken AI",
     "email": "development@ken.so"
   },
-  "homepage": "https://github.com/Ken-Technology/ken-ai-plugin",
+  "homepage": "https://ken.so",
   "repository": "https://github.com/Ken-Technology/ken-ai-plugin",
-  "keywords": ["ken-ai", "cold-email", "campaigns", "mcp"],
+  "keywords": ["ken-ai", "cold-email", "outbound", "campaigns", "mcp"],
   "skills": "./skills/",
   "mcpServers": "./.codex-plugin/mcp.json",
   "interface": {
     "displayName": "Ken AI",
-    "shortDescription": "DEPRECATED - Ken AI workflows now live in the Ken MCP server",
-    "longDescription": "DEPRECATED - this plugin is retired. The full cold-email campaign-creation workflow now runs natively on the Ken MCP server (https://mcp.ken.so/mcp): plan a broad ICP with segments, build KenSearch prospect targeting, write qualification and segmentation prompts, draft and review email copy, generate AI personalization prompts, and push everything to the platform. Connect the ken-ai MCP server in your client and call list_skills to see everything available. This plugin version ships only deprecation shims plus the bundled MCP server config.",
+    "shortDescription": "Run your Ken workspace: campaigns, replies, reports and deliverability",
+    "longDescription": "The skills Ken's own agents run, for your Ken workspace: build a campaign from an ICP to launch-ready, handle replies, review your pipeline, write client reports and keep sending healthy. The plugin connects the Ken MCP server (https://mcp.ken.so/mcp); sign in with your Ken account on first use. Each skill asks before it sends, launches or changes a live campaign.",
     "developerName": "Ken AI",
     "category": "Developer Tools",
     "capabilities": ["Interactive", "Write"],
     "websiteURL": "https://ken.so",
     "defaultPrompt": [
-      "Plan and configure a new Ken AI cold-email campaign for a client",
-      "Show the enrichment status of my Ken AI campaign"
+      "Build a new cold email campaign in my Ken workspace",
+      "Go through my Ken replies and draft answers for me to approve"
     ]
   }
 }

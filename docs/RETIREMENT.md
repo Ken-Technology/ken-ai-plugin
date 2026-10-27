@@ -1,5 +1,7 @@
 # Ken AI Plugin Retirement
 
+> **Superseded on 2026-10-27 (DEV-5197).** The plugin is live again: `plugins/ken-ai/` now ships the skills generated from the Ken MCP skills in ken-backend, and the repo is unarchived. This page is kept as the record of the July 2026 retirement.
+
 This plugin is retired. Every skill and command in it is now a deprecation shim
 that points at the Ken MCP server (`https://mcp.ken.so/mcp`), which
 serves the workflows natively via `list_skills()` / `load_skill("<name>")` and

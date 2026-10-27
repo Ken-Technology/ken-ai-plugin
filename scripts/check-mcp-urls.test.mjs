@@ -115,6 +115,11 @@ test('findMcpUrls keeps the port and path intact', () => {
   ]);
 });
 
+test('findMcpUrls checks the resource a connect URL with a query names', () => {
+  assert.deepEqual(findMcpUrls(`reconnect with \`${RESOURCE}?workspace=<id>\``), [RESOURCE]);
+  assert.deepEqual(findMcpUrls(`see ${RESOURCE}#setup.`), [RESOURCE]);
+});
+
 test('findMcpUrls skips lines marked mcp-url-ignore', () => {
   // Lets a changelog or post-mortem quote a dead URL without failing the build.
   assert.deepEqual(

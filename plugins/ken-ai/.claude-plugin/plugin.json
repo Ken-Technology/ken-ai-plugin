@@ -1,11 +1,21 @@
 {
   "name": "ken-ai",
-  "version": "1.0.0",
-  "description": "DEPRECATED - use the Ken MCP server directly. End-to-end Ken AI campaign creation: ICP planning, KenSearch targeting, qualification and segmentation prompts, email copy with review loop, AI personalization prompts, and pure-MCP campaign configuration on the Ken AI platform.",
+  "version": "2.0.0",
+  "description": "Ken AI skills for Claude Code: build cold email campaigns, handle replies, report results and keep sending healthy in your Ken workspace, through the Ken MCP server.",
   "author": {
     "name": "Ken AI",
-    "email": "development@ken.so"
+    "email": "development@ken.so",
+    "url": "https://ken.so"
   },
-  "homepage": "https://github.com/Ken-Technology/ken-ai-plugin",
-  "keywords": ["ken-ai", "cold-email", "campaigns", "mcp"]
+  "homepage": "https://ken.so",
+  "privacyPolicyUrl": "https://ken.so/privacy",
+  "repository": "https://github.com/Ken-Technology/ken-ai-plugin",
+  "license": "MIT",
+  "keywords": [
+    "ken-ai",
+    "cold-email",
+    "outbound",
+    "campaigns",
+    "mcp"
+  ]
 }
