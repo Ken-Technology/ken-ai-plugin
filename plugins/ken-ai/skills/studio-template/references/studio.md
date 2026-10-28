@@ -40,7 +40,7 @@ Pick the type from the answers:
 | `report` | puts the account next to its peers, from your data | `benchmark-report` |
 | `landing_page` | retells your closest customer story for them | `case-study` |
 | `event` | invites them to a dinner or webinar and saves the seat | `event-invite` |
-| `calculator` | lets them run the numbers, then book | `roi-calculator` |
+| `calculator` | lets them run the numbers, then book | none for now, see `calculator.md` |
 | `recruiting` | pitches a role to one candidate, or shows them the open roles that fit; needs the `recruiting` flag (see "Recruiting pages") | `role-pitch`, `roles-for-you` |
 | `other` | fits none of these | none, start blank |
 

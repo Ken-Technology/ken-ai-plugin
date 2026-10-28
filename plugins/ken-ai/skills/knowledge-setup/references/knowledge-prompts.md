@@ -15,11 +15,11 @@ For each lead the most specific prompt of a type wins: segment, then tier, then 
 | Type | Where it runs |
 |---|---|
 | `qualification` | Added after the campaign's own Qualification prompt, as a Knowledge section. It adds rules; it never replaces the campaign's. |
-| `scoring` | Added the same way to the lead-score question. |
+| `scoring` | Added the same way to the lead-score question, by the lead's segment, then tier, then Everyone. |
 | `personalization` | Goes into the campaign's personalization prompt, after the company folder's files and the Instructions. An AI variable can also link one, which copies the body into the variable. |
 | `replies` | The reply agent always gets the Everyone prompt. |
 | `tiers` | Places accounts in the custom account tiers (see below). Everyone or tiers only, never a segment. |
-| `research` | Kept and listed; campaigns do not run it yet. |
+| `research` | Added to account research and to a workflow research step, by the account's tier, else Everyone. Research has no segment, so a segment research prompt never runs. |
 
 To see what a campaign actually resolves to, per segment and for leads with no segment: `knowledge_prompts(operation="campaign-resolution-list", campaign_id=...)`. `match` is `segment`, `everyone` or `none`, and `tierPrompts` names the tier prompt that beats the Everyone prompt for each tier.
 

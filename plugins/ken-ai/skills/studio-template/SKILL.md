@@ -49,7 +49,7 @@ Pick the type and the closest starter:
 | `report` | puts the account next to its peers, from your data | `benchmark-report` |
 | `landing_page` | retells your closest customer story for them | `case-study` |
 | `event` | invites them to a dinner or webinar and saves the seat | `event-invite` |
-| `calculator` | lets them run the numbers, then book | `roi-calculator` |
+| `calculator` | lets them run the numbers, then book | none for now, see `references/calculator.md` |
 | `recruiting` | pitches a role to one candidate, or shows the roles that fit them (flag `recruiting`) | `role-pitch`, `roles-for-you` |
 | `other` | fits none of these, or is a cold email (`template_format="email"`, flag `studio_email`) | none, start blank |
 

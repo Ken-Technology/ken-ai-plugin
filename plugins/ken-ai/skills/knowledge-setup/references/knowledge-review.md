@@ -58,4 +58,4 @@ Tell the person it is waiting in Review for someone with edit rights.
 
 ## Export
 
-`knowledge_review(operation="export-create")` (or `folder_id=` for one folder) starts a zip of markdown. Its download works only in the app for the member who asked, for 24 hours, and no tool downloads it: send the person to Knowledge in the app.
+`knowledge_review(operation="export-create")` (or `folder_id=` for one folder) starts a zip of markdown. `knowledge_library(operation="export-content", export_id=<its id>)` downloads it, for the member who asked only, for 24 hours: `status` `running` means read it again in a minute, and a built zip up to 2 MiB comes back as `contentBase64`. A bigger one returns a note instead: export one folder at a time, or send the person to Knowledge in the app.
