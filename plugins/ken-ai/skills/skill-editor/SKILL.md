@@ -96,3 +96,7 @@ To bring Ken's changes into an edited copy: read Ken's current text (Step 2), sh
 | 409 `too_few_tasks` or `no_skills_folder` on a draft | Too few finished tasks, or the workspace has no Skills folder: say so |
 | 429 on a draft | A draft is already running for the person: wait for it |
 | 400 on `cmd` | Lowercase words joined by hyphens, up to 40 characters |
+
+## No Ken account yet
+
+These steps run on the Ken MCP server, which signs in with a Ken account. If the user has none, send them to https://app.ken.so/get-started to create one, then sign in when the agent asks.

@@ -43,3 +43,7 @@ Share the builder link for the saved role and stop there: https://app.ken.so/dem
 ## Errors
 
 Tools return a normalized error envelope (`success: false`, `error.category`). A 400 `validation_failed` names the field: fix that field and save again. A 404 `not_found` on every roles call means recruiting is off for the workspace. On `plan_limit` or `billing`, surface `error.message` and `error.recovery.summary`; never retry blindly.
+
+## No Ken account yet
+
+These steps run on the Ken MCP server, which signs in with a Ken account. If the user has none, send them to https://app.ken.so/get-started to create one, then sign in when the agent asks.

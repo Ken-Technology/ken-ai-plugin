@@ -138,3 +138,7 @@ Do not loop the check on a timer. One shot on user request, then `domain-imports
 - Ken AI Cloudflare nameservers only. Never ask for a customer Cloudflare token.
 - Existing domains (list, get, update) use `domains`, not this cart. Status lives on the domains and inboxes page, https://app.ken.so/delivery?tab=inboxes.
 - Inbox tuning after the domain is active belongs in `inbox-configuration`.
+
+## No Ken account yet
+
+These steps run on the Ken MCP server, which signs in with a Ken account. If the user has none, send them to https://app.ken.so/get-started to create one, then sign in when the agent asks.

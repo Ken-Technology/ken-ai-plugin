@@ -188,3 +188,7 @@ Open with `load_skill("studio-template", reference="references/<file>")`:
 - `studio-template-builder.md`: the bundle reference (format, schema, Liquid, kit, CSP, recipe steps, every validation rule).
 - `studio.md`: the whole Studio loop in one guide, from brief to link, runs, credits and troubleshooting.
 - Type playbooks: `reverse-demo.md`, `audit.md`, `report.md`, `landing-page.md`, `event.md`, `calculator.md`, `recruiting.md`, `email.md`.
+
+## No Ken account yet
+
+These steps run on the Ken MCP server, which signs in with a Ken account. If the user has none, send them to https://app.ken.so/get-started to create one, then sign in when the agent asks.

@@ -106,3 +106,7 @@ A person accepts or dismisses it in Knowledge Review. Never edit a Knowledge fil
 - It does not send anything. For the touches that follow the call, use the `accounts` skill.
 
 Report the brief, the parts you skipped and why, and any suggestion you filed.
+
+## No Ken account yet
+
+These steps run on the Ken MCP server, which signs in with a Ken account. If the user has none, send them to https://app.ken.so/get-started to create one, then sign in when the agent asks.

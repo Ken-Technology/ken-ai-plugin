@@ -110,3 +110,7 @@ Report: the event, the list by role and source, the target accounts on it, the t
 - Upload an attendee file (CSV, PDF, badge photo) from here: paste its text instead.
 - Confirm attendance for people found at an exhibiting company or on last year's list: they stay "likely".
 - Click Attend on LinkedIn, or read a LinkedIn event without the person's accepted warning.
+
+## No Ken account yet
+
+These steps run on the Ken MCP server, which signs in with a Ken account. If the user has none, send them to https://app.ken.so/get-started to create one, then sign in when the agent asks.

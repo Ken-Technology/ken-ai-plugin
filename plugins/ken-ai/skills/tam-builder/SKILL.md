@@ -108,3 +108,7 @@ Say what the list does not cover (countries, company types without a company pag
 - No email find or verify outside Ken Search's six countries.
 - No bulk fit classifier: you classify in batches.
 - No "do we already hold this person" check across every campaign: imports dedupe against their target campaign only.
+
+## No Ken account yet
+
+These steps run on the Ken MCP server, which signs in with a Ken account. If the user has none, send them to https://app.ken.so/get-started to create one, then sign in when the agent asks.

@@ -154,3 +154,7 @@ A recruiting campaign fills one role, needs the `recruiting` feature, and is cre
 ## Report back
 
 After each gate, one short status: the stage, what was written (ids), what waits on the user. At the end: the campaign id and name, each segment with its sequence and review score, the AI variables per segment, the settings applied and the ones left for the app, the verify report, and the link to launch.
+
+## No Ken account yet
+
+These steps run on the Ken MCP server, which signs in with a Ken account. If the user has none, send them to https://app.ken.so/get-started to create one, then sign in when the agent asks.

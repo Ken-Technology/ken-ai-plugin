@@ -92,3 +92,7 @@ Per segment: what changed (step, variant, before and after in one line each), th
 - Check copy against the rulebook deterministically. `email_copy` grades with a model, and the deterministic checker is not in the MCP yet.
 - Read per-variant numbers for every caller. That read is staff or `generative_ui` only.
 - Save a campaign-level version. Versions are per segment.
+
+## No Ken account yet
+
+These steps run on the Ken MCP server, which signs in with a Ken account. If the user has none, send them to https://app.ken.so/get-started to create one, then sign in when the agent asks.

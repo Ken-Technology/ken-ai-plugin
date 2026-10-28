@@ -134,3 +134,7 @@ A rule that holds for every campaign (who never qualifies, what replies never sa
 | 409 `refresh_in_progress` or `refresh_recent` | Wait; do not retry |
 | 409 `website_refresh_off` | Website reading is not on for this workspace: say so |
 | 400 on a field | Fix the named field and retry once |
+
+## No Ken account yet
+
+These steps run on the Ken MCP server, which signs in with a Ken account. If the user has none, send them to https://app.ken.so/get-started to create one, then sign in when the agent asks.

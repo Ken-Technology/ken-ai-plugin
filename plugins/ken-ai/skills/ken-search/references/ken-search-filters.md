@@ -111,7 +111,7 @@ Supported countries: United Kingdom, United States, Canada, Ireland, New Zealand
 - `hiringSurge` - `{ "functions": [...], "windowMonths": N, "minNetAdds": N, "minGrowthPercent": N }`
 - `specialties` - Company specialty keywords
 - `website` - Website domain
-- `keywords`, `booleanSearch`, `includeSimilarCompanies`
+- `keywords`, `booleanSearch`
 - `sortBy` - `"relevance"`, `"name"`, `"employees_count"`, `"founded_year"`
 
 ## Tool Workflow

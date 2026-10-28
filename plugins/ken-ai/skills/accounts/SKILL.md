@@ -200,3 +200,7 @@ Every write you make is recorded as an agent write through your client, with the
 Adding accounts, grading a touch, a hand-off brief and a signals scan (apart from its news search) are free. Research runs, mapping runs, touch plans, drafts and rewrites are charged, and an email find costs 1 credit per email found. Before research or mapping runs on more than a few accounts, tell the user what it costs.
 
 The cost of each step and what each error code means (`domain_taken`, `pinned_by_user`, `account_merged`, `committee_run_active`, `guardrail_violation`, 402 and the rest) are in `references/credits-and-errors.md`. Open it with `load_skill("accounts", reference="references/credits-and-errors.md")` when a call fails.
+
+## No Ken account yet
+
+These steps run on the Ken MCP server, which signs in with a Ken account. If the user has none, send them to https://app.ken.so/get-started to create one, then sign in when the agent asks.
