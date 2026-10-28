@@ -1,6 +1,6 @@
 # Calculator playbook
 
-A calculator puts a number on a cost the account lives with, starting from their own figures, and lets them change every input. The `roi-calculator` starter is the worked example. `studio-template-builder.md` (in this folder) holds the bundle format, the kit and every validation rule; this file covers what to build, including the one hard constraint: Alpine runs only as its CSP build.
+A calculator puts a number on a cost the account lives with, starting from their own figures, and lets them change every input. The gallery has no calculator starter for now. `studio-template-builder.md` (in this folder) holds the bundle format, the kit and every validation rule; this file covers what to build, including the one hard constraint: Alpine runs only as its CSP build.
 
 ## What it is for
 
@@ -40,9 +40,9 @@ The result renders twice. Liquid computes it on the server from the prefilled in
 
 Optional: `basis` (`{reps, hours, rep_cost}`, max 120 each). Working slots: `dossier`, `why_now`, `site`.
 
-The slot schema has no `minimum` or `maximum`, so ranges live in three places: the prompt ("Clamp every number to its range"), the Liquid at the top of the template (`at_least`, `at_most`), and the script's `fit()` for what the reader types.
+The slot schema has no `minimum` or `maximum`, so ranges live in three places: the prompt ("Clamp every number to its range"), the Liquid at the top of the template (`at_least`, `at_most`), and the inputs' `min` and `max` for what the reader types.
 
-Every required slot has a fallback, and the starter also ships `fallback.liquid` for the time before the first fill. The starter keeps every `data.*` read in one "inputs" block at the top of `template.liquid`, so `fallback.liquid` is the same file with that block swapped for constants. Keep the two in step when you change the calculator.
+Every required slot has a fallback; ship a `fallback.liquid` too, for the time before the first fill. Keep every `data.*` read in one "inputs" block at the top of `template.liquid`, so `fallback.liquid` is the same file with that block swapped for constants. Keep the two in step when you change the calculator.
 
 ## The recipe that fills them
 
@@ -52,7 +52,7 @@ Every required slot has a fallback, and the starter also ships `fallback.liquid`
 | `site` | tool `scrape.page` | Their homepage, for team size and open sales roles | `site` |
 | `estimate` | prompt | Fair starting numbers, a basis line for each, the headline and intro | 6 slots |
 
-The prompt step from the starter, shortened:
+The prompt step, shortened:
 
 ```json
 { "id": "estimate", "kind": "prompt", "model": "cheap",
@@ -65,42 +65,27 @@ Credits, in plain words: the binds and `scrape.page` are free. The prompt costs 
 
 ## Alpine under the CSP
 
-Studio pages run under a Content Security Policy with no `'unsafe-eval'`. Standard Alpine turns every directive into code with `new Function`, so it does not run there, and loading it from unpkg fails `csp-script-src` at validation. The only Alpine the policy allows is the CSP build, `https://cdn.jsdelivr.net/npm/@alpinejs/csp@3/dist/cdn.min.js`, which never evaluates expressions. The pattern that works:
+Studio pages run under a Content Security Policy with no `'unsafe-eval'` and no inline script of their own: only Ken's scripts run inline, each with the response's nonce, and validation refuses a template's inline `<script>` and `on*` handlers (`csp-inline-script`). Standard Alpine turns every directive into code with `new Function`, so it does not run there, and loading it from unpkg fails `csp-script-src`. The only Alpine the policy allows is the CSP build, `https://cdn.jsdelivr.net/npm/@alpinejs/csp@3/dist/cdn.min.js`, which evaluates directives with its own parser. The pattern that works:
 
-1. Register the component in an inline script, inside `alpine:init`, with `Alpine.data`. Load the CSP build after it, with `defer`.
-2. Put every computed value in a getter and every action in a method.
-3. Keep each directive to a single name: `x-text="yearBack"`, `x-on:click="reset"`, `x-bind:hidden="unchanged"`, `x-model.number="reps"`. The CSP build does not run arbitrary JavaScript, so math, `!`, ternaries and arguments go in a getter or a method, never in the markup.
-4. Pass the prefilled numbers through `data-*` attributes and read them in `init()`.
-5. Wire events with `x-on:` or `addEventListener`, never `onclick=` attributes.
-
-Shortened from the starter:
+1. Load the CSP build with `defer`. There is no inline script to register an `Alpine.data` component in.
+2. Put the state in an `x-data` object literal, with the prefilled numbers printed into it by Liquid.
+3. Keep each directive to what the CSP build evaluates: arithmetic, comparisons, ternaries, `!` and `&&`, assignments and method calls on the component's data. No `Math`, `window` or other globals, no arrow functions, no template literals.
+4. Wire events with `x-on:`, never `onclick=` attributes. Bind inputs with `x-model.number`, never `:type` or `:name` on an input (`csp-input-type`).
 
 ```html
-<script>
-document.addEventListener('alpine:init', function () {
-  window.Alpine.data('roi', function () {
-    return {
-      reps: 6, hours: 8, cost: 90000, share: 60,
-      init: function () {
-        var d = this.$el.dataset;
-        this.reps = Number(d.reps) || 6; this.hours = Number(d.hours) || 8; this.cost = Number(d.cost) || 90000;
-      },
-      get yearBack() {
-        return '$' + Math.round(this.reps * this.hours * this.cost * this.share / 4000).toLocaleString('en-US');
-      }
-    };
-  });
-});
-</script>
 <script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/csp@3/dist/cdn.min.js"></script>
 
-<div x-data="roi" data-reps="{{ data.reps | default: 6 }}" data-hours="{{ data.hours | default: 8 }}" data-cost="{{ data.rep_cost | default: 90000 }}">
+{% assign reps = data.reps | default: 6 | at_least: 1 | at_most: 50 %}
+{% assign hours = data.hours | default: 8 | at_least: 2 | at_most: 20 %}
+{% assign cost = data.rep_cost | default: 90000 | at_least: 40000 | at_most: 250000 %}
+
+<div x-data="{ reps: {{ reps | round }}, hours: {{ hours | round }}, cost: {{ cost | round }}, share: 60 }">
   <input type="number" min="1" max="50" x-model.number="reps">
-  <b x-text="yearBack">$64,800</b>
+  <b x-text="'$' + (reps * hours * cost * share / 4000).toFixed(0)">${{ reps | times: hours | times: cost | times: 60 | divided_by: 4000 }}</b>
 </div>
 ```
 
-The text inside `<b>` is the Liquid-computed figure the reader sees before Alpine starts. The starter computes it with the same formula as the getter (40 hour weeks, 48 weeks a year) and formats the thousands separators by hand, since Liquid has no filter for them.
+The three `assign` lines are the inputs block at the top of the template. The text inside `<b>` is the Liquid-computed figure the reader sees before Alpine starts, with the same formula as the `x-text` (40 hour weeks, 48 weeks a year).
 
 ## The CTA: booking under the result
 
@@ -112,17 +97,15 @@ It embeds the sender's booking page when `link.booking_url` is on the booking al
 
 ## Common failure modes
 
-- **Nothing reacts to input.** Standard Alpine, or an expression in a directive (`x-text="reps * hours"`), under the CSP. The first fails `csp-script-src`; the second passes validation and only fails in the browser console. Move the expression into a getter.
+- **Nothing reacts to input.** Standard Alpine, an inline `Alpine.data` script, or a global in a directive (`x-text="Math.round(total)"`), under the CSP. The first fails `csp-script-src`, the second `csp-inline-script`; the third passes validation and only fails in the browser console. Use the data's own methods (`total.toFixed(0)`).
 - **Numbers as strings.** The prompt returns `"6"`, `data-type` fails the integer slot, and the page uses the fallback 6. Keep "Return integers, not strings" in the prompt.
-- **Out-of-range inputs.** A prompt answer of 400 reps passes the schema, which cannot hold a range. Clamp in Liquid before printing and in the script before computing.
+- **Out-of-range inputs.** A prompt answer of 400 reps passes the schema, which cannot hold a range. Clamp in Liquid before printing, and give each input `min` and `max`.
 - **The two files drift.** You change a formula in `template.liquid` and not in `fallback.liquid`, and a reader who opens the link before the fill sees different math. Keep all `data.*` reads in the inputs block and diff the files before you push.
-- **The script and the server disagree.** The Liquid figure and the getter use different formulas, so the number jumps when Alpine starts. Write the formula once in a comment above both and copy it exactly.
-- **An overclaim.** The share you take over is your claim; the starter defaults it to 60 percent and lets the reader lower it. The prompt never promises a result, and the page calls every figure an estimate.
+- **The directive and the server disagree.** The Liquid figure and the `x-text` use different formulas, so the number jumps when Alpine starts. Write the formula once in a comment above both and copy it exactly.
+- **An overclaim.** The share you take over is your claim; default it to 60 percent and let the reader lower it. The prompt never promises a result, and the page calls every figure an estimate.
 - **A calendar that does not embed.** A booking URL outside the allow-list renders as a button, not an iframe. That is expected; your own `<iframe>` from another host fails `csp-iframe-src`.
 - **A placeholder in the preview.** A Studio preview has no link and so no booking link: `ken/booking` shows a dashed box the size of the frame, and a booking `ken/cta` keeps its button with no link. The live page shows the calendar and links the button.
 
 ## Starter
 
-`studio_templates(operation="create", starter_slug="roi-calculator")`
-
-To make it your calculator, change the inputs block, the formulas in Liquid and in the getters, the labels and help text, and the `estimate` prompt's rules for each starting number. Keep the getter names in step with every `x-text`.
+None in the gallery for now: the ROI calculator starter left it while it is rebuilt without an inline script. Build from `studio-template-builder.md` and this playbook, and keep the formula in the Liquid and in each `x-text` in step.

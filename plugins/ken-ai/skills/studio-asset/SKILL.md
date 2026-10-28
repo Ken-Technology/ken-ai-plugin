@@ -52,7 +52,6 @@ Read the template's files with `studio_templates(operation="pull", template_id=4
 | `benchmark-report`, peer benchmark report | `peer-benchmark` | `benchmark-report.md` |
 | `case-study`, built for you case study | `customer-story` | `case-study.md` |
 | `event-invite`, dinner or webinar invite | `invite` | `event-invite.md` |
-| `roi-calculator`, ROI calculator | `prospecting-roi` | `roi-calculator.md` |
 | `role-pitch`, role pitch for one candidate | `role` | `role-pitch.md` |
 | `roles-for-you`, roles for you | `roles` | `roles-for-you.md` |
 
@@ -178,7 +177,7 @@ When a prospect asks to see the work, build them a real sample: their campaign, 
 
 Open with `load_skill("studio-asset", reference="references/<file>")`:
 
-- One fill guide per starter: `rd-doc.md`, `rd-ken-native.md`, `rd-your-product.md`, `audit-rewrites.md`, `benchmark-report.md`, `case-study.md`, `event-invite.md`, `roi-calculator.md`, `role-pitch.md`, `roles-for-you.md`.
+- One fill guide per starter: `rd-doc.md`, `rd-ken-native.md`, `rd-your-product.md`, `audit-rewrites.md`, `benchmark-report.md`, `case-study.md`, `event-invite.md`, `role-pitch.md`, `roles-for-you.md`.
 - `studio-fill.md`: filling a page with your own model, from prepare to submit, with a worked example.
 - `sample-campaign-for-prospect.md`: the whole sample-campaign recipe, from the reply to the draft.
 

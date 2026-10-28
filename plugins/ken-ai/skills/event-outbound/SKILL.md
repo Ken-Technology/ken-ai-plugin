@@ -36,13 +36,13 @@ Ask whether the team is going: it changes the touches (meet in person, or follow
 
 ## Step 2 - Build the list
 
-Add rows from what the event publishes first, then what Ken AI can find. Every source below returns rows to review and saves nothing: add the rows you keep with `attendees-bulk-create` and their source.
+Add rows from what the event publishes first, then what Ken AI can find. Every source below but a list file returns rows to review and saves nothing: add the rows you keep with `attendees-bulk-create` and their source.
 
 **The event's own pages.** `preview-from-link` returns `pages`, the site's speaker, exhibitor and sponsor pages. Read each one:
 
 `outbound_events(operation="extract-attendees", event_id=12, url="https://example.com/summit/speakers", role="speaker")`
 
-- Pasted text works too: `text="..."` instead of `url`. A list file (CSV, PDF, badge photo) is not uploaded here: ask the user to paste its text.
+- Pasted text works too: `text="..."` instead of `url`.
 - A sponsorship prospectus or "who attends" page: `mode="prospectus"`. It returns the companies it names, the job titles attendees hold (`titleMix`) and how many attend (`attendeeCount`).
 - `note` says what to tell the person (a host-only guest list, a page closed to crawlers). `truncated` means a cap cut the list.
 
@@ -51,6 +51,15 @@ Add what you keep, up to 500 rows a call:
 `outbound_events(operation="attendees-bulk-create", event_id=12, source="url", source_url="https://example.com/summit/speakers", items=[{"role": "speaker", "full_name": "Maya Chen", "title": "VP Revenue Operations", "company_name": "Acme", "company_domain": "acme.com"}])`
 
 Each result is `created`, `duplicate` (already on the event: it fills a blank title or domain) or `validation_failed`. A row with no domain is matched in Ken Search during the call.
+
+**A list file the user has.** A CSV, an Excel sheet, a PDF, or a photo of a badge, a card or a list. Ask whether they have permission to use the list, as the app does, then add it in one call:
+
+`outbound_events(operation="attendees-upload", event_id=12, role="attendee", file_name="attendees.csv", file_content_base64="...")`
+
+- Ken AI reads it the way the app does: a CSV or sheet maps its columns by name (`columns={"Org": "company_name"}` fixes one), a PDF's text and each photo go to the model. One file a call.
+- A model can misread a photo or a PDF. For those, and for free text, call with `preview=True`, show the person the rows, then add the ones they keep with `attendees-bulk-create` and the returned `source`. A CSV or sheet maps the same way every time, so add it directly (`preview=True` checks the columns first).
+- A CSV's text works as `text="..."` with its `file_name`. Text alone is a pasted list: a copied table maps the same way, other text is read by the model.
+- `file.reason` says why a file added nothing (`no_text`: a scan, so send photos of its pages; `oversized_image`: crop it into parts). HEIC is not read: send it as JPEG. `added` has the counts and the first failures.
 
 **Find with Ken AI.** Three previews, each for a different kind of "likely":
 
@@ -107,7 +116,6 @@ Report: the event, the list by role and source, the target accounts on it, the t
 
 ## What this skill cannot do yet
 
-- Upload an attendee file (CSV, PDF, badge photo) from here: paste its text instead.
 - Confirm attendance for people found at an exhibiting company or on last year's list: they stay "likely".
 - Click Attend on LinkedIn, or read a LinkedIn event without the person's accepted warning.
 

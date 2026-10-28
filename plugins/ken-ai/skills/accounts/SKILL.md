@@ -137,7 +137,7 @@ What a signal means:
 
 There are two ways to put touches on an account.
 
-**Ken AI's plan.** `account_touches(operation="plan-start", account_id=101)` places up to 9 planned touches over 90 days across the people you can reach. The account must be `researching`, `warming` or `engaged`, with one person who has an email or LinkedIn; otherwise `invalid_state` says what is missing. Read the plan with `account_touches(operation="plan-get", account_id=101)`: `thin` means map more people. Then write each planned touch. Have Ken AI write it with `account_touches(operation="draft", touch_id=5001)` (charged; the touch lands in `awaiting_approval`), or write the body yourself with `update`.
+**Ken AI's plan.** `account_touches(operation="plan-start", account_id=101)` places planned touches across the people you can reach. Where account tiers are on, the account's tier sizes the plan: its `maxTouches`, `days` and `gapDays` from `account_signals(operation="account-tiers-get")` (on the default ladder Tier 1 is up to 11 touches over 100 days, Tier 5 up to 3 over 21). Otherwise it places up to 9 over 90 days. The account must be `researching`, `warming` or `engaged`, with one person who has an email or LinkedIn; otherwise `invalid_state` says what is missing. Read the plan with `account_touches(operation="plan-get", account_id=101)`: `thin` means map more people. Then write each planned touch. Have Ken AI write it with `account_touches(operation="draft", touch_id=5001)` (charged; the touch lands in `awaiting_approval`), or write the body yourself with `update`.
 
 **Your own touch.**
 

@@ -63,7 +63,7 @@ The company folder holds the company-wide files. Ken seeds none, except a `Compa
 | Competitors (folder) | One file per competitor: what they do, where the company wins, where it loses |
 
 1. Gather: run the client-research playbook (website, past research, the person's notes), or take what the person pastes or says.
-2. For each file: when one with that name exists, `get` it and update only the sections that changed. Otherwise `knowledge(operation="create", folder_id=<company folder id>, name="Pricing", body="# Pricing\n...", tags=["pricing"])`. Proof and Competitors files go in those folders (`knowledge(operation="folders-list", parent_id=<company folder id>)` gives their ids).
+2. For each file: when one with that name exists, `get` it and update only the sections that changed. Otherwise `knowledge(operation="create", folder_id=<company folder id>, name="Pricing", body="# Pricing\n...", tags=["pricing"])`. Proof and Competitors files go in those folders (`knowledge(operation="folders-list", parent_id=<company folder id>)` gives their ids). A folder that is missing (Battlecards, say) is `knowledge_library(operation="folders-create", parent_id=<company folder id>, name="Battlecards")` on a yes; `folders-update` renames or moves one, and `folders-delete` deletes it with everything below it: show the person what is inside first, and set its `confirm` argument only on their yes.
 3. Keep the workspace company context in step with Company overview: the client-research playbook writes it with `workspace(operation="update", workspace_id=..., company_context=...)`.
 
 Your writes, made with the person's yes, go live at once and can be undone from the change log. What Ken learns later from the website, calls and mail goes through the review mode, which by default holds pricing and company-wide changes for a person.
@@ -90,7 +90,7 @@ A one-off read of a site for research is the website-scraping playbook, not this
 - **One call:** `knowledge(operation="transcripts-create", text="...", title="Kickoff with Acme", occurred_at="2026-10-14T15:00:00Z", account_id=...)`. Up to 5 MB; `Name: words` lines keep the speaker. Facts arrive in Review. Without an account the transcript stays the person's own.
 - **Every call:** `knowledge(operation="transcripts-create-webhook")` returns a URL a recorder, Zapier or Make posts to; `knowledge(operation="transcripts-create-email-address")` returns an address to forward recaps to. Each is shown once, replaces the person's previous one, and is a password (Rules).
 - **Mailbox and CRM:** `knowledge_review(operation="sources-list")` shows them. Turn reading on or off, or share one with the workspace, on the owner's yes: `knowledge_review(operation="sources-update", source_id=..., ingest_enabled=true, share_with_workspace=false)`. HubSpot: `knowledge(operation="hubspot-create-connect-session")` returns an authorize link for a workspace admin, who finishes the connection signed in to the app.
-- **Documents:** people upload them in the app. Read an uploaded file's text with `knowledge_review(operation="upload-content", file_id=...)`.
+- **Documents:** upload a PDF, Word file, deck or spreadsheet the person gives you, on their yes: `knowledge_library(operation="upload-create", file_content_base64=..., file_name="Pricing deck.pdf", folder_id=<company folder id>)`. Up to 50 MB, into the company folder or a folder in it. The new file reads `reading` until Ken has parsed it. Read an uploaded file's text with `knowledge_review(operation="upload-content", file_id=...)`.
 
 ## Step 6: Review mode
 
@@ -116,12 +116,8 @@ A rule that holds for every campaign (who never qualifies, what replies never sa
 
 ## What this skill cannot do yet
 
-- Upload a document. People upload in the app; this skill reads uploads.
-- Make, rename or delete a folder. Use the app.
 - Give a file a system key. A file you create is a plain file, so update the `Company overview` Ken moved from Settings rather than making a second one.
 - Read a website on a customer connection: `web` is not on those, so ask the person to paste the page text (the website-scraping playbook).
-- Download an export. The zip opens only in the app.
-- Run research Knowledge prompts. They are kept, but campaigns do not run them yet.
 
 ## Errors
 
@@ -133,6 +129,7 @@ A rule that holds for every campaign (who never qualifies, what replies never sa
 | 409 `member_required` or `needs_person` | The connection has no person behind it: writing style and transcripts need the person's own connection |
 | 409 `refresh_in_progress` or `refresh_recent` | Wait; do not retry |
 | 409 `website_refresh_off` | Website reading is not on for this workspace: say so |
+| 409 `upload_folder_not_supported` | Upload into the company folder or a folder in it |
 | 400 on a field | Fix the named field and retry once |
 
 ## No Ken account yet

@@ -37,7 +37,7 @@ Anything else is ignored with a `bundle-unknown-file` warning.
 | One push | 300 files, 20 `fromUrl` files, 20 MB |
 | Paths | relative, `/`-separated, letters, digits, `.`, `_`, `-`; no `..`, no leading `/` |
 
-Asset types: images (png, jpg, gif, webp, avif, ico, svg), fonts (woff, woff2, ttf, otf), pdf and csv. An SVG may not hold `<script>`, `<foreignObject>`, `on*=` attributes or `javascript:`. JavaScript and CSS files are not assets: write them inline in `<script>` and `<style>`.
+Asset types: images (png, jpg, gif, webp, avif, ico, svg), fonts (woff, woff2, ttf, otf), pdf and csv. An SVG may not hold `<script>`, `<foreignObject>`, `on*=` attributes or `javascript:`. JavaScript and CSS files are not assets: write CSS inline in `<style>`. A page runs no script of its own (see Scripts below).
 
 `format` is one of three values:
 
@@ -287,7 +287,7 @@ Pages render with LiquidJS 10 on the page server. The validator parses with Scri
 - **Dates** render in UTC with the `en-US` locale.
 - **Limits**: 50,000 render steps (each node, loop iteration and kit call is one) and 2 MB of output per page. Past either, the render fails and the fallback serves.
 - **Escaping**: every `{{ }}` output is HTML-escaped automatically. Existing entities are kept, so an explicit `| escape` is harmless and never escapes twice. To output HTML from a slot, use `| raw`. Markup a filter adds is escaped too, so prose with line breaks escapes first and ends in `raw`: `{{ data.intro | escape | newline_to_br | strip_newlines | raw }}`, or the reader sees `<br />` as text. Filled HTML must pass `data-active-content`: formatting elements only, never scripts, styles, forms, frames, media or handlers.
-- **Scripts**: escaping turns quotes into entities, so never print a value inside `<script>`. Put it in a `data-*` attribute and read it with `el.dataset` (the `roi-calculator` pattern).
+- **Scripts**: a template has none (`csp-inline-script`). Print only numbers into an `x-data` literal or a directive; print text with Liquid in the markup, where escaping keeps it safe.
 - **Defaults**: give every Ken variable that can be null a `| default:` or an `{% if %}` guard (which ones: see Ken variables).
 - **Truthiness**: an empty string is truthy. An empty top-level slot is replaced by its fallback or removed before render, so `{% if data.x %}` works for it. Test nested strings with `{% if e.ps and e.ps != '' %}`.
 - **Literal braces**: a rendered page that contains `{{` or `{%` counts as a failed render. Never print literal Liquid braces, not even through `{% raw %}`.
@@ -422,7 +422,7 @@ Args: `title` (the iframe title, default "Book a time"), `height` (pixels, 320 t
 Every Studio page is served with this Content Security Policy, built from the policy below:
 
 ```
-default-src 'none'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net/npm/chart.js@4 https://cdn.jsdelivr.net/npm/chart.js@4/ https://cdn.jsdelivr.net/npm/@alpinejs/csp@3/ https://cdn.jsdelivr.net/npm/motion@11 https://cdn.jsdelivr.net/npm/motion@11/ https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https://api.ken.so/media/; connect-src 'self' https://cloudflareinsights.com/cdn-cgi/rum; frame-src https://calendly.com https://cal.com https://app.cal.com https://meetings.hubspot.com https://meetings-eu1.hubspot.com https://*.chilipiper.com https://savvycal.com https://www.loom.com https://www.youtube.com https://www.youtube-nocookie.com https://player.vimeo.com https://fast.wistia.net; form-action 'self'; base-uri 'none'; frame-ancestors 'none'
+default-src 'none'; script-src 'self' 'nonce-<per response>' https://cdn.jsdelivr.net/npm/chart.js@4 https://cdn.jsdelivr.net/npm/chart.js@4/ https://cdn.jsdelivr.net/npm/@alpinejs/csp@3/ https://cdn.jsdelivr.net/npm/motion@11 https://cdn.jsdelivr.net/npm/motion@11/ https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https://api.ken.so/media/; connect-src 'self' https://cloudflareinsights.com/cdn-cgi/rum; frame-src https://calendly.com https://cal.com https://app.cal.com https://meetings.hubspot.com https://meetings-eu1.hubspot.com https://*.chilipiper.com https://savvycal.com https://www.loom.com https://www.youtube.com https://www.youtube-nocookie.com https://player.vimeo.com https://fast.wistia.net; form-action 'self'; base-uri 'none'; frame-ancestors 'none'
 ```
 
 The policy the validator and the page server share, verbatim:
@@ -476,17 +476,17 @@ The policy the validator and the page server share, verbatim:
 
 What that means for the HTML you write:
 
-- **Scripts**: inline `<script>` is allowed. External scripts only from the script sources: Chart.js 4, the Alpine CSP build 3 and Motion 11. A source without a trailing `/` matches only that exact URL, so load files under the `/` prefixes, for example `https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js`.
-- **Alpine**: only the CSP build (`@alpinejs/csp`). Standard Alpine evaluates expressions with `new Function`, which the policy blocks, so it fails. Register components with `Alpine.data` in an inline script on `alpine:init`, keep directive expressions to property names and method calls, then load `https://cdn.jsdelivr.net/npm/@alpinejs/csp@3/dist/cdn.min.js` with `defer`. No `eval` and no `new Function` anywhere.
+- **Scripts**: no inline `<script>` and no `on*` handler attributes (`csp-inline-script`). Only Ken's own scripts run inline, each with the response's nonce; a template's inline script has none and does not run. A JSON data block (`type="application/ld+json"` structured data, or `application/json`) is not script and stays allowed. For charts, forms, booking and CTAs use the kit (`ken/chart`, `ken/form`, `ken/booking`, `ken/cta`). External scripts only from the script sources: Chart.js 4, the Alpine CSP build 3 and Motion 11. A source without a trailing `/` matches only that exact URL, so load files under the `/` prefixes, for example `https://cdn.jsdelivr.net/npm/@alpinejs/csp@3/dist/cdn.min.js`. Chart.js and Motion need a script of the page's own to call them, so use `ken/chart` and CSS animations instead.
+- **Alpine**: only the CSP build (`@alpinejs/csp`), loaded with `defer`. Standard Alpine evaluates expressions with `new Function`, which the policy blocks, so it fails. There is no inline script to register `Alpine.data` components in, so keep state in `x-data` object literals (`x-data="{ open: false }"`) and directive expressions to what the CSP build evaluates: object and array literals, arithmetic, comparisons, ternaries, `!` and `&&`, assignments (`count = 0`, `count++`) and method calls on the component's data. Globals (`Math`, `window`, `document`, `parseInt`), arrow functions, template literals, spread and `x-html` do not run. Never bind an input's `type`, `name` or `autocomplete` (`:type`, `x-bind:type`): it fails `csp-input-type`. No `eval` and no `new Function` anywhere.
 - **Network**: `connect-src 'self'`. `fetch` and XHR reach only the page's own host, so no third-party APIs and no analytics or pixels. Studio tracks views itself. The served header also lists `static.cloudflareinsights.com` and `cloudflareinsights.com/cdn-cgi/rum`, only for the Cloudflare Web Analytics beacon the zone injects after the page is served. Do not load or call them: the validator rejects a `<script src>` from that host, and Studio's own view tracking is the page's analytics.
 - **Styles and fonts**: inline `<style>` blocks and Google Fonts (`fonts.googleapis.com` CSS, `fonts.gstatic.com` files). Self-hosted font files go in `assets/` and load through `@font-face` with `asset_url`.
 - **Images** (`img`, `srcset`, `poster`, icons, CSS `url()`): `assets/` through `asset_url`, `data:` images, or the image proxy `https://api.ken.so/media/`. Nothing from other hosts.
 - **Frames**: only the booking and video lists. Use `ken/booking` for booking. No `<object>`, `<embed>` or `<applet>`.
-- **Forms**: post only back to the page's own host, which is the platform's form handler. Use `ken/form`. Password inputs, `cc-*` or password autocomplete, and card or ID-number field names are rejected.
+- **Forms**: post only back to the page's own host, which is the platform's form handler. Use `ken/form`: the handler stores only the fields a `ken/form` on the page declared and drops password, card and ID-number names. A form the template writes itself stores nothing. Password inputs, `cc-*` or password autocomplete, and card or ID-number field names are rejected.
 
 ## Links
 
-Every `href`, `src`, `srcset`, `action`, `formaction`, `poster`, meta refresh and literal `window.open` URL in the templates, and every URL and HTML string in filled data, passes the static link rules: `link-scheme`, `link-ip-host`, `link-userinfo`, `link-port`, `link-shortener`, `link-punycode`, `link-text-mismatch` and `nav-redirect`. The validation table below has each rule and its fix. In short: https (or mailto, tel, relative, `#`), a real domain, no `user@`, no port, no shortener, no punycode unless it is the workspace's or the account's own domain, link text that names the real destination, and no scripted redirects.
+Every `href`, `src`, `srcset`, `action`, `formaction`, `poster`, meta refresh and literal `window.open` URL in the templates, and every URL and HTML string in filled data, passes the static link rules: `link-scheme`, `link-ip-host`, `link-userinfo`, `link-port`, `link-shortener`, `link-punycode`, `link-text-mismatch` and `nav-redirect`. The validation table below has each rule and its fix. In short: https (or mailto, tel, relative, `#`), a real domain, no `user@`, no port, no shortener, no punycode unless it is one of the workspace's DNS-verified domains, link text that names the real destination, and no scripted redirects.
 
 A URL that holds Liquid (`https://{{ account.domain }}/pricing`) is checked at push only up to the Liquid. The rest is checked on the filled data and at render.
 
@@ -495,7 +495,7 @@ At publish, at fill and on Customize, every external link host also gets a reput
 | Rule | Severity | Meaning and fix |
 |---|---|---|
 | `link-domain-blocked` | error | A malware-blocking resolver (Cloudflare or Quad9) blocks the domain. Remove the link |
-| `link-domain-new` | error | The domain was registered less than 30 days ago. Remove it, unless it is the workspace's or the account's own domain (then it passes) |
+| `link-domain-new` | error | The domain was registered less than 30 days ago. Remove it, unless it is one of the workspace's DNS-verified domains: a sending domain Ken bought, an imported one moved to Ken's nameservers, or its Ready hosting hostname (then it passes). The email domain, the website and the account's domains are typed in, so they get the age rule too |
 | `link-check-unavailable` | warning | The check could not run. Nothing to fix; publishing goes ahead |
 
 Results are cached 24 hours per domain. Publishing is refused (409) while a link is flagged. Live pages are re-checked daily, and a page whose link host turns bad is taken down.
@@ -622,7 +622,7 @@ Whatever fills `data.*` (the recipe, your agent through `submit`, a person's Cus
 {"ok": false, "errorCount": 1, "warningCount": 1, "issues": [
   {"file": "template.liquid", "line": 212, "column": 1, "rule": "csp-script-src", "severity": "error",
    "message": "An external script from 'https://unpkg.com/alpinejs@3/dist/cdn.min.js' is blocked by the page's Content Security Policy.",
-   "fix": "Load scripts only from the allowed CDN list, or inline them."},
+   "fix": "Load scripts only from the Studio CDN list (Chart.js 4, the Alpine CSP build 3, Motion 11)."},
   {"file": "template.liquid", "line": 40, "column": 12, "rule": "liquid-unknown-variable", "severity": "warning",
    "message": "'company' is not a Ken variable or a variable the template assigns; it renders empty.", "fix": "Use account.name."}
 ]}
@@ -650,7 +650,7 @@ The loop:
 | `size-asset` | error | Compress or resize the file to 5 MB or less |
 | `size-bundle` | error | Remove or shrink assets until the bundle is 20 MB or less |
 | `size-elements` | error | At most 2000 HTML start tags per file or HTML value: loop over data instead of repeating markup, or move decoration into CSS or an SVG asset |
-| `asset-type` | error | Only images, fonts, pdf and csv in `assets/`; strip `<script>`, `<foreignObject>`, `on*=` and `javascript:` from SVGs; inline JS and CSS in the template |
+| `asset-type` | error | Only images, fonts, pdf and csv in `assets/`; strip `<script>`, `<foreignObject>`, `on*=` and `javascript:` from SVGs; inline CSS in the template |
 | `asset-relative-url` | warning | Replace the relative `assets/logo.png` (or `./assets/`, `/assets/`) and the doubled `{{ asset_url \| append: '/assets/logo.png' }}` with `{{ asset_url \| append: '/logo.png' }}`; as written it does not load on the page. Write a stylesheet inline in `<style>` instead. Fix it before you push |
 | **studio.json** | | |
 | `manifest-json` | error | Strict JSON: double quotes, no comments, no trailing commas |
@@ -699,20 +699,21 @@ The loop:
 | `liquid-unknown-variable` | warning | Use a root variable (`account`, `person`, `sender`, `brand`, `link`, `data`, `asset_url`) or `assign` it first; as written it renders empty |
 | `liquid-undeclared-slot` | error | Declare the slot in `studio.json`, or fix the name the template reads |
 | **Content Security Policy** | | |
-| `csp-script-src` | error | Load external scripts only from the script sources (Chart.js 4, Alpine CSP 3, Motion 11), or inline them |
+| `csp-script-src` | error | Load external scripts only from the script sources (Chart.js 4, Alpine CSP 3, Motion 11) |
+| `csp-inline-script` | error | Remove the inline `<script>` and the `on*` handler attributes; use the kit, CSS, or Alpine directives with inline expressions. Already published versions keep serving, but their own inline scripts no longer run |
 | `csp-style-src` | error | Use inline `<style>` or Google Fonts CSS; preload fonts only from `assets/` or `fonts.gstatic.com` |
 | `csp-iframe-src` | error | Frame only booking or video hosts from the lists; use `ken/booking`; remove `<object>`, `<embed>`, `<applet>` |
 | `csp-img-src` | error | Load images from `assets/` (`asset_url`), a `data:` image or `https://api.ken.so/media/`; this also applies to `img` and `srcset` in slot HTML |
 | `csp-form-action` | error | Use `ken/form`; never post to another host |
-| `csp-input-type` | error | Remove password inputs, `cc-*` or password autocomplete, and card or ID-number fields |
-| `csp-inline-handler-url` | error | Remove the `javascript:` URL (also encoded or split forms); attach behavior from an inline script |
+| `csp-input-type` | error | Remove password inputs, `cc-*` or password autocomplete, and card or ID-number fields; do not bind an input's `type`, `name` or `autocomplete` |
+| `csp-inline-handler-url` | error | Remove the `javascript:` URL (also encoded or split forms); use a real link, the kit, or an Alpine directive |
 | **Links** | | |
 | `link-scheme` | error | Use `https:`, `mailto:`, `tel:`, a relative path or `#`; `data:` only for images; no `http:`. A schemeless link with `&`, `:` or a control character before its first `/`, `?` or `#` also fails |
 | `link-ip-host` | error | Link to a domain, not an IP address |
 | `link-userinfo` | error | Remove the `user@` part before the host |
 | `link-port` | error | Remove the port; only the default https port is allowed |
 | `link-shortener` | error | Link to the final destination, not a shortener from the policy list |
-| `link-punycode` | error | Use the plain ASCII domain; `xn--` hosts pass only for the workspace's or the account's own domain |
+| `link-punycode` | error | Use the plain ASCII domain; `xn--` hosts pass only for the workspace's DNS-verified domains (a sending domain Ken bought or moved to Ken's nameservers, its Ready hosting hostname) |
 | `link-text-mismatch` | error | Make link text that looks like a domain or URL name the domain the link goes to, or use plain words |
 | `nav-redirect` | error | Remove `<meta http-equiv="refresh">` and any `location` assignment, `location.assign` or `location.replace`; use a link or `ken/cta`; `window.open` only with a literal https URL |
 | **Filled data** | | |
@@ -772,6 +773,6 @@ One playbook per page type, in the `studio-template` skill's `references/`. Open
 - `report.md`: put the account next to its peers from a dataset (starter `benchmark-report`).
 - `landing-page.md`: a page built for one account, such as the closest customer story (starter `case-study`).
 - `event.md`: a personal invite to a dinner or webinar with an RSVP form (starter `event-invite`).
-- `calculator.md`: an interactive calculator prefilled with the account's numbers (starter `roi-calculator`).
+- `calculator.md`: an interactive calculator prefilled with the account's numbers (no starter for now).
 - `recruiting.md`: a page for one candidate about a role, or the open roles that fit them (starters `role-pitch`, `roles-for-you`). Needs the `recruiting` flag.
 - `email.md`: the `email` format, for any type: a cold email pinned to a sequence step. No email starter is in the gallery yet, so start blank with `template_format="email"`. Needs the `studio_email` flag.

@@ -43,6 +43,7 @@ This copies the skills but not the server: also add the Ken MCP server, `https:/
 | `event-outbound` | Plan outreach around a conference: build its list, match it to your accounts, find who is likely there, plan touches for Today. |
 | `inbox-configuration` | Tune sending inboxes: daily limits, display names, signatures, and reply forwarding. |
 | `infra-planning` | Size sending domains and inboxes against daily send and credits on a paid plan. |
+| `keep-campaigns-running` | Once a week, keep your live campaigns stocked with leads, at the right volume, on healthy inboxes, and propose the rest. |
 | `ken-search` | Build and save people-search filters against the contact database for a campaign. |
 | `knowledge-setup` | Fill a workspace's Knowledge: company and offer files, website pages, calls, voice, tiers, Review and shared prompts. |
 | `meeting-prep-and-followup` | Prep for a sales call, then follow it up: the brief before, and after it the commitments, deal updates and a follow-up draft you approve. |
