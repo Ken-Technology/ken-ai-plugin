@@ -25,7 +25,7 @@ Every call takes `client_id`, the workspace id. Send it when the user can see mo
 1. `campaigns(operation="list", q="Acme")` finds the campaign by name. `campaigns(operation="get", campaign_id=42)` gives its status, schedule and launch date.
 2. Pick the window. The default is the last 30 days. For "why did replies drop", compare two windows of the same length: the last 14 days against the 14 days before.
 
-If an operation this skill names is not listed for you, or a campaign the user named answers 404, stop and say: "I can't read that campaign's analytics from here. You can see it in Kenso at https://app.ken.so/campaigns/<id>." A 404 means the campaign is not in this workspace or the read is not on for you. Do not retry it, and do not tell the user the campaign does not exist.
+If an operation this skill names is not listed for you, or a campaign the user named answers 404, stop and say: "I can't read that campaign's analytics from here. You can see it in Kenso at https://app.ken.so/<workspace id>/campaigns/<id>." A 404 means the campaign is not in this workspace or the read is not on for you. Do not retry it, and do not tell the user the campaign does not exist.
 
 ## Step 1 - Check reply classification first
 
@@ -65,7 +65,7 @@ Clicks show that people read past the first lines. Many clicks with few replies 
 
 - By step: the same performance call with `group_by="step"` shows which email gets the replies. A step with no replies after a few hundred sends is a candidate for `campaign-improvement`.
 - By segment: `group_by="segment"`, and the classification read's `bySegment`, show which audience answers. Different segments are different people, so a gap between segments is a targeting finding, not a copy finding.
-- By variant (optional): when `analytics_campaign(operation="query")` is listed for you (staff, or the workspace's `generative_ui` flag), `analytics_campaign(operation="query", metrics=["contacted", "replies", "interested", "reply_rate"], group_by=["step", "variant"], filters={"campaignId": [42]}, window={"preset": "last_30_days"})` splits each step by variant. The diagnosis works without it.
+- By variant: `analytics_campaign(operation="get-variant-performance", campaign_id=42)` splits each step by variant: contacted, replies, interested and their rates, the campaign to date unless you pass `from_date` and `to_date`. Each reply counts against the variant it answers. A row with `stillFilling` true is mostly sends under 7 days old, so its replies are still coming in. It is on per workspace: when the operation is not listed, the workspace does not have it yet. Before you call one variant the winner, test it (see "What proof means" below).
 
 ## Step 6 - What already changed
 
@@ -111,11 +111,19 @@ Every night Kenso reads what changed in the workspace's campaigns and what the n
 
 The proof level sets your words: below `proven`, never say won, beat, proven or caused about a finding.
 
+### What proof means
+
+Test two arms before you call one the winner: `analytics_campaign(operation="experiments-significance", campaign_id=42, step=2)` grades that step's email variants against variant A, and `analytics_campaign(operation="experiments-significance", control_contacted=1000, control_interested=12, variant_contacted=1000, variant_interested=25)` grades two arms of counts. It uses the same math as the Experiments page and needs the same `experiments` flag. It returns `proof`, `verdict` (about `headlineArm` against `controlArm`), `estimate` (the lift, 0.12 is +12%) and `interval`, the range of that lift at 80%.
+
+- `proven`: the difference is real. Only now may you say the arm won or lost.
+- `leaning`: more likely than not (80% or more), not proven. Say "leaning toward B", never "B won".
+- `cant_tell`: not enough data yet, or no difference so far. Say so, with the counts.
+
+It reads the counts once, as given, so a finding from the nightly run, when there is one, is the better read.
+
 ## What this skill cannot do yet
 
-- Test significance between two arms. There is no significance helper, so only an experiments finding at `proven` is a winner.
 - Count held meetings. Meetings booked are on the performance rows. Meetings held are not tracked yet.
-- Split steps by variant for every caller. That read is staff or `generative_ui` only.
 
 ## No Kenso account yet
 

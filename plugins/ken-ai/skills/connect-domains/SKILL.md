@@ -60,9 +60,11 @@ Done when each pool has enough apexes for the inbox counts from step 1.
 
 If `platformAllowed` is false (Google needs Google Workspace availability, Outlook needs Microsoft 365), drop that name or move it to an allowed platform. Azure is allowed unless LookupFailed.
 
+A row whose `errorCode` is DomainBlocklisted is on Spamhaus DBL or SURBL. Drop that name and pick another: the import refuses it, and `risk_confirmed` does not lift it.
+
 `requiresConfirm` is a warning, not a hard fail. If a pool falls below packing minimum after drops, go back to step 1 or 2.
 
-Paid-plan errors (`PLAN_FEATURE_NOT_AVAILABLE`, Forbidden, "A paid plan is required") and OverCapacity are hard stops. Import needs Platform (`planType` Platform), Dfy, VIP (`planType` Premium), or a grandfathered Starter / Growth / Core plan, with billing Active or Trialing. Free cannot import onto Kenso inboxes: it connects its own inboxes in the app, or upgrades to Platform at https://app.ken.so/settings/billing. Relay the envelope `message` and `error.recovery.summary` when present. OverCapacity comes only from a hard cap.
+Paid-plan errors (`PLAN_FEATURE_NOT_AVAILABLE`, Forbidden, "A paid plan is required") and OverCapacity are hard stops. Import needs Platform (`planType` Platform), Dfy, VIP (`planType` Premium), or a grandfathered Starter / Growth / Core plan, with billing Active or Trialing. Free cannot import onto Kenso inboxes: it connects its own inboxes in the app, or upgrades to Platform at https://app.ken.so/<workspace id>/settings/billing. Relay the envelope `message` and `error.recovery.summary` when present. OverCapacity comes only from a hard cap.
 
 Done when every remaining name is Eligible, InUseMx, or LiveWebsite, warnings are confirmed or dropped, packing holds, and `canSubmit` is true (or the only failures are names you dropped).
 
@@ -74,7 +76,9 @@ Per mailbox: `first_name`, `last_name`, `username` (local-part only), optional `
 
 On a credit plan, price the cart: `billing(operation="credit-estimates-create", client_id=..., kind="infra", items=[{"action": "ken_inbox_monthly", "quantity": <Google + Outlook mailboxes>}, {"action": "azure_domain_monthly", "quantity": <Azure domains>}])` (drop a zero item). Import needs the first month in available credits. If `sufficient` is false, show `display.availability` and shrink the cart or buy credits first.
 
-Show the cart (names, platform, mailbox count, monthly credits from `display.summary` on a credit plan, forwarding URL, nameservers come back after import). Get a yes.
+**Website question (workspaces with domain pages).** Before you import domains, ask the person: "What should people see when they open these domains? A rebuild of your website (recommended) or a redirect to your website?" A rebuild shows a copy of their home page on every one of these domains; a redirect sends visitors to their website, as today. Never choose for them. Pass the answer as `website_mode`: `page` for the rebuild, `redirect` for the redirect. Where domain pages are on, the import is refused without it; in any other workspace, do not ask and leave `website_mode` out. For a workspace member, the operation `outbound-site-get` is listed only where domain pages are on.
+
+Show the cart (names, platform, mailbox count, monthly credits from `display.summary` on a credit plan, forwarding URL, website mode, nameservers come back after import). Get a yes.
 
 ## 5. Import
 
@@ -83,6 +87,7 @@ domain_orders(
   operation="domain-imports-create",
   client_id=...,
   forwarding_url="https://acme.com",
+  website_mode=...,  # the person's answer: "page" or "redirect"
   domains=[{
     "name": "acme.io",
     "platform": "GOOGLE",
@@ -120,15 +125,16 @@ Do not loop the check on a timer. One shot on user request, then `domain-imports
 
 | Signal | What to tell the user |
 |--------|------------------------|
-| Paid-plan / Forbidden / `PLAN_FEATURE_NOT_AVAILABLE` | Free cannot import onto Kenso inboxes. Connect your own inboxes in the app, or upgrade to Platform at https://app.ken.so/settings/billing. Show `error.recovery.summary` when present |
-| `INSUFFICIENT_CREDITS` | Not enough credits for the first month of the imported inboxes. Show the message (it carries the credits needed and available). Shrink the cart, or buy credits at https://app.ken.so/settings/billing and retry. Dfy: the Kenso team adds credits. White-label child: ask the parent workspace |
-| `FREE_CREDITS_NOT_ELIGIBLE` | Free and bonus credits can't pay for domains or inboxes, and the bought credits fall short. Show the message (it carries the credits needed, the credits that can pay, and the free part). Buy credits at https://app.ken.so/settings/billing and retry. Dfy: the Kenso team adds credits. White-label child: ask the parent workspace. |
+| Paid-plan / Forbidden / `PLAN_FEATURE_NOT_AVAILABLE` | Free cannot import onto Kenso inboxes. Connect your own inboxes in the app, or upgrade to Platform at https://app.ken.so/<workspace id>/settings/billing. Show `error.recovery.summary` when present |
+| `INSUFFICIENT_CREDITS` | Not enough credits for the first month of the imported inboxes. Show the message (it carries the credits needed and available). Shrink the cart, or buy credits at https://app.ken.so/<workspace id>/settings/billing and retry. Dfy: the Kenso team adds credits. White-label child: ask the parent workspace |
+| `FREE_CREDITS_NOT_ELIGIBLE` | Free and bonus credits can't pay for domains or inboxes, and the bought credits fall short. Show the message (it carries the credits needed, the credits that can pay, and the free part). Buy credits at https://app.ken.so/<workspace id>/settings/billing and retry. Dfy: the Kenso team adds credits. White-label child: ask the parent workspace. |
 | OverCapacity / remaining too small | Hard cap only. Show remaining daily send. Shrink inbox counts so `existing + cart <= planDaily`. It is not a mailbox-slot limit |
 | "workspace mailbox cap" / "workspace domain cap" | White-label child at its parent's cap. Shrink the cart or ask the parent workspace to raise it |
 | LookupFailed | Cannot import until preview returns Eligible, InUseMx, or LiveWebsite. Retry later |
 | DomainPendingElsewhere | Another workspace's import still holds the name and has not moved its nameservers. Show `claim.recordName` and `claim.recordValue`: the user adds that TXT record at the domain's own DNS (where they edit its records today), waits for DNS to update (it can take minutes, sometimes longer), then you retry the import. The same record comes from `domain_orders(operation="claim", domain=..., client_id=...)`. Only a workspace that controls the DNS can add it |
 | ClaimLookupFailed | The TXT record could not be read right now. Retry later. Not the same as LookupFailed |
 | ConfirmRequired | MX or live site. Continue or drop that name |
+| DomainBlocklisted | On Spamhaus DBL or SURBL. Drop that name and pick another. Do not retry or set `risk_confirmed`: neither lifts it |
 | PlatformUnavailable / `platformAllowed=false` | That name cannot take that platform. Drop or re-pool |
 | Owner email missing | Set the workspace owner email, then retry |
 
@@ -136,7 +142,7 @@ Do not loop the check on a timer. One shot on user request, then `domain-imports
 
 - Imports domains the user already owns. Registering new names is `domain-selection`.
 - Kenso Cloudflare nameservers only. Never ask for a customer Cloudflare token.
-- Existing domains (list, get, update) use `domains`, not this cart. Status lives on the domains and inboxes page, https://app.ken.so/delivery?tab=inboxes.
+- Existing domains (list, get, update) use `domains`, not this cart. Status lives on the domains and inboxes page, https://app.ken.so/<workspace id>/delivery?tab=inboxes.
 - Inbox tuning after the domain is active belongs in `inbox-configuration`.
 
 ## No Kenso account yet

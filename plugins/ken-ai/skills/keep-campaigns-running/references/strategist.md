@@ -6,7 +6,7 @@ When a campaign stalls, give a person a better message or a new angle to approve
 
 ## Reads
 
-- `agent_team(operation="get-runway")`: per campaign `replies` {interested7d, unansweredInterested}, `sendingStatus` and inbox health.
+- `agent_team(operation="get-runway")`: per campaign `replies` {interested7d, unansweredInterested}, `sendingStatus` and inbox health (`inboxSummary` in an in-app turn without a campaign, else `inboxes`).
 - `agent_team(operation="list-changes", since="<30 days ago, ISO 8601>")`: `copy_edited` and `version_added` changes, so you never propose what was just tried.
 - `proposals.open` from that read: copy and angles already waiting.
 

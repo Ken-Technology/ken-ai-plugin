@@ -13,7 +13,7 @@ When the workspace has Knowledge on, the pages Kenso keeps reading on its own ar
 
 Scrape one URL per `scrape` call. For 8 pages it is the simplest and the most reliable path.
 
-`web` is not listed for every connection. When it is missing, ask the user for the pages' text or the links they want read, and say that live scraping is not available on this connection.
+`web` is not listed for every connection. A customer's own connection gets its map and scrape where the workspace has web reads on, 100 calls a day. When it is missing, ask the user for the pages' text or the links they want read, and say that live scraping is not available on this connection.
 
 ## The site
 
@@ -37,6 +37,7 @@ If map fails or returns nothing usable, scrape the homepage alone.
 - A page that fails is skipped; keep going. Never abort a site for one failure.
 - Site unreachable: report it and stop for that site.
 - Web scraping off: the error says "Web scraping is off right now". Skip that page like any failed page and never retry it; the other pages can still come from Kenso's web archive. Say once at the end that live scraping is off.
+- Daily limit: a 429 that says the workspace reached its limit of web reads in a day. Stop scraping, keep the pages already read, and say when it resets (the error gives the time). Never retry before then.
 - An archive copy (`metadata.kenSource: "archive"`) is a normal result. It can be up to 18 months old; `metadata.capturedAt` says when.
 - Never echo scraped markdown back into the conversation. Report one line per page: URL and `ok` or `failed`, then how many URLs the map found and how many pages were read.
 - With several sites, finish one before starting the next.

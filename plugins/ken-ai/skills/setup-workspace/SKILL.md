@@ -124,7 +124,7 @@ List who is already in with `members(operation="list", client_id=...)` and pendi
 
 Suggest inviting the people who will review campaigns or handle replies. Collect **emails only**; do not ask for roles. Confirm the list, then call `members(operation="invite", email=..., client_id=...)` once per email. The server sends the invitation email.
 
-- Roles are changed later by an admin in the team settings: https://app.ken.so/settings/users
+- Roles are changed later by an admin in the team settings: https://app.ken.so/<workspace id>/settings/users
 - `code="USER_LIMIT_REACHED"`: relay `error.message` and `error.recovery.summary` as the upgrade path, then continue.
 - If the invite fails because the workspace is not linked to an organization, do **not** invite as a staff user and do not retry. Tell the user Kenso support needs to link the workspace to its owner's organization first (give them the workspace id and the owner's email), then invites will work.
 
@@ -138,14 +138,14 @@ Pure guidance. No writes. Message shapes: `references/setup-messages.md` (unbran
 
 > Blocklist upload stays in-platform. Do not ask the user to paste their client list or upload a CSV into this conversation - guide them to the blocklist page instead.
 
-Explain that the blocklist keeps current clients, partners, and anyone they cannot contact from ever getting cold email, and that they upload or maintain it themselves at https://app.ken.so/settings/blocklist. Never ingest a client list, never solicit a paste, and never add entries for them.
+Explain that the blocklist keeps current clients, partners, and anyone they cannot contact from ever getting cold email, and that they upload or maintain it themselves at https://app.ken.so/<workspace id>/settings/blocklist. Never ingest a client list, never solicit a paste, and never add entries for them.
 
-**Integrations:** optional and low pressure. Connect when ready at https://app.ken.so/settings/integrations:
+**Integrations:** optional and low pressure. Connect when ready at https://app.ken.so/<workspace id>/settings/integrations:
 
-- CRM sync: https://app.ken.so/settings/integrations/crm
-- Calendar: https://app.ken.so/settings/integrations/calendar
-- LinkedIn accounts connect from https://app.ken.so/delivery?tab=linkedinAccounts
-- API keys, when they need them: https://app.ken.so/settings/integrations/api-keys
+- CRM sync: https://app.ken.so/<workspace id>/settings/integrations/crm
+- Calendar: https://app.ken.so/<workspace id>/settings/integrations/calendar
+- LinkedIn accounts connect from https://app.ken.so/<workspace id>/delivery?tab=linkedinAccounts
+- API keys, when they need them: https://app.ken.so/<workspace id>/settings/integrations/api-keys
 
 OAuth stays in the browser. Never claim setup connected anything.
 
@@ -157,8 +157,8 @@ Cold email goes out from separate sending domains (never the main company domain
 
 Branch on the Step 1 preflight:
 
-- **Free:** "Paid plans unlock sending domains and inboxes. Upgrade anytime at https://app.ken.so/settings/billing, then set them up on the domains and inboxes page." Do not surface any plan error to a Free user; this branch is the graceful path.
-- **Paid** (Platform, Core / VIP or a grandfathered paid plan): buy new sending domains, connect ones they own (BYOD), and see inboxes on the domains and inboxes page, https://app.ken.so/delivery?tab=inboxes. Use `sendingInfrastructure.status`: `ready` means sending is set up, `pending` means it is still being set up (relay `pendingReason` if present), `not_required` means nothing is expected yet. Capacity is daily emails, so do not quote `kenMailboxSlots` as a mailbox allowance.
+- **Free:** "Paid plans unlock sending domains and inboxes. Upgrade anytime at https://app.ken.so/<workspace id>/settings/billing, then set them up on the domains and inboxes page." Do not surface any plan error to a Free user; this branch is the graceful path.
+- **Paid** (Platform, Core / VIP or a grandfathered paid plan): buy new sending domains, connect ones they own (BYOD), and see inboxes on the domains and inboxes page, https://app.ken.so/<workspace id>/delivery?tab=inboxes. Use `sendingInfrastructure.status`: `ready` means sending is set up, `pending` means it is still being set up (relay `pendingReason` if present), `not_required` means nothing is expected yet. Capacity is daily emails, so do not quote `kenMailboxSlots` as a mailbox allowance.
 - **Unknown plan:** give the Free line and the domains and inboxes link in one sentence each.
 
 In an MCP chat client, a paid user who wants to size and set this up with the agent can do it later with the `infra-planning` and `connect-domains` skills.

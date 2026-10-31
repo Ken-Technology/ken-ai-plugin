@@ -22,17 +22,17 @@ Every call takes `client_id`, the workspace id. Send it when the user can see mo
 
 | Signal | Threshold | Proposal |
 |---|---|---|
-| A campaign's bounces | near 3% of sends, or near 100 bounces | Pause the campaign and clean the list before it sends again |
-| One inbox's bounces | near 5% in 24 hours | Stop that inbox's sends: pause it or set its daily limit to 0 |
+| A campaign's bounces | the sequencer's campaign pause: hard bounces above 5% of sends, with at least 100 sends and 5 hard bounces. `domainGate` on `analytics_events(operation="get-deliverability-gates")` gives the live numbers (it has no campaign rows: count the campaign's hard bounces from `bounceBreakdown`) | Pause the campaign and clean the list before it sends again |
+| One inbox's bounces | verdict `over` on `analytics_events(operation="get-deliverability-gates")` (`inboxGate`): hard bounces above 4% of sends, with at least 30 sends and 3 hard bounces | Stop that inbox's sends: pause it or set its daily limit to 0 |
 | Spam complaints on a domain | a rising `complaintRate`, or a `domain_complaint_rate` hold | Read the domain's health (Step 5) before it sends more |
-| Fewer than about 100 sends | rates are noise | Judge on the counts |
+| A small sample (`isSmallSample`: under 30 sends for an inbox, under 100 for a domain) | rates are noise | Judge on the counts |
 
 ## Step 0 - Scope it
 
 1. What is the complaint: bounces, a send drop, or a health check? Which campaign, domain or inbox, if the user named one?
 2. The window. For a spike, the last 7 days against the 7 before. For a health check, the last 30 days.
 
-If an operation this skill names is not listed for you, or answers 404, say which check is not available here in one sentence, point to https://app.ken.so/delivery?tab=inboxes, and carry on with the rest. Do not retry a 404 as "not found".
+If an operation this skill names is not listed for you, or answers 404, say which check is not available here in one sentence, point to https://app.ken.so/<workspace id>/delivery?tab=inboxes, and carry on with the rest. Do not retry a 404 as "not found".
 
 ## Step 1 - The holds Kenso already placed
 
@@ -57,7 +57,9 @@ Done when you have every domain and inbox over a threshold, with its counts.
 
 ## Step 3 - Apply the thresholds
 
-Mark each campaign, domain and inbox against the table above. Hard bounces on `invalidRecipient` are bad addresses. `policyBlocked` and other refusals are the receiving side rejecting the sender.
+`analytics_events(operation="get-deliverability-gates")` checks every domain and inbox against the bounce gates Kenso enforces, over the last 24 hours. `inboxGate` and `domainGate` give each gate's `threshold`, `minSends` and `minBounces`. Each row carries `sentCount`, `bounceCount`, `bounceRate` and a `verdict`: `over`, `watch` (at or above 80% of the threshold) or `ok`. An `isSmallSample` row has too few sends to be `over`: give its counts, not its rate. While `isEnforced` is true, Kenso blocks an inbox that stays `over` on its own (Step 1 shows the ones it already blocked).
+
+Mark each campaign against the table above, and each domain and inbox by its verdict. Hard bounces on `invalidRecipient` are bad addresses. `policyBlocked` and other refusals are the receiving side rejecting the sender.
 
 ## Step 4 - Find the cause
 
@@ -73,10 +75,10 @@ Say which cause the numbers point to, and the numbers. Mark it as your read when
 
 ## Step 5 - Domain health and blocklists
 
-- `domains(operation="get-health", domain_id=12)` is the latest snapshot: blocklists, DNS, bounces, placement, nameservers and certificate, with `inboxRate`, `spamRate` and `bounceRate`.
+- `domains(operation="get-health", domain_id=12)` is the latest snapshot: blocklists, mail DNS, bounces, placement, nameservers and certificate, with `inboxRate`, `spamRate` and `bounceRate`. `spfStatus`, `dkimStatus`, `dmarcStatus` and `mxStatus` are the SPF, DKIM, DMARC and MX verdicts: `pass`, `fail` or `unknown`. They come from the last check, dated by `checkedAt`, and do not change until the next one, so run a fresh check before you call a record broken or fixed.
 - A fresh check: `domains(operation="domain-health-checks-create", domain_ids=[12])` returns a job. Follow it with `jobs(operation="get", job_id="<job id>", job_type="domain_health")`. A 409 means a check is already running: follow the job it names.
 - Blocklists: `free_tools(operation="check_blacklist", input={"target": "acme-mail.com"})` returns each listing, what it means and where to delist.
-- DNS: `domains(operation="get-dns", domain_id=12)`, and `domains(operation="verify-dns", domain_id=12)` to check it again.
+- Tracking DNS (the link records, not mail DNS): `domains(operation="get-dns", domain_id=12)`, and `domains(operation="verify-dns", domain_id=12)` to check it again.
 
 ## Step 6 - Warmup
 
@@ -84,7 +86,7 @@ Say which cause the numbers point to, and the numbers. Mark it as your read when
 
 ## Step 7 - Placement tests
 
-For workspace members, a placement test sends the campaign's copy from one domain or inbox to test mailboxes and reads where it lands. It sends mail, so ask first.
+For workspace members, a placement test sends the campaign's copy from one domain or inbox to test mailboxes and reads where it lands. It sends mail, so ask first. Starting one needs Delivery edit (never a client seat), and a workspace gets 2 a day and 8 in 30 days: over that the call answers 429 naming the limit and when it resets, so tell the user and do not retry before then.
 
 - `approvals(operation="placement-tests-create", campaign_id=42, domain_id=12)` (or `inbox_id=301`) starts one. Without `sequence_version_id` it uses the live copy.
 - `approvals(operation="placement-tests-list", campaign_id=42)` lists them, and `analytics(operation="placement-tests-get", test_id=77)` reads one.
@@ -109,8 +111,6 @@ After each change, read it back (`campaigns(operation="get", campaign_id=42)`, `
 
 ## What this skill cannot do yet
 
-- Gate bounces per domain. Kenso pauses inboxes, campaigns and domains on its own for the reasons in the reference, but no per-domain bounce-rate gate exists yet.
-- Check SPF, DKIM and DMARC on their own. Domain health shows DNS state, but there is no dedicated record check.
 - Run placement tests for every caller. They are for workspace members only.
 
 ## No Kenso account yet

@@ -15,7 +15,7 @@ Every call takes `client_id`, the workspace id. Send it when the user can see mo
 - **Never report opens.** Open tracking is off for deliverability, so open numbers mean nothing.
 - **Three interested replies, or none.** Quote exactly three, from three different people, or leave the section out. Never pad it with a neutral or out-of-office reply.
 - **N/A, never 0, for anything you could not read.** A 0 says nothing happened; N/A says you do not know. Every N/A that only the reader can fill (meetings held, pipeline, cost per meeting) becomes a question under "Where we need you".
-- **No benchmarks yet.** There is no benchmark field in Kenso, so write N/A for any benchmark row and never quote an "industry average". Use a benchmark only when the user gives you one with its source.
+- **Benchmarks and targets are the workspace's own.** Use the ones Step 0 gives you, or one the user gives you with its source. Write N/A for one you do not have, and never quote an "industry average".
 - **No vendor names.** Never name a sending provider, data vendor, mailbox host or AI model maker in the report. Say "your sending domains", "our data", "the AI".
 - **Names as the app shows them.** Use each campaign's and segment's name exactly as it appears in Kenso. Never an internal label such as "plan 3" or "v2 series".
 - **Never invent results or work.** Meetings, pipeline, revenue, costs and "what we did this week" come from a tool or from the user. When neither has it, write N/A or leave the line out.
@@ -26,8 +26,9 @@ Every call takes `client_id`, the workspace id. Send it when the user can see mo
 1. **The window.** Weekly is Monday to Sunday. Default to the latest week that has ended. Monthly is a calendar month. Default to the previous month in the first 3 days of a month, otherwise month to date, and say "month to date" in the report.
 2. **The campaigns.** `campaigns(operation="list", limit=100)`. Keep every campaign that sent in the window (Step 1 tells you). Name each one as the app does.
 3. **The reader.** Ask who it is for if the user did not say: the client's contact name for the greeting, and the sender's first name for the sign-off.
+4. **Benchmark and target.** `workspace(operation="get", workspace_id=7)`, where `workspace_id` is the same id as `client_id`; when you do not know it yet, take it from `workspace(operation="list")`. `replyRateBenchmark`, `replyRateTarget`, `positiveReplyRateBenchmark` and `positiveReplyRateTarget` are percent (2.5 means 2.5%) of people contacted, the same basis as the report's rates, unlike the 0 to 1 rates the analytics calls return. `meetingsPerMonthBenchmark` and `meetingsPerMonthTarget` are meetings booked per month. A null one is not set: write N/A for it. If the workspace read fails, write N/A for all six and carry on with the report. When the user gives you one with its source, use it and offer to save it with `workspace(operation="update", workspace_id=7, reply_rate_target=4)`; save it only on a yes. A rate the user gives as a share of replies is a different number: do not save it or compare it as one of these.
 
-If an operation this skill names is not listed for you, or answers 404 on a campaign the user named, stop and say: "I can't read those results from here. They are in Kenso at https://app.ken.so/campaigns/<id>." Do not retry a 404 as "not found", and do not report a campaign as missing because one read failed.
+If an operation this skill names is not listed for you, or answers 404 on a campaign the user named, stop and say: "I can't read those results from here. They are in Kenso at https://app.ken.so/<workspace id>/campaigns/<id>." Do not retry a 404 as "not found", and do not report a campaign as missing because one read failed.
 
 ## Step 1 - The numbers
 
@@ -83,7 +84,7 @@ Fix the source of a failed check, or write that number as N/A and tell the user 
 Load `load_skill("report", reference="references/templates.md")` for the weekly email, the monthly review layout and the wording of the lines. In short:
 
 1. **Headline:** one sentence with the period's main number.
-2. **Scoreboard:** sent, people contacted, replies, interested replies, meetings booked, human clicks, each with its N/A where unknown.
+2. **Scoreboard:** sent, people contacted, replies, interested replies, meetings booked, human clicks, each with its N/A where unknown. In the monthly review only, add reply rate, interested reply rate and meetings against the benchmark and target from Step 0 (see the template). A weekly report never puts a week's meetings next to the per-month numbers.
 3. **Per campaign:** two or three lines each.
 4. **What worked** and **what we would change:** each tied to a number. Skip a section that has nothing real.
 5. **Next moves:** at most three, each one change with a hypothesis ("Shorter step 2 for the RevOps segment: we expect more interested replies from step 2 within two weeks").
@@ -96,12 +97,11 @@ Return the report and the cover email as text in your reply.
 
 - **Default:** the user copies the text and sends it.
 - **Share page (optional):** `approvals(operation="shares-create", items=["report"], permission="view", campaign_id=42)` makes a view-only page with the campaign's weekly report, and `recurring_report=True` refreshes it every Monday. Passing `recipients` emails them the link, so ask first. Send the user `data.url` from the response; never build a share link yourself.
-- **Studio doc (optional):** only when the workspace has the `studio` and `rd_docs` flags on and the user asks for a doc. Build it with the `studio-asset` skill on a doc template, then `studio_docs(operation="create-doc-export", asset_id=88, provider="google_drive")` returns a Google Doc link. Without those flags the text is the report.
+- **File to forward (optional):** only when the workspace has the `studio` and `rd_docs` flags on and the user asks for a file. One call makes a branded Studio doc from the report and shares it: `studio_docs(operation="create-doc", title="Weekly report: Oct 20-26", sections=[{"heading": "Scoreboard", "body": "| Metric | This week |\n|---|---|\n| Sent | 1,204 |"}], provider="google_drive")`. Each section is one part of Step 7 with its text as Markdown. Send `data.share.url` from the response. `provider="google_drive"` (or `"onedrive"`) puts a Google Doc (or Word file) in the user's own drive that anyone with the link can open; `provider="studio_page"` returns the page on the workspace's link domain with a Download PDF button, and its first link charges 1 credit. The doc refuses email addresses and phone numbers, so leave them out of the quoted replies. Without those flags the text is the report.
 
 ## What this skill cannot do yet
 
-- Render an HTML or PDF deck. The report is text.
-- Compare against a benchmark. There is no benchmark field yet, so benchmarks are N/A.
+- Render a slide deck. The report is text, or a Studio doc where Step 8 offers one.
 - Count meetings held, or read the reader's CRM pipeline. Both are N/A until the reader gives them.
 
 ## No Kenso account yet

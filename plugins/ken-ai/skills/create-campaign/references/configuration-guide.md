@@ -58,7 +58,7 @@ Live campaign with segments + copy + prompts
 
 ## Campaign settings
 
-Writable through `campaigns(operation="update", ...)`: `name`, `contact_limit`, `sending_days`, `sending_start_time`, `sending_end_time`, `sending_timezone`, `max_emails_per_day`, `ramp_up_days`, and the campaign options its full docs list (`describe_tools(['campaigns'])`). Gap-fill picks up a schedule or daily-cap change on its next pass, about every 10 minutes. On a client's live campaign, any schedule or volume change needs a yes that names that client, carried in `sending_days_requested_by`.
+Writable through `campaigns(operation="update", ...)`: `name`, `contact_limit`, `sending_days`, `sending_start_time`, `sending_end_time`, `sending_timezone`, `max_emails_per_day`, `ramp_up_days`, `excluded_countries` (the countries the campaign never sends to, a full replace; `[]` clears it), and the campaign options its full docs list (`describe_tools(['campaigns'])`). Gap-fill picks up a schedule or daily-cap change on its next pass, about every 10 minutes. On a client's live campaign, any schedule or volume change needs a yes that names that client, carried in `sending_days_requested_by`.
 
 AI workflows are writable through `campaign_flow(operation="replace-ai-workflows", ...)` (next section).
 

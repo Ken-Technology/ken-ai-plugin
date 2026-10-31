@@ -30,7 +30,7 @@ A person launches the campaign. You build it and hand it over.
 - Trigger capacity (`trigger-capacity-get`, `trigger-capacity-update`) is for admins only. If they are missing, skip the capacity step and tell the user an admin sets it.
 - Job postings answer 503 `service_unavailable` when the index is off. Tell the user and do not retry in a loop.
 - Signals on target accounts (`account_signals`) need the Accounts and Accounts signals flags. Without them, use the searches below.
-- If the workspace has no campaign to attach a trigger to, build one first (Step 5). If none of the operations here are in your tools, tell the user in one sentence and link `https://app.ken.so`.
+- If the workspace has no campaign to attach a trigger to, build one first (Step 5). If none of the operations here are in your tools, tell the user in one sentence and link `https://app.ken.so/<workspace id>`.
 
 ## Step 1 - Pick the signal and the plan it points to
 
@@ -70,11 +70,12 @@ Funds, real estate and banks are hidden by default. `location.states` takes US s
 Then apply the gate, cheapest check first, and keep the count after each one:
 
 1. **Titles**: keep only titles that match the plan; drop the families in `references/signal-gate.md` (recruiting for clients, IT implementation roles, incidental words, part-time and entry-level posts, roles that do not own pipeline). Read the real title, never the keyword that matched.
-2. **Size and country**: the user's ICP. The people search covers six countries (United States, United Kingdom, Canada, Ireland, Australia, New Zealand): a company elsewhere passes the gate but gets no decision maker in Step 3. Say how many.
+2. **Size and country**: the user's ICP. The people search covers six countries (United States, United Kingdom, Canada, Ireland, Australia, New Zealand): a company elsewhere passes the gate, and Step 3 finds its decision maker by name with the email finder. Say how many.
 3. **Language**: drop postings not written in the campaign's language.
 4. **Duplicates**: one row per company domain. Drop target accounts (`accounts(operation="list", domain="acme.com")` when Accounts is on) and companies already in the campaign.
+5. **Fit** (optional, paid): when the fit_classification flag is on, score the companies that passed against the user's ICP with `models(operation="fit-classifications-create", fit_definition="...", rows=[{"companyId": 123456}, {"domain": "acme.com", "name": "Acme"}])`: up to 100 rows a call, each back with `fit` (yes, no or maybe), a 0-100 `score` and a one-sentence `reason`, at 0.05 credits a classified row (`estimate_only=True` prices it first). Keep the `yes` rows and their reasons. While the flag is off (the call is not found), judge fit from the company data yourself and keep a reason per company.
 
-Show the user the funnel before you go on: "212 postings, 141 companies, 46 pass titles, 31 pass size and country, 29 new. Next: 29 companies, up to 29 people imported into a Draft campaign." There is no dry-run tool that prices this: say that each imported person is enriched, verified and qualified by the campaign, which is charged per lead, and get a yes before Step 3.
+Show the user the funnel before you go on: "212 postings, 141 companies, 46 pass titles, 31 pass size and country, 29 new. Next: 29 companies, up to 29 people imported into a Draft campaign." Price it with `job_postings(operation="triggers-preview", signal_type="open_roles", parameters='{...}')` (the same keys the trigger stores; it runs for `fundraising`, `open_roles` and `company_headcount_growth`, and saves, fires and charges nothing). Show its `steps` (pass counts per gate step) and `estimatedCredits.basis` (an upper bound for the page, charged per lead), say that each imported person is enriched, verified and qualified by the campaign, and get a yes before Step 3.
 
 ## Step 3 - One decision maker per company
 
@@ -84,7 +85,16 @@ Write to the person who runs the plan, not the logo. At a company over 200 peopl
 2. Find the person: `search(operation="people_in_accounts", account_ids=[123456, 234567], current_titles=["VP Sales", "Head of Sales", "Director of Sales Development"], seniority_levels=["Director", "VP", "CLevel"])`. Keep one per company, two at most.
 3. Funding rounds name executives on the round (`people`); use them only when their role owns the plan.
 
-Keep each person's search id. The campaign finds and verifies their email after import. Outside the six countries there is no email find here yet: list those companies for the user instead of importing them.
+Keep each person's search id. The campaign finds and verifies their email after import.
+
+**Outside the six countries, or when the people search finds nobody**, use the email finder. It works in any country:
+
+1. Get the decision maker's name: the round's `people`, the company's team or about page (`web(operation="scrape", body={"url": "https://acme.fr/equipe", "formats": ["markdown"]})`), or the user.
+2. Tell the user the count and the price before you start: 1 credit for each email found, nothing for a miss. Get a yes.
+3. Find and verify the email, one call at a time: `saved_searches(operation="email-finds-create", full_name="Claire Martin", company_domain="acme.fr")`. Pass the company's website domain: with only `linkedin_url`, the find needs the company in the people search. The call waits up to 45 seconds; a find still running comes back with its id, read it with `saved_searches(operation="email-finds-get", email_find_id=...)`. The limit is 30 finds a minute and 500 a day per workspace.
+4. Keep the `found` rows with their email and `verification.status`, and import them as a CSV (Step 5), one row per person with the email in its own column. List the `not_found` companies for the user.
+
+If `email-finds-create` is not in your tools, the email finder is off for this workspace: list those companies for the user instead of importing them.
 
 ## Step 4 - Write the copy
 
@@ -120,16 +130,14 @@ The import skips people already in the campaign. To carry each company's signal 
 - `triggers(operation="get-stats", trigger_id=77, days=7)`: firings by outcome.
 - `triggers(operation="trigger-firings-list", trigger_id=77, status="suppressed")`: why firings were held back (cooldown, frequency cap, do not contact, blocklist, an active conversation, already in a trigger campaign, expired).
 - Too many suppressed or off-target firings: tighten `parameters` with `triggers(operation="triggers-update", trigger_id=77, changes={"parameters": "..."})`. Too few: widen the window or the titles.
+- To check that a saved trigger would fire, test-fire it on a sample signal: `job_postings(operation="triggers-test-fire", trigger_id=77, contact_id=..., payload={...})`. It reports `shouldFire`, `rejectedBy` and each check, and queues, sends and charges nothing. `payload` is the signal's JSON object. Sweep-only signals (`click_dormancy`, `company_icp_timing`, `linkedin_post_engagement`) answer `test_fire_not_supported`.
 - `triggers(operation="pause", trigger_id=77)` and `triggers(operation="resume", trigger_id=77)` stop and restart it. On a client's campaign both need a yes that names that client.
 
 Report the signal, the gate funnel, who you picked and why, the campaign and trigger ids, and what the person has to click.
 
 ## What this skill cannot do yet
 
-- No gate dry-run with a cost: count with the free searches and say it is charged per lead.
-- No bulk fit classifier: judge fit from the company data yourself, in batches, and keep a reason per company.
-- No email find outside the people search's six countries.
-- No test fire for a trigger.
+- No people search outside its six countries: there the email finder needs each decision maker's name, from the round, the company's site or the user.
 
 ## No Kenso account yet
 

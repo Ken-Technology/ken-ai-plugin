@@ -52,15 +52,15 @@ Done when you can say in one sentence who the page is for, what they do next, an
 
 Check what exists first: `studio_templates(operation="list", template_type="audit")`. Reuse a template that already fits.
 
-To copy a starter, list them with `studio_templates(operation="starters-list")` (each has `slug`, `name`, `type`, `format`, `description`, `showcases`), pick the closest to the brief, and copy it:
+To copy a template from the Kenso template library, search it with `studio_templates(operation="starters-list", q="deal")` (filters `type`, `category`, `needs` and `featured`; each template has `slug`, `name`, `type`, `format`, `description`, `category`, `tags`, `needs`, `coverUrl` and `samples` with a preview `url`), read the closest one's sections and recipe with `studio_docs(operation="starters-get", slug="deal-room")`, and copy it:
 
-`studio_templates(operation="create", starter_slug="rd-ken-native", name="Campaign we built for you")`
+`studio_templates(operation="create", starter_slug="deal-room", name="Deal room for Brightwave")`
 
-The starter's files become draft version 1. To start blank instead:
+Its files become draft version 1. To start blank instead:
 
 `studio_templates(operation="create", name="Pipeline teardown", template_type="audit", template_format="page")`
 
-Then read the files: `studio_templates(operation="pull", template_id=41)`. Text files come back inline. Binaries come back as a `downloadUrl` that works for 15 minutes. Write them into a working folder in your own environment.
+Then read the files: `studio_templates(operation="pull", template_id=41)`. Text files come back inline. Binaries come back as a `downloadUrl` that works for 15 minutes. Write them into a working folder in your own environment. The pull also returns `bundleSha256`: send it as `expected` on your push.
 
 ## Step 3 - Build the bundle
 
@@ -71,6 +71,23 @@ Keep three samples in `samples/`: a full one, a shared one (`person` is null) an
 Images, fonts and PDFs go in `assets/`. Reference them as `{{ asset_url | append: '/logo.png' }}`: `asset_url` already points at `assets/`. A relative `assets/logo.png` does not load on the page; the validator warns with `asset-relative-url`.
 
 With no shell or file access (Claude Desktop, claude.ai, ChatGPT), keep the bundle in the conversation and send every text file inline in `text_files`. Push a logo or image from a public URL with `files={"assets/logo.png": {"fromUrl": "https://example.com/logo.png"}}` (at most 5 MB). The hosted preview in Step 5 is your render check.
+
+### Brand kit
+
+The workspace brand kit holds the colors, fonts and logos every Studio page, doc and template styles with. A template reads it as `brand.colors.primary`, `brand.colors.accent`, `brand.fonts.heading`, `brand.fonts.body`, `brand.logo_url` (the wide logo), `brand.icon_url` (the square logo) and `brand.name`.
+
+- Any of them can be null (a field the kit does not set; the colors and fonts are always null while the workspace's `brand_kit` flag is off), so give each a `| default:`. Assign them once at the top of `template.liquid` and use the names below:
+
+  ```liquid
+  {%- assign brand_primary = brand.colors.primary | default: '#4f00d0' -%}
+  {%- assign brand_accent = brand.colors.accent | default: brand_primary -%}
+  {%- assign font_heading = brand.fonts.heading | default: 'Inter' -%}
+  {%- assign font_body = brand.fonts.body | default: 'Inter' -%}
+  ```
+
+- Never hard-code a brand color or font when the kit has one: the default is only for a workspace whose kit has no value. Guard each logo with `{% if brand.logo_url %}`.
+- Read the kit with `studio_docs(operation="brand-kit-get")`: `primaryColor` and `accentColor` (`#RRGGBB`), `headingFont` and `bodyFont` (Google Fonts families), `logoUrl`, `iconUrl` and `isEmpty`. It answers 404 while the `brand_kit` flag is off: build with the defaults and say the page uses them.
+- When `isEmpty` is true, offer `studio_docs(operation="brand-kit-suggest")`. It reads the workspace's website and saves nothing (10 a workspace an hour). Show the suggestion, and save only what the user agrees to: `studio_docs(operation="brand-kit-update", primary_color="#4F00D0", heading_font="Space Grotesk", fill_empty_only=True)`. `fill_empty_only` keeps any field a person already set. Pass a suggested `logoUrl` as `logo_source_url` to import it as the wide logo.
 
 ## Step 4 - Validate until it passes
 
@@ -97,6 +114,8 @@ Done when `ok` is true and you have read every warning. Then store the draft:
 `studio_templates(operation="push", template_id=41, text_files={"studio.json": "...", "template.liquid": "..."}, message="Hero, shortlist and first emails")`
 
 Push returns the draft `version` and its `validation`. It stores the files even when they have errors; publish refuses them. When the latest version is already published, a push starts the next draft. Binary files (logos, fonts) go up through `create-upload-url`; the bundle reference shows how.
+
+Send the `bundleSha256` from your pull as `expected`: `studio_templates(operation="push", template_id=41, text_files={"template.liquid": "..."}, expected="<bundleSha256>")`. Take it from a pull without `version` (the draft); a `latest` or version-id pull gives a token push accepts only while the template has no draft. Each push returns the next one in `version.bundleSha256`. A `409` with `concurrent_change` means someone saved the draft after your pull (a person in the editor, or another agent): pull again, re-apply your change to the new files and push with the new `bundleSha256`. Never push your old copy over theirs. Without `expected` the last write wins.
 
 ## Step 5 - Preview on 3 accounts
 
@@ -223,7 +242,7 @@ For a campaign's pages, `studio_pages(operation="asset-engagement-get", campaign
 
 ## Recruiting pages
 
-A recruiting page is for one candidate, not for an account. It needs the workspace's `recruiting` flag: without it `studio_templates(operation="starters-list")` leaves the recruiting starters out, and `studio_templates(operation="create", template_type="recruiting")` answers 400 `validation_failed` with `feature_disabled`.
+A recruiting page is for one candidate, not for an account. It needs the workspace's `recruiting` flag: without it `studio_templates(operation="starters-list")` leaves the recruiting templates of the Kenso template library out, and `studio_templates(operation="create", template_type="recruiting")` answers 400 `validation_failed` with `feature_disabled`.
 
 - **Who it belongs to.** One page per lead of a recruiting campaign, keyed by the lead (`contactId`), with no company: a lead without a company still gets a page. The link is `https://{host}/{first-last}/{page-slug}-for-{first-name}`, for example `https://go.acme.com/maya-chen/role-for-maya`.
 - **What it reads.** `person.*` with the candidate's `current_title`, `current_company`, `location`, `skills`, `experience_summary` and `linkedin_url`, set while the page fills as well as on the page, so a `prompt` step can write from them. `role.*` is the campaign's role (`title`, `company`, `location`, `remote_policy`, `pay_range`, `description`, `highlights`, `job_url`, `booking_url`), and `roles` is the campaign's primary role and its open extra roles, primary first, at most 4. `account` is empty: never read it on a recruiting page.
@@ -234,7 +253,16 @@ A recruiting page is for one candidate, not for an account. It needs the workspa
 
 ## Step 10 - After it ships
 
-- **Hand edits:** `studio_pages(operation="customize", asset_id=901, overrides={"headline": "Six people who should hear about Fernway first"})`. Overrides merge over the fill; a null value removes one. `studio_pages(operation="customize", asset_id=901, reset=True)` drops them all. A live page is republished with the edit. Errors: 400 `unknown_slot`, `link-domain-blocked`, or a value that breaks its slot schema.
+- **Hand edits:** `studio_pages(operation="customize", asset_id=901, overrides={"headline": "Six people who should hear about Fernway first"})`. Overrides merge over the fill; a null value removes one. `studio_pages(operation="customize", asset_id=901, reset=True)` drops them all, with the page's own layout and Kenso-value overrides. A live page is republished with the edit. Errors: 400 `unknown_slot`, `link-domain-blocked`, or a value that breaks its slot schema.
+- **Edit one page's layout** (its text, sections, styles or images, on this page only; the template and the other pages stay as they are):
+  1. Read: `studio_pages(operation="get", asset_id=901, include_source=True)`. `data.source.template` is the page's `template.liquid` (its own copy when `source.own` is true, else its version's), `source.sections` its sections list, `source.token` the save token.
+  2. Edit `source.template` as text. Change only what the ask needs, so the next template update merges cleanly.
+  3. Save: `studio_pages(operation="customize", asset_id=901, layout={"template": "<the whole edited template>"}, expected="<source.token>")`. Add `"sections": [{"id": "hero", "label": "Hero"}]` when you add, remove or reorder `data-section` elements. Validation errors come back like a push's (`file:line` and the rule): fix and save again.
+  4. A `409` with `concurrent_change` means the page was saved after your read: read it again and re-apply your edit to the new source. Never resend your old template.
+  - A new image: `studio_docs(operation="create-upload-url", asset_id=901, path="assets/hero.png", content_type="image/png", size_bytes=48213)` returns `uploadId`, `url`, `headers` and `path`, the name the API gave the image (`assets/hero-1a2b3c4d5e6f.png`). PUT the bytes to `url` with exactly the returned `headers`, then save with `layout={"template": "<the edited template>", "files": {"assets/hero-1a2b3c4d5e6f.png": {"uploadId": "<uploadId>"}}}`, where the template shows it as `<img src="{{ asset_url | append: '/hero-1a2b3c4d5e6f.png' }}" alt="">`. Use the returned `path`, not the one you asked for: any other key is `invalid_path`. `{"assets/hero-1a2b3c4d5e6f.png": null}` removes one.
+  - Kenso values on this page only: `ken_overrides={"account": {"name": "Fernway Health"}, "brand": {"colors": {"primary": "#0f766e"}}}` (account `name`, `domain`, `industry`, `size_band`; sender `name`, `first_name`, `last_name`, `title`; brand `logo_url`, `name` (the name templates show; `product_name` does the same), `colors`, `fonts`). A null value removes one; a null group (`{"brand": null}`) drops that group. `person.*` stays per link.
+  - Back to the template: `reset_layout=True` drops the page's layout, `reset_ken_overrides=True` its Kenso-value overrides.
+  - A page with its own layout stays on its version when the template publishes. `studio_pages(operation="update-version", asset_id=901)` merges the new version into it. A `409` with `layout_conflict` lists the clashing lines and moved nothing: ask the user, then call again with `layout="keep"` (stay on this version; returns `{"kept": true}`) or `layout="take"` (drop this page's layout for the new version; its slot overrides stay).
 - **Refill:** `studio_pages(operation="refill", asset_id=901)` reruns the recipe with Kenso's executor on the page's pinned version, charged like a fill. A live page stays live and keeps its links. A page that follows the latest version and is not live or retired refills on the latest published version, so a filled page a publish left on its version (because the new version reruns its steps) catches up.
 - **Republish a retired page:** `studio_pages(operation="republish", asset_id=901)` brings back the same URLs for 1 credit.
 - **Change the template:** pull, edit, validate, push, then publish with the `update_live` you want.
@@ -288,4 +316,4 @@ Every write you make is recorded as the connected user through your client, for 
 | 409 `studio_version_changed` on submit | the page moved to another template version after your prepare; nothing was saved | prepare again and submit with its `versionId` |
 | 402 | not enough credits | tell the user to add credits |
 | 429 `quota_exceeded` | daily limit per workspace: 50 publishes, 2,000 link creates, 5,000 run pages | wait until tomorrow; do not retry in a loop |
-| 503 | the page host, the link check, the starter gallery or fills were unavailable; nothing changed | retry in a minute |
+| 503 | the page host, the link check, the Kenso template library or fills were unavailable; nothing changed | retry in a minute |

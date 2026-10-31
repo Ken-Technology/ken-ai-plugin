@@ -62,7 +62,7 @@ Use this layout for every verify-campaign run. One row per executed check; SKIP 
 **WARNINGS (recommended fixes):**
 1. Status is Draft (0) - launch from the campaign page when ready; this check does not launch.
 2. Segment "enterprise" description drifts from the campaign plan - update with `segments(operation="update", segment_id=..., description=...)`.
-3. No placement test yet - a workspace admin can start one after your yes with `approvals(operation="placement-tests-create", campaign_id={id}, random_scope=True)`; it sends the live copy to seed inboxes.
+3. No placement test yet - a member with Delivery edit can start one after your yes with `approvals(operation="placement-tests-create", campaign_id={id}, random_scope=True)`; it sends the live copy to seed inboxes and uses one of the workspace's 2 tests a day (8 in 30 days).
 4. No canary plan - agree the first 50-200 leads and how long to watch them before the rest send.
 
 Want me to apply the critical fixes?

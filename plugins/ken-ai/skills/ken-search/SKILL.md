@@ -39,6 +39,7 @@ Build people-search filters for the Kenso contact database (280M+ people), check
 | `companyHeadquarters`, `excludeCompanyHeadquarters` | HQ locations (6 countries only) |
 | `currentCompanies`, `excludeCompanies`, `pastCompanies` | company names |
 | `currentCompanyIds` | numeric index ids from `search-companies`, never invented |
+| `companyWebTechAny`, `companyWebTechAll`, `companyWebTechExclude`, `companyWebTechCategories` | technology and category keys from `saved_searches(operation="list-web-technologies")`; only where the feature is on |
 | `countries`, `states`, `cities`, `excludeCountries` | person location |
 | `companyFundingAmount`, `companyFundedWithinDays` | `{"min", "max"}` whole USD; days 1-3650 |
 | `yearsOfExperience`, `yearsInCurrentRole`, `yearsInCurrentCompany` | `{"min", "max"}` |

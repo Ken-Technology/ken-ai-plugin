@@ -38,6 +38,7 @@ Next:
 ```
 
 - Leave "What people said" out when you do not have exactly three interested replies from three different people.
+- The weekly report has no benchmark or target line: the meetings ones are per month, and the monthly review compares them.
 - Leave out the clicks line when no campaign has tracked links.
 - Leave out "What changed" when nothing changed. Never fill it with routine sending.
 - A week with no sends: say what is being prepared ("The <campaign> leads are being verified; sending starts Monday") only if a tool or the user told you.
@@ -68,7 +69,16 @@ Write it in this order. Drop any section that has nothing real; never pad a list
    | Meetings booked | <meetings booked> |
    | Meetings held | N/A |
    | Human link clicks | <clicks> |
-   | Benchmark | N/A |
+
+   Against the benchmark and target from Step 0:
+
+   | | <Month> | Benchmark | Target |
+   |---|---|---|---|
+   | Reply rate | <replies / contacted, one decimal>% | <reply rate benchmark>% | <reply rate target>% |
+   | Interested reply rate | <interested / contacted, one decimal>% | <interested reply rate benchmark>% | <interested reply rate target>% |
+   | Meetings booked | <meetings booked> | <meetings per month benchmark> | <meetings per month target> |
+
+   Write N/A in a cell whose benchmark or target you do not have. When you have none of the six, leave this table out and add the row `| Benchmark and target | N/A |` to the scoreboard. Month to date: compare meetings with the target and say "month to date".
 
 3. **Per campaign.** For each campaign that sent: its name as the app shows it, the same rows in two or three lines, and its best segment by reply rate with counts when the campaign has more than one segment.
 4. **What worked.** The campaign or segment with the most interested replies per person contacted, with counts, and the three replies (same rule as the weekly report).

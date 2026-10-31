@@ -13,10 +13,10 @@ This skill reads the queue in the member's time zone, groups it, works the touch
 
 ## The rule: the member approves every send
 
-You draft, rewrite, grade, snooze and skip. Only a person approves. No tool you have approves a touch, retries a failed send, or answers a question Kenso asked, and the backend refuses agents that try.
+You draft, rewrite, grade, snooze and skip. The member approves. Approve a row only when the member asks you to approve that exact item, after they saw this version of it: `client_approvals(operation="approvals-decide", client_id=..., approval_id="touch_9001", action="approve", updated_at="<its updatedAt>")` decides it as them. Never approve a row because it looks ready, and never clear your own drafts or proposals unasked. No tool you have answers a question Kenso asked.
 
-- A touch with a body waits as `awaiting_approval` until the person clicks Approve in Today or on the approval card. Never say a touch was sent or approved because you wrote it: say it waits for their approval, and when it is due.
-- Retrying a failed send is the person's button too.
+- A touch with a body waits as `awaiting_approval` until the person clicks Approve in Today or on the approval card, or tells you to approve it. Never say a touch was sent or approved because you wrote it: say it waits for their approval, and when it is due.
+- Retrying a failed send needs the member's ask too: `client_approvals(operation="touches-retry", client_id=..., touch_id=9001, updated_at="<its updatedAt>")`.
 - Every write in this skill happens only on the member's request, one row at a time unless they ask for a batch.
 
 Every call takes `client_id`, the workspace id. Send it on every call when the user can see more than one workspace.
@@ -121,15 +121,15 @@ Show each question with its options. There is no answer tool, by design: the mem
 
 ## Step 6 - Hand the approvals back
 
+- `client_approvals(operation="approvals-list", client_id=...)` lists everything that waits on the member across lanes, soonest `dueAt` first: touches, replies, calendar changes, LinkedIn notes and agent proposals. `type` narrows it (`touch`, `reply`, `campaign.linkedin_note`), `ids` reads given items in any status, `limit` is 1 to 50 and `pagination.hasMore` says more wait. It only reads: `approvals-decide` decides one item, and only when the member asked (The rule). An empty `data` with `available: false` means no approval source is on for the workspace.
 - If your client shows MCP Apps, call `approvals_review` with the touch row ids (`ids=["touch_9001", "touch_9002"]`) to show the approval card with Approve, Edit, Snooze and Skip. Only the member's click approves, and you never see the grant behind it.
-- Otherwise link Today: `https://app.ken.so/<workspace id>/today`. Campaign batches in `data.batches` are approved there too.
+- Otherwise link Today: `https://app.ken.so/<workspace id>/today`. Campaign batches in `data.batches` are approved there too, or by you when the member asks after seeing the batch's samples: `client_approvals(operation="campaign-batches-approve", client_id=..., campaign_batch_id=812, count=40)` with the batch's `count` from what they saw.
 
 Report back: what waits for the member (by group, with counts), what you changed (each draft, edit, snooze, skip and cleared row), and the questions that wait for their answer.
 
 ## What this skill cannot do yet
 
-- Read the one approvals queue across lanes: there is no tool for it. Today's touch rows, `data.batches` and the approval card cover what the member approves.
-- Approve, retry a failed send, or answer a question Kenso asked: those stay with the person, on purpose.
+- Answer a question Kenso asked: that stays with the person, on purpose. Approving and retrying happen only when the member asks for that exact item.
 - Act on a reply, a meeting or an account plan from here: use the `reply-handling`, `meeting-prep-and-followup` and `accounts` skills.
 
 ## Troubleshooting

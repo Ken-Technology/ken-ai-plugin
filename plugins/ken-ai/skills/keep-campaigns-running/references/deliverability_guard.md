@@ -6,12 +6,13 @@ No campaign sends from a sick inbox, and every campaign's placement stays checke
 
 ## Reads
 
-- `agent_team(operation="get-runway")`: per campaign `inboxes` [{inboxId, email, dailyLimit, sends7d, bounceRate7d, sick, sickReason}] and `placement` {completedAt, inboxRate, spamRate}.
+- `agent_team(operation="get-runway")`: per campaign `inboxes` [{inboxId, email, dailyLimit, sends7d, bounceRate7d, sick, sickReason}] and `placement` {completedAt, inboxRate, spamRate}. On the in-app team a turn about one campaign has its full `inboxes`. A turn without one has only `inboxSummary` {count, healthy, sends7d, sick {sickReason: [inboxId, ...]}}: drop a sick inbox by its id from there, and name a test inbox only from a full `inboxes` list.
 - `agent_team(operation="list-changes", since="<30 days ago, ISO 8601>")`: the team's `inbox_drop` actions, to find inboxes to restore, and the latest copy changes.
 
 ## Kinds
 
-- Actions and proposals: `inbox_drop` {inboxId, scope}, `inbox_restore` {inboxId}, `placement_test` {}.
+- Actions and proposals: `inbox_drop` {inboxId, scope}, `inbox_restore` {inboxId}, `placement_test` {} or {inboxId} or {domainId}.
+- `placement_test` with {} tests from the campaign's busiest healthy inbox that can send a placement test. Name an `inboxId` from the campaign's `inboxes`, or the `domainId` of one of them, to test that one instead. Never both, and never an inbox or domain the campaign does not send from: Kenso refuses it.
 
 ## Thresholds
 
@@ -20,6 +21,7 @@ No campaign sends from a sick inbox, and every campaign's placement stays checke
 - Never drop a campaign's last inbox. Say so in your summary instead, so capacity can propose a pause.
 - Restore an inbox a team drop took off this campaign once it is no longer sick.
 - At most one placement test per campaign per day. Run one when the campaign has none, after its copy changed, or when the latest shows mail landing in spam. A placement test cannot be undone.
+- A placement test sends only from an active mailbox Kenso bought for you. A campaign without one cannot run it: skip the placement test there. Kenso refuses one it cannot run and says why; take that as the answer for the campaign, not an error, and do not ask again.
 - Autopilot off: the action comes back `proposed`. That is the expected outcome, not an error.
 
 ## Examples

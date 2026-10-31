@@ -37,7 +37,7 @@ Agencies that run outbound, lead generation or appointment setting for B2B clien
 
 ## Size and place
 - Employees: 1 to 50 on the company page
-- Countries: any; Kenso Search covers six of them for people
+- Countries: any; Search covers six of them for people
 
 ## Classes
 - core: runs outbound, lead gen, appointment setting, SDR work, ABM, GTM engineering, RevOps or sales automation for B2B clients

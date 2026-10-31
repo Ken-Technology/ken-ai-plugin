@@ -149,3 +149,7 @@ You write `search`, `brief` and `audience`, then prepare again with them (step 4
 `studio_pages(operation="submit", asset_id=901, data={"search": {"currentTitles": ["Owner", "Director of Operations"]}, "brief": "Fernway sells shift scheduling to home care agencies...", "audience": {"summary": "Owners and operations leads at home care agencies in Texas...", "chips": ["Agency owners"]}, "headline": "Six people who should hear about Fernway first", "intro": "I looked for the people who get the call when a visit has no caregiver...", "shortlist": [{"name": "...", "title": "...", "company": "...", "why": "..."}], "emails": [{"name": "...", "subject": "...", "body": ["Hi Maria,", "...", "..."]}]}, grade_results=[{"stepId": "grade", "score": 8.2, "pass": true, "reasons": ["Specific first lines, one soft ask"]}], version_id=57)`
 
 The page comes back with `state: "ready"` and every slot `filled`.
+
+## After the fill: edit one page
+
+Slots change with `studio_pages(operation="customize", asset_id=901, overrides={...})`. Anything else on one page (text in the template, a section, a style, an image) is the per-page edit loop: read with `studio_pages(operation="get", asset_id=901, include_source=True)`, edit `data.source.template`, save with `studio_pages(operation="customize", asset_id=901, layout={"template": "..."}, expected="<data.source.token>")`, and on a `409` with `concurrent_change` read again and re-apply. The template and every other page stay as they are.

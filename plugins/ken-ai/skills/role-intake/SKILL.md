@@ -38,7 +38,7 @@ The user approves each save. Then say what was saved, for example "Saved the rol
 
 ## 4. Hand off to the builder
 
-Share the builder link for the saved role and stop there: https://app.ken.so/demo/campaigns/build?kind=recruiting&roleId=<role id>. The builder plans the candidate search, the LinkedIn-first sequence and the copy from the role. Never start a campaign build for customers in its place.
+Share the builder link for the saved role and stop there: https://app.ken.so/<workspace id>/demo/campaigns/build?kind=recruiting&roleId=<role id>. The builder plans the candidate search, the LinkedIn-first sequence and the copy from the role. Never start a campaign build for customers in its place.
 
 ## Errors
 

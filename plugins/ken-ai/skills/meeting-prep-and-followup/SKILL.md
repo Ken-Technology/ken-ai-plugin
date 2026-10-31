@@ -28,7 +28,10 @@ Every call takes `client_id`, the workspace id. Send it on every call when the u
 | Part | Operations | Needs |
 |---|---|---|
 | Meetings, briefs, sources, CRM preview | `meetings` list, get, get-brief, list-sources, get-source-transcript, get-crm-changes | full access and Meetings on |
+| Saving and refreshing briefs | `committee` meetings-replace-brief, meetings-write-brief | full access and Meetings on |
+| The brief a client may see | `committee` meetings-get-client-brief | Meetings on, any member who can see the meeting |
 | Kenso Notetaker transcripts | `meetings` get-transcript | Kenso Notetaker on |
+| Call scores and the rubric | `meeting_notes` score-call, get-score, notetaker-score-rubric-get | full access and Kenso Notetaker on |
 | Calendar events | `meetings` events-list, events-create, events-update | full access and a connected calendar |
 | Open times | `calendar` get-availability, `scheduler` links-suggested-times | a connected calendar; Scheduler for links |
 | Account, touches, notes | `accounts` get, activity, `account_touches` list, create, `meeting_notes` list, create | Accounts on |
@@ -36,7 +39,7 @@ Every call takes `client_id`, the workspace id. Send it on every call when the u
 | Writing style and account knowledge | `knowledge` context | Knowledge on |
 | Email threads | `threads` list, list-messages, replace-draft, create-message | every member who can reply |
 
-When an operation is not listed for you, or answers 404 `not_found` on every id, that part is off for this workspace or this seat. Skip it, tell the user in one sentence which part is not on, and carry on with the rest. Do not retry it. If `meetings` itself is missing, say meeting briefs are not available to this connection and send the user to their calendar in Kenso: `https://app.ken.so/demo/calendar`.
+When an operation is not listed for you, or answers 404 `not_found` on every id, that part is off for this workspace or this seat. Skip it, tell the user in one sentence which part is not on, and carry on with the rest. Do not retry it. If `meetings` itself is missing, say meeting briefs are not available to this connection and send the user to their calendar in Kenso: `https://app.ken.so/<workspace id>/demo/calendar`.
 
 ## Before the call
 
@@ -53,7 +56,11 @@ Skip prep for internal meetings and calls with existing customers unless the use
 `meetings(operation="get-brief", meeting_id="mtg_812")`
 
 - `status: ready`: the brief has `openWith`, `attending` (with each person's role on the buying committee and whether they are new), `gotTheYes`, `relationship`, `whyNow`, `angle`, `openItems` and `touchHistory`, each line with its sources. `isStale` means the account moved after it was written.
-- `not_written` or `not_eligible`: build the prep yourself from step 3. Writing or refreshing a brief is a person's button in Kenso; no tool here writes one.
+- `not_written` or `not_eligible`: build the prep yourself from step 3.
+- To save a brief you wrote, on the user's yes: `committee(operation="meetings-replace-brief", meeting_id="mtg_812", open_with={"text": "...", "sources": [{"kind": "touch", "id": "4401"}]}, why_now=[...], angle=[...], open_items=[...])`. It is free (no model call) and is marked as written by an agent. The PUT replaces the whole brief: a section you leave out is saved empty, so copy every line you keep from `get-brief`.
+- To have Kenso write the first brief or refresh a stale one: `committee(operation="meetings-write-brief", meeting_id="mtg_812")`. It costs credits (about 1, charged to the meeting owner), so run it only when the user asks.
+- A brief a person wrote is never overwritten: both answer 409 `invalid_state` with `human_written`. Ask the person to change it in Kenso.
+- A client seat (one an admin gave Calendar view) gets the client-safe version of the same brief: no credits, `canWrite` or `canRefresh`, and both writes answer it 403.
 
 ### 3. Fill the gaps
 
@@ -101,6 +108,8 @@ From the transcript only, with the minute it was said:
 
 `references/followup-template.md` lists the checks.
 
+When the user wants coaching on the call, score it: `meeting_notes(operation="score-call", meeting_id="mtg_812")` scores the transcript against the workspace's rubric, or Kenso's default, and saves the score. `meeting_notes(operation="get-score", meeting_id="mtg_812")` reads a saved score without scoring again; its 404 "never scored" means there is none yet. Lead with the two lowest criteria and their reasons. A 409 `no_transcript` means there is nothing to score. Read the rubric with `meeting_notes(operation="notetaker-score-rubric-get")`, and change it only when an admin asks.
+
 ### 3. Show the CRM changes
 
 `meetings(operation="get-crm-changes", meeting_id="mtg_812")` previews what the call implies: new contacts for people on the call, notes for pains, objections and priorities, the deal's next step, tasks for commitments, and the call's activity log. `data.push.available` is false: nothing pushes them yet. Show the list and tell the person to make those changes in their CRM.
@@ -131,7 +140,7 @@ In the user's voice, from the writing style in Knowledge when it is on:
 
 Pick the first that applies:
 
-1. **There is an email thread with the contact** (`threads(operation="list", contact_id=5512)`): save the draft on it with `threads(operation="replace-draft", thread_id="thr_...", body="...")`. The person sends it from `https://app.ken.so/replies`, or approves that text in chat and you send it with `threads(operation="create-message", thread_id="thr_...", body="...", sender_email_id=88, idempotency_key="followup-mtg_812-v1")`.
+1. **There is an email thread with the contact** (`threads(operation="list", contact_id=5512)`): save the draft on it with `threads(operation="replace-draft", thread_id="thr_...", body="...")`. The person sends it from `https://app.ken.so/<workspace id>/replies`, or approves that text in chat and you send it with `threads(operation="create-message", thread_id="thr_...", body="...", sender_email_id=88, idempotency_key="followup-mtg_812-v1")`.
 2. **The account is in Accounts**: create it as a touch to the attendee's stakeholder (`stakeholderId` on the brief or the participant), which waits for a person's approval in Today: `account_touches(operation="create", account_id=101, stakeholder_id=4401, channel="email", due_at="2026-10-28T09:00:00Z", reason="manual", subject="Next steps from today", body="Hi Maya, ...", rationale="Follow-up to the Oct 27 call")`. A 422 `guardrail_violation` means a Contact limits rule: move `due_at` to the `nextAllowedAt` it names.
 3. **Neither**: show the draft in chat for the person to send from their own mail. Where the workspace's `agent_send` flag is on, every seat that can reply can instead start the thread with the text the person approved, from a shared cold inbox (an `inboxes(operation="list", role="sending", status="active")` entry with no `ownerMemberId`, on a cold sending domain): `replies(operation="threads-create", sender_inbox_id=91, to="maya@acme.com", subject="Next steps from today", body="Hi Maya, ...", idempotency_key="followup-mtg_812-v1")`. A 404 (the flag is off) or a 409 `client_approval_required` means the person sends it.
 
@@ -145,7 +154,8 @@ When the next meeting is agreed with a time, offer the calendar invite and creat
 ## What this skill cannot do yet
 
 - No tool applies the CRM changes: the preview is read-only until CRM writeback ships.
-- No tool writes or refreshes a meeting brief, scores a call against a rubric, or edits meeting notes.
+- No tool edits meeting notes.
+- For anything shown to a client, read `committee(operation="meetings-get-client-brief", meeting_id="mtg_812")`: the same brief without credit or write fields.
 - Call briefs for phone calls are staff-only.
 - Starting a new email thread is staff-only (see step 6).
 - Held meetings are not tracked yet: a booking or a calendar event is not proof the meeting happened.
