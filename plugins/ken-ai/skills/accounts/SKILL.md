@@ -5,7 +5,7 @@ description: Run the Accounts loop - add target accounts, research them, map the
 
 # Accounts
 
-Accounts is the 1:1 lane in Ken AI: a short list of target companies, each worked by hand with touches to the people who buy. An account has its domains, a stage, an owner, a research dossier, a buying committee (stakeholders and open seats), signals and touches. Today in Ken AI is where a person approves what goes out.
+Accounts is the 1:1 lane in Kenso: a short list of target companies, each worked by hand with touches to the people who buy. An account has its domains, a stage, an owner, a research dossier, a buying committee (stakeholders and open seats), signals and touches. Today in Kenso is where a person approves what goes out.
 
 This skill is the loop an agent runs: read what Knowledge knows, add the accounts, research them, map their committees, scan their signals, then plan and write touches. It ends with every touch waiting for a person in Today, or with the account handed to a teammate.
 
@@ -34,7 +34,7 @@ Each other part of the loop sits behind its own flag, so a workspace may have so
 | Signals and scoring | `account_signals` list, list-workspace, scan, scoring-get, scoring-update | `accounts_signals` |
 | The tier ladder | `account_signals` account-tiers-get, account-tiers-update, account-tiers-reset | `accounts` |
 | The 90-day touch plan | `account_touches` plan-start, plan-get, plan-pause, plan-resume, plan-end | `accounts_plan` |
-| Ken AI writes or grades a touch | `account_touches` draft, rewrite, feedback | `accounts_writer` |
+| Kenso writes or grades a touch | `account_touches` draft, rewrite, feedback | `accounts_writer` |
 | Hand-off to a teammate | `committee` handoff-brief, hand-off | `accounts_handoff` |
 | Today | `today` get, update | `today` |
 
@@ -58,13 +58,13 @@ Add up to 100 at once from their domains:
 
 `accounts(operation="bulk-create", items=[{"domains": ["acme.com"]}, {"domains": ["globex.com", "globex.io"]}])`
 
-The first domain is the primary. Each result is `created`, `domain_taken` (another account owns that domain: use the `accountId` it names), `invalid` (with the field) or `failed`. Ken AI names each account from Ken Search.
+The first domain is the primary. Each result is `created`, `domain_taken` (another account owns that domain: use the `accountId` it names), `invalid` (with the field) or `failed`. Kenso names each account from Kenso Search.
 
 To add one account with its fields set:
 
 `accounts(operation="create", domains=["acme.com"], fields={"stage": "researching", "why_now": "Hiring three AEs for EMEA"})`
 
-- Stages: `researching`, `warming`, `engaged`, `meeting_booked`, `nurture`, `lost`, `paused`, `not_a_fit`. Ken moves an account to `lost` when its deals are all lost, and back to `engaged` when it gets an open opportunity again. Ken plans and drafts no touch for `lost`, `paused` or `not_a_fit` accounts.
+- Stages: `researching`, `warming`, `engaged`, `meeting_booked`, `nurture`, `lost`, `paused`, `not_a_fit`. Kenso moves an account to `lost` when its deals are all lost, and back to `engaged` when it gets an open opportunity again. Ken plans and drafts no touch for `lost`, `paused` or `not_a_fit` accounts.
 - A field a person set is pinned. Changing it with `accounts(operation="update", account_id=101, changes={"stage": "warming"})` fails with `pinned_by_user`. Send `overwrite_pinned=True` only when the user asked for that exact change.
 - Delete and merge cannot be undone. Use them only when the user asks. To set an account aside, set its stage to `paused` or `not_a_fit`.
 
@@ -88,7 +88,7 @@ Done when each account's research succeeded, or you told the user why it did not
 
 Read the committee: `committee(operation="get", account_id=101)`. It returns the stakeholders (person, role, priority, coverage, notes, reports-to, `warmPath` when a teammate can get an intro), the open seats, `coverage {covered, total}` and the latest mapping run.
 
-Ask Ken AI to map it: `committee(operation="map", account_id=101, instruction="whoever owns security")`
+Ask Kenso to map it: `committee(operation="map", account_id=101, instruction="whoever owns security")`
 
 The run comes back with 202. Follow it with `committee(operation="run-get", run_id=7001)` until `status` is `succeeded` or `failed`. A `paused` run with `pausedReason` `credits` or `member_limit` resumes by itself once credits arrive or an admin raises the limit: tell the user. One run per account at a time: `committee_run_active` names the open run, so follow it instead of starting another.
 
@@ -98,7 +98,7 @@ To find the people yourself, start the run in finding and hand over what you fou
 
 `committee(operation="submit-candidates", run_id=7001, candidates=[{"full_name": "Maya Chen", "title": "VP Revenue Operations", "linkedin_url": "https://www.linkedin.com/in/mayachen", "evidence": "Named as VP RevOps on the team page", "source_url": "https://acme.com/team", "suggested_role": "economic_buyer"}])`
 
-Each candidate needs `full_name` and at least one of `ken_person_id`, `linkedin_url` or `source_url`: Ken AI never adds a person with no source. Send candidates once per run (`run_not_finding` means the run moved on, so do not resend). If you found nobody, send `candidates=[]` and Ken AI maps the account at once.
+Each candidate needs `full_name` and at least one of `ken_person_id`, `linkedin_url` or `source_url`: Kenso never adds a person with no source. Send candidates once per run (`run_not_finding` means the run moved on, so do not resend). If you found nobody, send `candidates=[]` and Kenso maps the account at once.
 
 To add one person yourself:
 
@@ -113,7 +113,7 @@ Done when the committee has the people you will write to, each with an email or 
 
 ## Step 5 - Scan the signals
 
-Scan an account now: `account_signals(operation="scan", account_id=101)`. It runs in seconds. The Ken data sources are free; the news search is billed like any web search. It checks funding, sales and RevOps hiring, new sales and finance leaders, headcount growth, stakeholder job changes and, at most once a day for companies over 100 employees, the news. Each source reports `succeeded`, `skipped` (with a reason such as `scanned_recently` and its `nextScanAt`) or `failed`. One failed source never fails the scan, and a rescan of the same data stores nothing.
+Scan an account now: `account_signals(operation="scan", account_id=101)`. It runs in seconds. The Kenso data sources are free; the news search is billed like any web search. It checks funding, sales and RevOps hiring, new sales and finance leaders, headcount growth, stakeholder job changes and, at most once a day for companies over 100 employees, the news. Each source reports `succeeded`, `skipped` (with a reason such as `scanned_recently` and its `nextScanAt`) or `failed`. One failed source never fails the scan, and a rescan of the same data stores nothing.
 
 - One account's stored signals: `account_signals(operation="list", account_id=101, kind="funding,hiring")`.
 - Every account's new signals since a date: `account_signals(operation="list-workspace", detected_after="2026-10-12T00:00:00Z")`. Each carries `points` and `weightedPoints` (full up to 7 days old, then less).
@@ -137,7 +137,7 @@ What a signal means:
 
 There are two ways to put touches on an account.
 
-**Ken AI's plan.** `account_touches(operation="plan-start", account_id=101)` places planned touches across the people you can reach. Where account tiers are on, the account's tier sizes the plan: its `maxTouches`, `days` and `gapDays` from `account_signals(operation="account-tiers-get")` (on the default ladder Tier 1 is up to 11 touches over 100 days, Tier 5 up to 3 over 21). Otherwise it places up to 9 over 90 days. The account must be `researching`, `warming` or `engaged`, with one person who has an email or LinkedIn; otherwise `invalid_state` says what is missing. Read the plan with `account_touches(operation="plan-get", account_id=101)`: `thin` means map more people. Then write each planned touch. Have Ken AI write it with `account_touches(operation="draft", touch_id=5001)` (charged; the touch lands in `awaiting_approval`), or write the body yourself with `update`.
+**Kenso's plan.** `account_touches(operation="plan-start", account_id=101)` places planned touches across the people you can reach. Where account tiers are on, the account's tier sizes the plan: its `maxTouches`, `days` and `gapDays` from `account_signals(operation="account-tiers-get")` (on the default ladder Tier 1 is up to 11 touches over 100 days, Tier 5 up to 3 over 21). Otherwise it places up to 9 over 90 days. The account must be `researching`, `warming` or `engaged`, with one person who has an email or LinkedIn; otherwise `invalid_state` says what is missing. Read the plan with `account_touches(operation="plan-get", account_id=101)`: `thin` means map more people. Then write each planned touch. Have Kenso write it with `account_touches(operation="draft", touch_id=5001)` (charged; the touch lands in `awaiting_approval`), or write the body yourself with `update`.
 
 **Your own touch.**
 
@@ -145,7 +145,7 @@ There are two ways to put touches on an account.
 
 - With a body the touch waits for approval. Without one it is `planned`, to write later.
 - Channels: `email`, `linkedin_connect`, `linkedin_message`, `linkedin_follow`, `linkedin_like`, `linkedin_comment`, `call`, `event`, `intro`, `asset`, `task`. Reasons: `cadence`, `signal`, `manual` (the default), `reply`.
-- `linkedin_follow`, `linkedin_like` and `linkedin_comment` need the workspace's `linkedin_engagement` and `accounts_writer` flags. Create them with no body and no page link: Ken AI puts a follow or a like up for approval as it is, and for a comment it picks the person's recent post and writes the comment first.
+- `linkedin_follow`, `linkedin_like` and `linkedin_comment` need the workspace's `linkedin_engagement` and `accounts_writer` flags. Create them with no body and no page link: Kenso puts a follow or a like up for approval as it is, and for a comment it picks the person's recent post and writes the comment first.
 - `rationale` says why this touch, now, with its source. The person approving reads it.
 - Edit with `account_touches(operation="update", touch_id=5001, changes={"body": "Hi Maya, ..."})`. That works from `planned`, `drafted`, `awaiting_approval` and `failed`; another status is `invalid_transition`.
 
@@ -163,7 +163,7 @@ Done when each touch you made is `awaiting_approval` with a body, or `planned` o
 List what waits on an account: `account_touches(operation="list", account_id=101, status="awaiting_approval")`. Each touch's `approverMemberId` is the member who must approve it (null when anyone may).
 
 - If your client shows MCP Apps, call `approvals_review` with `account_id` to show the approval card, with Approve, Edit, Snooze and Skip buttons for the person. Only their click approves, and you never see the grant behind it.
-- Otherwise send the user to Today in Ken AI: `https://app.ken.so/<workspace id>/today`.
+- Otherwise send the user to Today in Kenso: `https://app.ken.so/<workspace id>/today`.
 - `today(operation="get", timezone="Europe/Bucharest")` reads the member's Today as they see it: touches waiting for approval, failed sends, tasks due today and paused plans.
 
 Report back per account: the research status and why now, the committee coverage, the signals found, and each waiting touch with its person, channel and due time.
@@ -173,7 +173,7 @@ Report back per account: the research status and why now, the committee coverage
 When an account is ready for someone else (a meeting booked, an AE taking over), and the user asks for the hand-off:
 
 1. Find the teammate's member id: `members(operation="list")`.
-2. Get Ken AI's brief: `committee(operation="handoff-brief", account_id=101, to_member_id=12, channel="email")`. It returns `subject` and `body`: fit score, why now, the engaged and planned stakeholders, roles not mapped yet, the last conversation and the angle. Nothing is sent or charged. `channel` is `email`, `slack` or `crm_task`.
+2. Get Kenso's brief: `committee(operation="handoff-brief", account_id=101, to_member_id=12, channel="email")`. It returns `subject` and `body`: fit score, why now, the engaged and planned stakeholders, roles not mapped yet, the last conversation and the angle. Nothing is sent or charged. `channel` is `email`, `slack` or `crm_task`.
 3. Show the brief to the user and edit it with them. The hand-off messages a person, so send it only after the user says yes:
 
 `committee(operation="hand-off", account_id=101, to_member_id=12, channel="email", subject="Handing off Acme", body="...")`
@@ -201,6 +201,6 @@ Adding accounts, grading a touch, a hand-off brief and a signals scan (apart fro
 
 The cost of each step and what each error code means (`domain_taken`, `pinned_by_user`, `account_merged`, `committee_run_active`, `guardrail_violation`, 402 and the rest) are in `references/credits-and-errors.md`. Open it with `load_skill("accounts", reference="references/credits-and-errors.md")` when a call fails.
 
-## No Ken account yet
+## No Kenso account yet
 
-These steps run on the Ken MCP server, which signs in with a Ken account. If the user has none, send them to https://app.ken.so/get-started to create one, then sign in when the agent asks.
+These steps run on the Kenso MCP server, which signs in with a Kenso account. If the user has none, send them to https://app.ken.so/get-started to create one, then sign in when the agent asks.

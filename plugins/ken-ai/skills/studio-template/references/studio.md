@@ -4,7 +4,7 @@ Studio is Library > Studio in the app. You build a template once (a reverse demo
 
 This guide is the loop from a brief to a link in a touch. Two guides go with it:
 
-- The bundle reference: the bundle format, slot schema, Liquid, Ken variables, kit snippets, CSP, recipe steps and every validation rule id. Open it at step 3 with `load_skill("studio-template", reference="references/studio-template-builder.md")`. One playbook per template type sits next to it in the same `references/` folder.
+- The bundle reference: the bundle format, slot schema, Liquid, Kenso variables, kit snippets, CSP, recipe steps and every validation rule id. Open it at step 3 with `load_skill("studio-template", reference="references/studio-template-builder.md")`. One playbook per template type sits next to it in the same `references/` folder.
 - The fill guide for your own model (executor `"agent"`): `load_skill("studio-asset", reference="references/studio-fill.md")`. Open it at step 7 when you take that path. The `studio-asset` skill also has one file per starter that says what each field needs and where its data comes from.
 
 Every call takes `client_id`, the workspace id. Send it on every call when the user can see more than one workspace.
@@ -17,9 +17,9 @@ Studio's "Build with your agent", "Edit with your agent" and "Fill with your age
 
 | The user's line | Start at |
 |---|---|
-| "Build a new Ken Studio template." | Step 1 |
-| "Build Ken Studio template 41." or "Edit Ken Studio template 41." | `studio_templates(operation="get", template_id=41)` and `pull`, then Step 3. Ask what to change when the user has not said |
-| "Fill the pages waiting for your agent on Ken Studio template 41." | Step 7, the `"agent"` path |
+| "Build a new Kenso Studio template." | Step 1 |
+| "Build Kenso Studio template 41." or "Edit Kenso Studio template 41." | `studio_templates(operation="get", template_id=41)` and `pull`, then Step 3. Ask what to change when the user has not said |
+| "Fill the pages waiting for your agent on Kenso Studio template 41." | Step 7, the `"agent"` path |
 
 Work through to the end of the user's ask without stopping between steps: a build ends with a pushed draft that validates and 3 previews (Step 5). Publish (Step 6) only when the user asked for it.
 
@@ -108,8 +108,8 @@ Pick 3 accounts from the brief with `accounts(operation="list", ...)`. Without `
 
 Preview in both modes before you call the build done:
 
-- **Filled layout:** add `sample` to render a bundle sample's `data` on each account, with that account's own Ken variables (`account.*`, `person.*`, `sender.*`, `brand.*`). This is how the page looks after the fill, before any page exists: `studio_templates(operation="preview", template_id=41, account_ids=[3101, 3102, 3103], sample="samples/full.json")`. Each preview's `sample.name` says which sample rendered. With no account to render on, the sample renders alone.
-- **Fallback:** leave `sample` out. An account that has no page on this template yet renders its Ken variables with every slot on its `fallback`: that is what the reader sees before the fill. An account that already has a page renders its filled data.
+- **Filled layout:** add `sample` to render a bundle sample's `data` on each account, with that account's own Kenso variables (`account.*`, `person.*`, `sender.*`, `brand.*`). This is how the page looks after the fill, before any page exists: `studio_templates(operation="preview", template_id=41, account_ids=[3101, 3102, 3103], sample="samples/full.json")`. Each preview's `sample.name` says which sample rendered. With no account to render on, the sample renders alone.
+- **Fallback:** leave `sample` out. An account that has no page on this template yet renders its Kenso variables with every slot on its `fallback`: that is what the reader sees before the fill. An account that already has a page renders its filled data.
 
 Do not push a throwaway draft with sample data baked in to see the filled layout: `sample` does that without a push.
 
@@ -141,7 +141,7 @@ This publishes the draft (or `version_id=`). New pages use it, and pages that ha
 | `"all"` | Every live page is refilled on the new version, as a run (`updateRunId`). URLs and links stay. |
 | `[812, 813]` | Only these live pages are refilled. |
 
-Refilling live pages runs Ken's executor: only the slots the new version added or changed are refilled, and tokens are charged at 2x model cost. The page credit is not charged again. Ask the user before sending `"all"` or a list.
+Refilling live pages runs Kenso's executor: only the slots the new version added or changed are refilled, and tokens are charged at 2x model cost. The page credit is not charged again. Ask the user before sending `"all"` or a list.
 
 The response has `version`, `followedCount` (pages that moved with it), `liveCount` (live pages still on an older version) and `updateRunId`.
 
@@ -182,7 +182,7 @@ The run comes back with `assets` (`assetId`, `accountId`, `state` per page) and 
 
 Follow it with `studio_pages(operation="run-get", run_id=77)`: `state` (`queued`, `running`, `completed`, `failed`, `cancelled`), counts, and each page's state and steps. A fill takes minutes, so check back with gaps. List the results with `studio_pages(operation="list", template_id=41, state="ready,needs_review,failed")`.
 
-A `needs_review` page had a grade fail after its retries, or its data could not be validated. Read it with `studio_pages(operation="get", asset_id=901)` (`data`, `slotStatus`), then refill it, or prepare and submit corrected data. A person can also review it on the page's Customize screen in Ken: their save there moves it to `ready`. An agent's `customize` edit leaves it in review.
+A `needs_review` page had a grade fail after its retries, or its data could not be validated. Read it with `studio_pages(operation="get", asset_id=901)` (`data`, `slotStatus`), then refill it, or prepare and submit corrected data. A person can also review it on the page's Customize screen in Kenso: their save there moves it to `ready`. An agent's `customize` edit leaves it in review.
 
 ## Step 8 - Create the link
 
@@ -235,7 +235,7 @@ A recruiting page is for one candidate, not for an account. It needs the workspa
 ## Step 10 - After it ships
 
 - **Hand edits:** `studio_pages(operation="customize", asset_id=901, overrides={"headline": "Six people who should hear about Fernway first"})`. Overrides merge over the fill; a null value removes one. `studio_pages(operation="customize", asset_id=901, reset=True)` drops them all. A live page is republished with the edit. Errors: 400 `unknown_slot`, `link-domain-blocked`, or a value that breaks its slot schema.
-- **Refill:** `studio_pages(operation="refill", asset_id=901)` reruns the recipe with Ken's executor on the page's pinned version, charged like a fill. A live page stays live and keeps its links. A page that follows the latest version and is not live or retired refills on the latest published version, so a filled page a publish left on its version (because the new version reruns its steps) catches up.
+- **Refill:** `studio_pages(operation="refill", asset_id=901)` reruns the recipe with Kenso's executor on the page's pinned version, charged like a fill. A live page stays live and keeps its links. A page that follows the latest version and is not live or retired refills on the latest published version, so a filled page a publish left on its version (because the new version reruns its steps) catches up.
 - **Republish a retired page:** `studio_pages(operation="republish", asset_id=901)` brings back the same URLs for 1 credit.
 - **Change the template:** pull, edit, validate, push, then publish with the `update_live` you want.
 - **Delete:** only when the user asks. `studio_templates(operation="delete", template_id=41)` fails while pages are live; `force=True` retires them first, so ask before sending it.
@@ -250,7 +250,7 @@ A recruiting page is for one candidate, not for an account. It needs the workspa
 | The platform writing the `prompt` and `grade` steps (executor `"ken"`, refill, `update_live`) | model tokens at 2x cost |
 | Your own agent writing the `prompt` and `grade` steps over MCP (executor `"agent"`) | no token charge |
 | A `ken.copy` tool step, on any path | model tokens at 2x cost |
-| Data steps the platform runs | rate card: email found 1 credit, qualification 0.05, personalization 0.3. Today's data steps (`bind`, Ken Search, `chart.data`) cost nothing |
+| Data steps the platform runs | rate card: email found 1 credit, qualification 0.05, personalization 0.3. Today's data steps (`bind`, Kenso Search, `chart.data`) cost nothing |
 | Scraping | free until the rate card prices it |
 | `webhook` and `dataset` steps, PDF, hosting, previews | free |
 

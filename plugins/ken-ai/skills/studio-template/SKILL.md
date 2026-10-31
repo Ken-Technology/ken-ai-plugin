@@ -5,7 +5,7 @@ description: Build, edit and manage Studio templates - pick or copy a starter, w
 
 # Studio templates
 
-Studio is Library > Studio in Ken AI. A template is built once (a reverse demo, audit, report, landing page, event invite, calculator, recruiting page or cold email) and Ken AI fills a copy of it for each account: a Studio page on the workspace's own link host. This skill covers the template itself: start it, write its files, check them, preview them on real accounts, publish, and manage versions, datasets and campaign pins.
+Studio is Library > Studio in Kenso. A template is built once (a reverse demo, audit, report, landing page, event invite, calculator, recruiting page or cold email) and Kenso fills a copy of it for each account: a Studio page on the workspace's own link host. This skill covers the template itself: start it, write its files, check them, preview them on real accounts, publish, and manage versions, datasets and campaign pins.
 
 Filling a template for one account, prospect or candidate, and sending each person their link, is the `studio-asset` skill.
 
@@ -25,8 +25,8 @@ The "Build with your agent" and "Edit with your agent" buttons in Studio hand th
 
 | The user says | Start at |
 |---|---|
-| "Build a new Ken Studio template." | Step 1 |
-| "Build Ken Studio template 41." or "Edit Ken Studio template 41." | `studio_templates(operation="get", template_id=41)`, `studio_templates(operation="pull", template_id=41)`, then Step 3. Ask what to change when the user has not said |
+| "Build a new Kenso Studio template." | Step 1 |
+| "Build Kenso Studio template 41." or "Edit Kenso Studio template 41." | `studio_templates(operation="get", template_id=41)`, `studio_templates(operation="pull", template_id=41)`, then Step 3. Ask what to change when the user has not said |
 | "Which templates do we have?" | `studio_templates(operation="list")`, then "Manage templates" |
 | "Fill the pages waiting for your agent on template 41." | The `studio-asset` skill |
 
@@ -75,7 +75,7 @@ Then read the files with `studio_templates(operation="pull", template_id=41)`. T
 
 ## Step 3 - Write the bundle
 
-Open the bundle reference before you write or fix any file: `load_skill("studio-template", reference="references/studio-template-builder.md")`. It holds `studio.json`, the slot schema subset, fallbacks, Liquid, Ken variables, the four kit snippets, the Content Security Policy, links, recipe steps and every validation rule id with its fix. Then open the playbook for your type: `references/reverse-demo.md`, `audit.md`, `report.md`, `landing-page.md`, `event.md`, `calculator.md`, `recruiting.md` or `email.md`.
+Open the bundle reference before you write or fix any file: `load_skill("studio-template", reference="references/studio-template-builder.md")`. It holds `studio.json`, the slot schema subset, fallbacks, Liquid, Kenso variables, the four kit snippets, the Content Security Policy, links, recipe steps and every validation rule id with its fix. Then open the playbook for your type: `references/reverse-demo.md`, `audit.md`, `report.md`, `landing-page.md`, `event.md`, `calculator.md`, `recruiting.md` or `email.md`.
 
 The bundle is `studio.json`, `template.liquid`, an optional `fallback.liquid`, `assets/` and `samples/`. Keep three samples: a full one, a shared one (`"person": null`) and a partial one (some slots missing).
 
@@ -108,7 +108,7 @@ Pick 3 accounts that match the brief with `accounts(operation="list", q="Fernway
 
 Preview in both modes before you call the build done:
 
-- **Filled layout:** with `sample`, each account renders that sample's `data` with its own Ken variables.
+- **Filled layout:** with `sample`, each account renders that sample's `data` with its own Kenso variables.
 - **Fallback:** without `sample`, an account with no page renders every slot on its fallback, which is what a reader sees before the fill.
 
 Each entry in `previews` has `url` (signed for 24 hours; give it to the user), `screenshots.desktop` and `screenshots.mobile` (open both when you can show images), and `consoleErrors` (must be empty). `linkIssues` lists links that block a publish. For a calculator or form, add `interact` steps and read `interact.finalScreenshot`. An email template returns `emailPreviews` instead.
@@ -129,7 +129,7 @@ New pages use the published version, and pages with no link yet move to it. Live
 | `"all"` | Every live page is refilled on the new version as a run (`updateRunId`). URLs and links stay |
 | `[812, 813]` | Only these live pages are refilled |
 
-Refilling live pages runs Ken AI's executor on the slots the new version changed, at 2x model cost. Ask the user before you send `"all"` or a list, and say what it costs.
+Refilling live pages runs Kenso's executor on the slots the new version changed, at 2x model cost. Ask the user before you send `"all"` or a list, and say what it costs.
 
 Publish refuses with 409 `invalid_state` on validation errors (each detail names `file:line` and the rule), a flagged link (`link-domain-blocked`, `link-domain-new`), `already_published` (push a change first) or `no_draft`. 50 publishes a day per workspace; a 503 changed nothing, so retry in a minute.
 
@@ -151,7 +151,7 @@ Publish refuses with 409 `invalid_state` on validation errors (each detail names
 
 **Webhook steps** (your own endpoint fills slots, as in `rd-your-product`): read the signing secret with `studio_templates(operation="get-webhook-secret", template_id=41)`. Never paste it into a chat, a file in the bundle or the page.
 
-**Campaign pins.** A campaign's sequence can carry the merge tag `asset_link`, written in double curly braces, and Ken AI builds each page one step ahead from the pinned template:
+**Campaign pins.** A campaign's sequence can carry the merge tag `asset_link`, written in double curly braces, and Kenso builds each page one step ahead from the pinned template:
 
 - Read the pin: `studio_pages(operation="asset-template-get", campaign_id=55)`.
 - Set it: `studio_pages(operation="asset-template-put", campaign_id=55, template_id=41)`. A step can use a template only when every required slot has a fallback or the bundle ships `fallback.liquid`.
@@ -164,7 +164,7 @@ Pinning, unpinning or pinning an email template to a sequence step changes what 
 
 - Nothing you do here sends. A page reaches a person only through a link someone puts in a touch or a sequence, and a person approves every send.
 - Publish, `update_live`, `update-version`, `force=True` and dataset deletes change live pages: ask first and say the cost.
-- Never invent prices, customers, numbers or quotes in fallbacks, samples or prompts. Fallbacks read only Ken variables.
+- Never invent prices, customers, numbers or quotes in fallbacks, samples or prompts. Fallbacks read only Kenso variables.
 - Vendor names (the scraper, the search provider, the model) never appear on a page a prospect reads.
 - Prospects never read "reverse demo" or "demo": the starters ban both in their grade checks; keep that.
 - A structural change to a live template (new sections, new slots, a new recipe) is a new version and a publish, never a hand edit on single pages.
@@ -172,7 +172,7 @@ Pinning, unpinning or pinning an email template to a sequence step changes what 
 
 ## Credits
 
-Previews, validation, pushes, hosting and PDFs are free. Publishing is free. Pages cost 1 credit on their first link, and fills cost model tokens at 2x model cost when Ken AI writes them: the `studio-asset` skill has the full table.
+Previews, validation, pushes, hosting and PDFs are free. Publishing is free. Pages cost 1 credit on their first link, and fills cost model tokens at 2x model cost when Kenso writes them: the `studio-asset` skill has the full table.
 
 ## What this skill cannot do yet
 
@@ -189,6 +189,6 @@ Open with `load_skill("studio-template", reference="references/<file>")`:
 - `studio.md`: the whole Studio loop in one guide, from brief to link, runs, credits and troubleshooting.
 - Type playbooks: `reverse-demo.md`, `audit.md`, `report.md`, `landing-page.md`, `event.md`, `calculator.md`, `recruiting.md`, `email.md`.
 
-## No Ken account yet
+## No Kenso account yet
 
-These steps run on the Ken MCP server, which signs in with a Ken account. If the user has none, send them to https://app.ken.so/get-started to create one, then sign in when the agent asks.
+These steps run on the Kenso MCP server, which signs in with a Kenso account. If the user has none, send them to https://app.ken.so/get-started to create one, then sign in when the agent asks.

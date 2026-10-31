@@ -7,7 +7,7 @@ description: Brief a person on one target account before a call - what Knowledge
 
 "Brief me on Northwind." This skill writes one brief on one target account, for a person about to talk to it: why now, who is in the room, what they care about, where the deal stands and what to open with. Every line carries its source.
 
-There is no single brief operation in Ken AI. You compose the brief from four reads: Knowledge's context pack, the account, its buying committee and, when there is a meeting, its prep brief. A search only fills the gaps those four leave.
+There is no single brief operation in Kenso. You compose the brief from four reads: Knowledge's context pack, the account, its buying committee and, when there is a meeting, its prep brief. A search only fills the gaps those four leave.
 
 ## Rules
 
@@ -63,7 +63,7 @@ Find the meeting: `meetings(operation="list", account_id=101, status="upcoming",
 
 - `status: ready`: use `openWith`, `attending` (with each person's committee role and whether they are new), `gotTheYes`, `relationship`, `whyNow`, `angle`, `openItems` and `touchHistory`. Every line there carries its sources.
 - `isStale: true`: the account had activity after the brief was written. Say so, and prefer the newer facts from Steps 1 to 3.
-- `not_written` or `not_eligible`: there is no meeting brief. A member writes one in Ken AI; there is no MCP write. Build the brief from Steps 1 to 3.
+- `not_written` or `not_eligible`: there is no meeting brief. A member writes one in Kenso; there is no MCP write. Build the brief from Steps 1 to 3.
 - No meeting at all: write the brief for the call the user described.
 
 ## Step 5 - Fill only the gaps
@@ -101,12 +101,12 @@ A person accepts or dismisses it in Knowledge Review. Never edit a Knowledge fil
 
 ## What this skill cannot do yet
 
-- There is no one-call brief and no way to write or refresh a meeting brief from here: a member does that in Ken AI.
+- There is no one-call brief and no way to write or refresh a meeting brief from here: a member does that in Kenso.
 - It cannot score a past call against a rubric, or write a call brief for a client.
 - It does not send anything. For the touches that follow the call, use the `accounts` skill.
 
 Report the brief, the parts you skipped and why, and any suggestion you filed.
 
-## No Ken account yet
+## No Kenso account yet
 
-These steps run on the Ken MCP server, which signs in with a Ken account. If the user has none, send them to https://app.ken.so/get-started to create one, then sign in when the agent asks.
+These steps run on the Kenso MCP server, which signs in with a Kenso account. If the user has none, send them to https://app.ken.so/get-started to create one, then sign in when the agent asks.

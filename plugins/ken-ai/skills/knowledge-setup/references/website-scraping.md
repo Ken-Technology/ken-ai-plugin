@@ -1,8 +1,8 @@
 # Website Scraping Skill
 
-Pick the pages of a company website that explain what it sells and to whom, and scrape them as markdown with the platform `web` tool (Ken's web archive first, then Firecrawl). The pages feed client research, campaign strategy, and copy.
+Pick the pages of a company website that explain what it sells and to whom, and scrape them as markdown with the platform `web` tool (Kenso's web archive first, then Firecrawl). The pages feed client research, campaign strategy, and copy.
 
-When the workspace has Knowledge on, the pages Ken keeps reading on its own are a separate list, the watched pages in the knowledge-setup skill. This playbook is for one-off reads that feed research and copy now.
+When the workspace has Knowledge on, the pages Kenso keeps reading on its own are a separate list, the watched pages in the knowledge-setup skill. This playbook is for one-off reads that feed research and copy now.
 
 ## Tools
 
@@ -36,7 +36,7 @@ If map fails or returns nothing usable, scrape the homepage alone.
 
 - A page that fails is skipped; keep going. Never abort a site for one failure.
 - Site unreachable: report it and stop for that site.
-- Web scraping off: the error says "Web scraping is off right now". Skip that page like any failed page and never retry it; the other pages can still come from Ken's web archive. Say once at the end that live scraping is off.
+- Web scraping off: the error says "Web scraping is off right now". Skip that page like any failed page and never retry it; the other pages can still come from Kenso's web archive. Say once at the end that live scraping is off.
 - An archive copy (`metadata.kenSource: "archive"`) is a normal result. It can be up to 18 months old; `metadata.capturedAt` says when.
 - Never echo scraped markdown back into the conversation. Report one line per page: URL and `ok` or `failed`, then how many URLs the map found and how many pages were read.
 - With several sites, finish one before starting the next.

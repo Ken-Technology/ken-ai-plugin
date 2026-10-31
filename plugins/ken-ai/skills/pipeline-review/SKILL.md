@@ -5,7 +5,7 @@ description: Review the deal pipeline - open opportunities by stage and age, sta
 
 # Pipeline review
 
-Deals rarely die on a call. They die afterwards, quietly: no next step written down, a close date that passed weeks ago, a nurture pile nobody has touched in two months. This skill reads the opportunities in Ken AI, flags the deals that are stuck against what actually happened on each account, proposes one next action per deal, and writes the week's update.
+Deals rarely die on a call. They die afterwards, quietly: no next step written down, a close date that passed weeks ago, a nurture pile nobody has touched in two months. This skill reads the opportunities in Kenso, flags the deals that are stuck against what actually happened on each account, proposes one next action per deal, and writes the week's update.
 
 It ends with a short pipeline report, a list of next actions with owners, and each deal change the user approved applied.
 
@@ -80,7 +80,7 @@ For each flagged deal, propose one action with an owner and a date:
 - **Follow up**: the contact wrote last and nobody answered. Hand the thread to the reply-handling skill.
 - **Book the next meeting**: interest but no meeting. Draft the ask with real times (the meeting-prep-and-followup skill does this).
 - **Fix the record**: a passed close date, a missing next step, a stage that does not match. Propose the new values.
-- **Write the summary**: the deal has activity but no summary or next step. `opportunities(operation="fill-details", opportunity_id=77)` has Ken AI write them from the deal's context. It never overwrites a value a person, an import or a CRM set, and fills each deal at most once every 2 minutes.
+- **Write the summary**: the deal has activity but no summary or next step. `opportunities(operation="fill-details", opportunity_id=77)` has Kenso write them from the deal's context. It never overwrites a value a person, an import or a CRM set, and fills each deal at most once every 2 minutes.
 - **Close it**: no activity for a long time and no answer to the last two touches. Propose moving it to a lost stage, or to nurture if the workspace has one, with the reason.
 
 Never draft or send outreach from this skill. Name the skill that does it.
@@ -124,6 +124,6 @@ If replies came in but `interested` is 0, the replies may not be classified yet.
 
 `references/stale-signals.md` holds the thresholds and how to read each signal. `references/weekly-update.md` holds the update layout and the metric definitions. Open one with `load_skill("pipeline-review", reference="references/stale-signals.md")`.
 
-## No Ken account yet
+## No Kenso account yet
 
-These steps run on the Ken MCP server, which signs in with a Ken account. If the user has none, send them to https://app.ken.so/get-started to create one, then sign in when the agent asks.
+These steps run on the Kenso MCP server, which signs in with a Kenso account. If the user has none, send them to https://app.ken.so/get-started to create one, then sign in when the agent asks.

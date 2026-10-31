@@ -16,7 +16,7 @@ The design rule that keeps it right: no model does arithmetic. The `dataset` ste
 
 | `data-section` | What it holds | Reads |
 |---|---|---|
-| `cover` | "{account} next to its peers", prepared for, peer group, prepared by, greeting, "What's inside" | Ken variables, the industry and size band |
+| `cover` | "{account} next to its peers", prepared for, peer group, prepared by, greeting, "What's inside" | Kenso variables, the industry and size band |
 | `summary` | The headline, the short version, what the site shows, the one metric to look at first with a bar chart (25th percentile, median, 75th) | `data.headline`, `data.summary`, `data.observations`, `data.focus`, `data.chart` |
 | `benchmarks` | One row per metric: name, unit, which direction is better, a band from p25 to p75 with a median mark, the three numbers, a "Yours" line in print | `data.benchmarks`, straight from the CSV |
 | `takeaways` | Three titled points, each built on one or two rows | `data.takeaways` |
@@ -61,7 +61,7 @@ The key steps from the starter, prompt shortened:
   "prompt": "... We do not know {{ account.name }}'s own numbers. Never say or imply where they rank. ... every number you write must be copied exactly from one row of data.benchmarks, with its unit. Do no arithmetic. ... If data.benchmarks is empty, return {} and nothing else. ..." }
 ```
 
-`where` is a list of `{column, op, value}`. `eq` ignores case, `in` takes a list, `between` takes two numbers. `value` is a Ken variable (`account.industry`) or a literal. To compare against the whole industry, drop the `size_band` filter and raise `limit`.
+`where` is a list of `{column, op, value}`. `eq` ignores case, `in` takes a list, `between` takes two numbers. `value` is a Kenso variable (`account.industry`) or a literal. To compare against the whole industry, drop the `size_band` filter and raise `limit`.
 
 Upload the CSV before the first fill:
 

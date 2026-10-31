@@ -25,7 +25,7 @@ Every call takes `client_id`, the workspace id. Send it when the user can see mo
 1. `campaigns(operation="list", q="Acme")` finds the campaign by name. `campaigns(operation="get", campaign_id=42)` gives its status, schedule and launch date.
 2. Pick the window. The default is the last 30 days. For "why did replies drop", compare two windows of the same length: the last 14 days against the 14 days before.
 
-If an operation this skill names is not listed for you, or a campaign the user named answers 404, stop and say: "I can't read that campaign's analytics from here. You can see it in Ken AI at https://app.ken.so/campaigns/<id>." A 404 means the campaign is not in this workspace or the read is not on for you. Do not retry it, and do not tell the user the campaign does not exist.
+If an operation this skill names is not listed for you, or a campaign the user named answers 404, stop and say: "I can't read that campaign's analytics from here. You can see it in Kenso at https://app.ken.so/campaigns/<id>." A 404 means the campaign is not in this workspace or the read is not on for you. Do not retry it, and do not tell the user the campaign does not exist.
 
 ## Step 1 - Check reply classification first
 
@@ -37,7 +37,7 @@ The interested count is only as good as the classifier behind it, and the classi
 
 - Replies are `totalCount` minus the `out_of_office` count.
 - Classification is behind when `unclassified` holds a large share of the replies, or when a campaign that had interested replies shows none for several days while replies keep arriving. Spot-check with `threads(operation="list", campaign_id=42, interest="unclassified", limit=20)` and read a few.
-- If classification is behind, stop the diagnosis there. Tell the user the positive-reply numbers for this window are not reliable, give the reply count, and say the Ken AI team needs to look at classification. Do not explain a drop the classifier made.
+- If classification is behind, stop the diagnosis there. Tell the user the positive-reply numbers for this window are not reliable, give the reply count, and say the Kenso team needs to look at classification. Do not explain a drop the classifier made.
 
 Done when you know whether the interested count can be trusted.
 
@@ -48,7 +48,7 @@ Done when you know whether the interested count can be trusted.
 Read `sentCount` and `contactedCount` by day. Fewer sends come before fewer replies, so a reply drop that follows a send drop is a sending question, not a copy question.
 
 - Status: a paused, completed or errored campaign stops sending. `campaigns(operation="get", campaign_id=42)` says which.
-- Holds: `analytics(operation="auto-pauses-list")` lists the inboxes, domains and campaigns Ken AI paused on its own, with the reason and the rate that tripped it. `isActive` true means the hold still blocks sending.
+- Holds: `analytics(operation="auto-pauses-list")` lists the inboxes, domains and campaigns Kenso paused on its own, with the reason and the rate that tripped it. `isActive` true means the hold still blocks sending.
 - Leads: `analytics(operation="get-weekly-report", campaign_id=42)` returns `next`, which says how many leads are left and when the last one starts. A campaign with no leads left stops sending.
 
 Hand any sending, hold or inbox problem to `deliverability-guard`.
@@ -107,7 +107,7 @@ It also returns a text summary. Quote its figures as they are. Run Step 1 anyway
 
 ## Experiments
 
-Every night Ken AI reads what changed in the workspace's campaigns and what the numbers did after, and files each change as a finding with a proof level. When the user asks about tests, findings, a winning version or making a version the default, load `load_skill("campaign-diagnosis", reference="references/experiments.md")` and follow it. Findings need the workspace's `experiments` flag. While it is off, say Experiments are not on for this workspace yet.
+Every night Kenso reads what changed in the workspace's campaigns and what the numbers did after, and files each change as a finding with a proof level. When the user asks about tests, findings, a winning version or making a version the default, load `load_skill("campaign-diagnosis", reference="references/experiments.md")` and follow it. Findings need the workspace's `experiments` flag. While it is off, say Experiments are not on for this workspace yet.
 
 The proof level sets your words: below `proven`, never say won, beat, proven or caused about a finding.
 
@@ -117,6 +117,6 @@ The proof level sets your words: below `proven`, never say won, beat, proven or 
 - Count held meetings. Meetings booked are on the performance rows. Meetings held are not tracked yet.
 - Split steps by variant for every caller. That read is staff or `generative_ui` only.
 
-## No Ken account yet
+## No Kenso account yet
 
-These steps run on the Ken MCP server, which signs in with a Ken account. If the user has none, send them to https://app.ken.so/get-started to create one, then sign in when the agent asks.
+These steps run on the Kenso MCP server, which signs in with a Kenso account. If the user has none, send them to https://app.ken.so/get-started to create one, then sign in when the agent asks.

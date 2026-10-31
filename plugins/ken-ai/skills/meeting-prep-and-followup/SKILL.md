@@ -5,7 +5,7 @@ description: Prepare for a sales meeting and follow it up - the brief, attendees
 
 # Meeting prep and follow-up
 
-Calls usually go better than what happens after them. The deals that slip are the ones where nobody wrote down what was promised, the money question was left for "another call", and the follow-up went out days later with no date in it. This skill does both halves in Ken AI:
+Calls usually go better than what happens after them. The deals that slip are the ones where nobody wrote down what was promised, the money question was left for "another call", and the follow-up went out days later with no date in it. This skill does both halves in Kenso:
 
 - **Before the call:** who attends, where the account stands, what was said so far, the objections to expect, and the one next step to ask for.
 - **After the call:** what was decided and promised, the CRM changes the call implies, the deal update, and a follow-up draft in the user's voice that locks one dated next step.
@@ -28,7 +28,7 @@ Every call takes `client_id`, the workspace id. Send it on every call when the u
 | Part | Operations | Needs |
 |---|---|---|
 | Meetings, briefs, sources, CRM preview | `meetings` list, get, get-brief, list-sources, get-source-transcript, get-crm-changes | full access and Meetings on |
-| Ken AI Notetaker transcripts | `meetings` get-transcript | Ken AI Notetaker on |
+| Kenso Notetaker transcripts | `meetings` get-transcript | Kenso Notetaker on |
 | Calendar events | `meetings` events-list, events-create, events-update | full access and a connected calendar |
 | Open times | `calendar` get-availability, `scheduler` links-suggested-times | a connected calendar; Scheduler for links |
 | Account, touches, notes | `accounts` get, activity, `account_touches` list, create, `meeting_notes` list, create | Accounts on |
@@ -36,7 +36,7 @@ Every call takes `client_id`, the workspace id. Send it on every call when the u
 | Writing style and account knowledge | `knowledge` context | Knowledge on |
 | Email threads | `threads` list, list-messages, replace-draft, create-message | every member who can reply |
 
-When an operation is not listed for you, or answers 404 `not_found` on every id, that part is off for this workspace or this seat. Skip it, tell the user in one sentence which part is not on, and carry on with the rest. Do not retry it. If `meetings` itself is missing, say meeting briefs are not available to this connection and send the user to their calendar in Ken AI: `https://app.ken.so/demo/calendar`.
+When an operation is not listed for you, or answers 404 `not_found` on every id, that part is off for this workspace or this seat. Skip it, tell the user in one sentence which part is not on, and carry on with the rest. Do not retry it. If `meetings` itself is missing, say meeting briefs are not available to this connection and send the user to their calendar in Kenso: `https://app.ken.so/demo/calendar`.
 
 ## Before the call
 
@@ -53,7 +53,7 @@ Skip prep for internal meetings and calls with existing customers unless the use
 `meetings(operation="get-brief", meeting_id="mtg_812")`
 
 - `status: ready`: the brief has `openWith`, `attending` (with each person's role on the buying committee and whether they are new), `gotTheYes`, `relationship`, `whyNow`, `angle`, `openItems` and `touchHistory`, each line with its sources. `isStale` means the account moved after it was written.
-- `not_written` or `not_eligible`: build the prep yourself from step 3. Writing or refreshing a brief is a person's button in Ken AI; no tool here writes one.
+- `not_written` or `not_eligible`: build the prep yourself from step 3. Writing or refreshing a brief is a person's button in Kenso; no tool here writes one.
 
 ### 3. Fill the gaps
 
@@ -85,8 +85,8 @@ Cite where each line came from. Leave out what you could not find instead of gue
 
 ### 1. Get what was said
 
-- Ken AI Notetaker: `meetings(operation="get-transcript", meeting_id="mtg_812")`.
-- Other recorders (Fireflies, Fathom, a paste or an upload): `meetings(operation="list-sources", meeting_id="mtg_812")`, then `meetings(operation="get-source-transcript", meeting_id="mtg_812", source_id="msrc_31")`. A `candidate` source is a call Ken AI found that the rep has not confirmed yet: ask them to pick it in the app.
+- Kenso Notetaker: `meetings(operation="get-transcript", meeting_id="mtg_812")`.
+- Other recorders (Fireflies, Fathom, a paste or an upload): `meetings(operation="list-sources", meeting_id="mtg_812")`, then `meetings(operation="get-source-transcript", meeting_id="mtg_812", source_id="msrc_31")`. A `candidate` source is a call Kenso found that the rep has not confirmed yet: ask them to pick it in the app.
 - No transcript: ask the user for their notes. With Accounts on, save them on their yes: `meeting_notes(operation="create", account_id=101, meeting_id="mtg_812", notes="...")`. The note goes on that meeting.
 
 ### 2. Pull out what matters
@@ -113,7 +113,7 @@ With Opportunities on, find the open deal (`opportunities(operation="list", acco
 
 - Stage keys differ per workspace: read them with `opportunities(operation="stages-list")`.
 - Change an amount or a close date only when the call stated it. `pinned_by_user` means a person set that field: leave it.
-- `opportunities(operation="fill-details", opportunity_id=77)` has Ken AI write the deal's summary and next step from its context. It never overwrites a value a person, an import or a CRM set.
+- `opportunities(operation="fill-details", opportunity_id=77)` has Kenso write the deal's summary and next step from its context. It never overwrites a value a person, an import or a CRM set.
 - A first call that qualified and has no deal yet: propose `opportunities(operation="create", account_id=101, fields={"name": "Acme - EMEA rollout", "next_step": "..."})` and create it on the user's yes.
 
 ### 5. Draft the follow-up
@@ -152,6 +152,6 @@ When the next meeting is agreed with a time, offer the calendar invite and creat
 
 `references/prep-template.md` and `references/followup-template.md` hold the layouts and checks. Open one with `load_skill("meeting-prep-and-followup", reference="references/followup-template.md")`.
 
-## No Ken account yet
+## No Kenso account yet
 
-These steps run on the Ken MCP server, which signs in with a Ken account. If the user has none, send them to https://app.ken.so/get-started to create one, then sign in when the agent asks.
+These steps run on the Kenso MCP server, which signs in with a Kenso account. If the user has none, send them to https://app.ken.so/get-started to create one, then sign in when the agent asks.

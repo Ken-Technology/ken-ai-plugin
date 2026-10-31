@@ -11,7 +11,7 @@ Review live sending domains. On a paid plan, search names and order them. Credit
 
 Before any search or order:
 
-1. `billing(operation="billing_subscription", client_id=...)`. Plans that buy Ken AI domains, with billing Active or Trialing: Platform (`planType` Platform), Dfy, grandfathered Starter / Growth / Core (all credit plans), and VIP (`planType` Premium, exempt). If Free, or `PLAN_FEATURE_NOT_AVAILABLE`, stop adds: Free cannot buy Ken AI domains or inboxes and connects its own inboxes in the app, or upgrades to Platform at https://app.ken.so/settings/billing; show `error.recovery.summary` when present. If `managedByWorkspace` is set (white-label child), record `caps.mailboxes` and `caps.domains`; its credits are run by the parent workspace.
+1. `billing(operation="billing_subscription", client_id=...)`. Plans that buy Kenso domains, with billing Active or Trialing: Platform (`planType` Platform), Dfy, grandfathered Starter / Growth / Core (all credit plans), and VIP (`planType` Premium, exempt). If Free, or `PLAN_FEATURE_NOT_AVAILABLE`, stop adds: Free cannot buy Kenso domains or inboxes and connects its own inboxes in the app, or upgrades to Platform at https://app.ken.so/settings/billing; show `error.recovery.summary` when present. If `managedByWorkspace` is set (white-label child), record `caps.mailboxes` and `caps.domains`; its credits are run by the parent workspace.
 2. `billing(operation="credits-get", client_id=...)`. Record `exempt` and `display.available`.
 3. `domain_orders(operation="purchase-capacity", client_id=...)`. Read `remaining`, `planDaily`, `planDailyEnforced`, `existingCapacity`, `emailLimit`. `planDaily` is emails/day. Do not compute `emailLimit / 30`.
 4. `planDailyEnforced` true, or missing: daily send is a hard cap. If `remaining` is 0, stop new orders and work with existing domains. `planDailyEnforced` false (credit plans): `remaining` is a planning figure, and credits are the limit.
@@ -46,7 +46,7 @@ Each hit has `price` and a registrar quote, both money objects in minor units (c
 What the user pays for the first year:
 
 - Credit plans, when the hit has `priceMillicredits`: that many millicredits (ceil(registrar quote x 1.03) x 50 credits). `renewalPriceMillicredits`, when present, is the yearly renewal.
-- Exempt workspaces, or a hit without `priceMillicredits`: `price` at Stripe checkout. It already includes Ken AI's markup, so show it as is.
+- Exempt workspaces, or a hit without `priceMillicredits`: `price` at Stripe checkout. It already includes Kenso's markup, so show it as is.
 
 Show name, the first-year price, and Google/Microsoft availability flags. Do not put Google inboxes on a name that is not Google-available.
 
@@ -86,9 +86,9 @@ Surface the envelope `message` plus `refusal.code`, metrics, and `remedy`.
 
 | Code | What to tell the user |
 |------|------------------------|
-| `PLAN_FEATURE_NOT_AVAILABLE` | Free cannot buy Ken AI infrastructure. Connect your own inboxes in the app, or upgrade to Platform at https://app.ken.so/settings/billing. Show `error.recovery.summary` when present. |
-| `INSUFFICIENT_CREDITS` | Not enough credits for the registration plus the first month of the order's inboxes. Show the message (it carries the credits needed and available). Shrink the cart, or buy credits at https://app.ken.so/settings/billing and retry. Dfy: the Ken AI team adds credits. White-label child: ask the parent workspace. |
-| `FREE_CREDITS_NOT_ELIGIBLE` | Free and bonus credits can't pay for domains or inboxes, and the bought credits fall short. Show the message (it carries the credits needed, the credits that can pay, and the free part). Buy credits at https://app.ken.so/settings/billing and retry. Dfy: the Ken AI team adds credits. White-label child: ask the parent workspace. |
+| `PLAN_FEATURE_NOT_AVAILABLE` | Free cannot buy Kenso infrastructure. Connect your own inboxes in the app, or upgrade to Platform at https://app.ken.so/settings/billing. Show `error.recovery.summary` when present. |
+| `INSUFFICIENT_CREDITS` | Not enough credits for the registration plus the first month of the order's inboxes. Show the message (it carries the credits needed and available). Shrink the cart, or buy credits at https://app.ken.so/settings/billing and retry. Dfy: the Kenso team adds credits. White-label child: ask the parent workspace. |
+| `FREE_CREDITS_NOT_ELIGIBLE` | Free and bonus credits can't pay for domains or inboxes, and the bought credits fall short. Show the message (it carries the credits needed, the credits that can pay, and the free part). Buy credits at https://app.ken.so/settings/billing and retry. Dfy: the Kenso team adds credits. White-label child: ask the parent workspace. |
 | `INBOX_LIMIT_REACHED` | Show `used` / `limit` / `remaining`. Rebalance existing mailboxes, or upgrade. |
 | "exceeds your daily send capacity" | The cart exceeds remaining daily send on a plan with a hard cap. Shrink it. It is not a mailbox-slot limit. |
 | "workspace mailbox cap" / "workspace domain cap" | White-label child at its parent's cap. Shrink the cart or ask the parent workspace to raise it. |
@@ -101,6 +101,6 @@ If checkout fails because remaining is too small on a hard cap, show `remaining`
 - Sizing against daily send and credits belongs in `infra-planning`.
 - Importing owned domains belongs in `connect-domains`.
 
-## No Ken account yet
+## No Kenso account yet
 
-These steps run on the Ken MCP server, which signs in with a Ken account. If the user has none, send them to https://app.ken.so/get-started to create one, then sign in when the agent asks.
+These steps run on the Kenso MCP server, which signs in with a Kenso account. If the user has none, send them to https://app.ken.so/get-started to create one, then sign in when the agent asks.

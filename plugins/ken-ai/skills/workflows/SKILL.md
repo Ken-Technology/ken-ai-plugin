@@ -5,7 +5,7 @@ description: Build, validate, test, publish and run a workflow over MCP, from a 
 
 # Workflows
 
-A workflow is automation in Ken AI (Workflows, https://app.ken.so/demo/workflows). It has one trigger (a signal, a new lead, a webhook, a schedule, or a run on records someone picks), a list of steps (find people, enrich, qualify with AI, branch, promote to Accounts, draft an email, post to Slack) and limits (credits per month and per run, runs per day). A `general` workflow runs on the workspace's accounts, people or leads. A `campaign` workflow belongs to one campaign and runs on its leads. A `system` workflow is Ken's own and read-only. Ken keeps one for each Knowledge skill (edit the skill instead), and the ones Ken seeds for its own jobs are hidden: a 404 for anyone but staff (`references/ops-console.md`).
+A workflow is automation in Kenso (Workflows, https://app.ken.so/demo/workflows). It has one trigger (a signal, a new lead, a webhook, a schedule, or a run on records someone picks), a list of steps (find people, enrich, qualify with AI, branch, promote to Accounts, draft an email, post to Slack) and limits (credits per month and per run, runs per day). A `general` workflow runs on the workspace's accounts, people or leads. A `campaign` workflow belongs to one campaign and runs on its leads. A `system` workflow is Kenso's own and read-only. Kenso keeps one for each Knowledge skill (edit the skill instead), and the ones Kenso seeds for its own jobs are hidden: a 404 for anyone but staff (`references/ops-console.md`).
 
 You edit a draft, and nothing runs until you publish it. A published workflow is `live`: its trigger starts runs. `draft` means it was never published. `off` means it was unpublished, or the engine paused it at a limit (`pausedReason`). Every run records the version it ran, each step with its attempts, and the credits charged. This skill is the loop from a goal to a live workflow, then running it on records and recovering runs.
 
@@ -16,7 +16,7 @@ Open a reference with `load_skill(name="workflows", reference="references/exampl
 | `references/definition-format.md` | you write or fix a definition: keep it open the whole time |
 | `references/examples.md` | you want a complete workflow to copy: three of them, one with a `code.run@1` step |
 | `references/lead-source-workflows.md` | the user wants leads or accounts to come in by themselves (Sales Navigator, forms, website visitors, hiring signals, imports), or picks a template: every template, what it needs, and the template loop with a spend limit |
-| `references/ops-console.md` | the caller is Ken AI staff and the question is fleet-wide: queues, provider breakers, stuck runs, spenders, kill switches, system and shadow workflows. Never for anyone else |
+| `references/ops-console.md` | the caller is Kenso staff and the question is fleet-wide: queues, provider breakers, stuck runs, spenders, kill switches, system and shadow workflows. Never for anyone else |
 
 Every call takes `client_id`, the workspace id. Send it on every call when the user can see more than one workspace.
 
@@ -76,13 +76,13 @@ The result is `valid`, `mode` and `issues`, each with `severity`, `path` (a JSON
 | `code` | Fix |
 |---|---|
 | `limits_required` | Add `limits` with `creditsPerMonth`, `creditsPerRun`, `runsPerDay` and `atLimit`. Publish mode. |
-| `missing_secret` | The user creates the secret under Settings > Workflows > Secrets in Ken AI. `workflows(operation="workflow-secrets-list", client_id=...)` lists the names that exist. |
+| `missing_secret` | The user creates the secret under Settings > Workflows > Secrets in Kenso. `workflows(operation="workflow-secrets-list", client_id=...)` lists the names that exist. |
 | `secret_header_only` | A step other than `code.run@1` names a header-only secret, which only a Run code step can use. Use a plain secret there. A secret stays header-only until the user deletes it and creates it again without the mark. |
 | `secret_host_not_listed` | A `code.run@1` step names a header-only secret whose host its `allowedHosts` does not cover. Add the host `fix` names to `allowedHosts`. |
 | `secret_header_conflict` | Two header-only secrets of one `code.run@1` step set the same header on the same host. Keep one of them in `secrets`. |
 | `too_many_hosts` | A `code.run@1` step's `allowedHosts` plus the hosts its wildcards cover for header-only secrets pass 20. Replace the wildcard with the exact host, or remove a host. |
 | `app_not_connected` | The user connects Slack (for `slack.message@1`) or a CRM, HubSpot or Salesforce (for `crm.*` steps), under Settings > Integrations, or removes the step. `workflows(operation="workflow-slack-connection-get", client_id=...)` checks Slack; the CRM connection is on Settings > Integrations > CRM. |
-| `feature_disabled` | The step needs a flag that is off for this workspace: remove the step, or ask Ken AI to turn the flag on. |
+| `feature_disabled` | The step needs a flag that is off for this workspace: remove the step, or ask Kenso to turn the flag on. |
 | `unknown_reference` | A reference names a step, root or output field that does not exist. Use the step's `exampleOutput` from `workflows(operation="step-types-get", client_id=..., type="ai.qualify@1")`. |
 | `unknown_record_field` | A warning, so it still publishes, but the reference renders empty: `account`, `person` or `lead` followed by a field the record does not have, such as `account.domain`. Use the field `fix` names (`account.primaryDomain`, `lead.companyDomain`); `references/definition-format.md` lists each record's fields. |
 | `unknown_step_type` | Use the type `fix` suggests, or find one with `workflows(operation="step-types-list", client_id=...)`. |
@@ -108,12 +108,12 @@ Tell the user both numbers, and the `limits` that cap them (only the `workflow` 
 
 This runs the draft once as a test run on one record. Leave out the record to use the newest record of the trigger's type. For a campaign workflow, that is the newest live lead of its campaign; when the campaign has none, the call answers 400 `record_required` and names the campaign: add a lead to that campaign first.
 
-A test run calls real providers, so it needs the workspace's `workflows_runtime` flag like any run. While that flag is off, the call answers 404 `Workflow runs are not enabled for this workspace (workflows_runtime is off).` and starts nothing: stop and tell the user that Ken AI has to turn workflow runs on for this workspace. A test run that was already queued when the flag went off fails with the same message on its step. What a step does in a test depends on its type's `test` field (`workflows(operation="step-types-get", ...)`):
+A test run calls real providers, so it needs the workspace's `workflows_runtime` flag like any run. While that flag is off, the call answers 404 `Workflow runs are not enabled for this workspace (workflows_runtime is off).` and starts nothing: stop and tell the user that Kenso has to turn workflow runs on for this workspace. A test run that was already queued when the flag went off fails with the same message on its step. What a step does in a test depends on its type's `test` field (`workflows(operation="step-types-get", ...)`):
 
 | `test` | In a test run |
 |---|---|
 | `simulate` or `sample` | returns the type's static example output, calls nothing and costs nothing. The output is the same on every test, not built from the record: `send.email@1` returns `touchId` 48213, `campaign.promote@1` returns `accountId` 1042. To check what the step would have done, read its rendered `input` in the run's steps. Every send is simulated: a test never sends. |
-| `live` | runs for real and is charged. AI and data steps are live, and so are `campaign.protect@1`, `campaign.sequence@1`, the two segment steps and the A/B test step. `code.run@1` is live too, once the workspace has `workflows_code`: a test runs the code for real (free in credits), except a code step with `allowedHosts`, which is simulated (output `{}`) unless you name it in `live_steps`, since its code can call outside Ken. While the feature is off, a test of a draft with a code step answers `feature_disabled` unless you pin the step's output. For any other type, read its `test` field. |
+| `live` | runs for real and is charged. AI and data steps are live, and so are `campaign.protect@1`, `campaign.sequence@1`, the two segment steps and the A/B test step. `code.run@1` is live too, once the workspace has `workflows_code`: a test runs the code for real (free in credits), except a code step with `allowedHosts`, which is simulated (output `{}`) unless you name it in `live_steps`, since its code can call outside Kenso. While the feature is off, a test of a draft with a code step answers `feature_disabled` unless you pin the step's output. For any other type, read its `test` field. |
 
 The trigger's output (what steps read as `trigger.<field>`) comes from the record under test, for the fields the trigger declares: a lead gives `leadId`, `campaignId`, `campaignSegmentId` and `createdAt`, an account `accountId` and `stage`, a person `personId` and its first account link. A field the record cannot supply, such as a signal's `signal`, `payload` and `occurredAt`, keeps the trigger type's example value, and the result's `exampleFields` lists those names: steps that read them ran on made-up values.
 
@@ -146,7 +146,7 @@ The gate, in order; the first failure wins:
 2. Every send step keeps `approval: "required"`. `"auto"` passes the gate only when the workspace has the `workflows_auto_send` flag, and even then every send still waits for approval in Today for now. Otherwise `approval_required`.
 3. A test passed on the current draft.
 
-A workflow that is off and has no draft (turned off, or a default workflow Ken AI set up off) is turned back on instead: the same call puts its published version live through gates 1 and 2, with no new test and no new version.
+A workflow that is off and has no draft (turned off, or a default workflow Kenso set up off) is turned back on instead: the same call puts its published version live through gates 1 and 2, with no new test and no new version.
 
 | 409 | Do |
 |---|---|
@@ -203,11 +203,11 @@ Read one run: `workflow_runs(operation="get", client_id=..., run_id=5531)`. The 
 - **Bulk:** `workflow_runs(operation="bulk", client_id=..., action="restart", workflow_id=12, status="failed")` acts on a filter, or pass `run_ids=[5531, 5532]` instead. `action` is `cancel`, `restart`, `retry` or `skip` (`skip` needs `node_id`, the step to skip in every run). A filter stops at the newest 1,000 runs and says `truncated: true` with a `nextCursor`: call again with the same filter and `cursor=<nextCursor>` until `truncated` is false. Each result has its own `status`.
 - **Where a workflow fails:** `workflow_runs(operation="step-overview", client_id=..., workflow_id=12)` counts each step's statuses over the last 30 days (or `created_after` / `created_before`), with average duration, credits and the last error.
 
-A send step with a body (or LinkedIn `text`) creates a touch that waits for approval in Today. Without one, the touch is created planned and is not in Today until Ken's writer drafts it (workspaces with the `accounts_writer` flag) or a person writes it on the account. The run stays `waiting` meanwhile. Once a person approves it, the Accounts send pass sends it where sending is on for the workspace, and the step succeeds with status `sent` and charges one send credit. A touch a person skips or deletes ends the step with status `skipped` or `deleted` and charges nothing. When the workspace's Contact limits refuse the touch (the same check an agent's `POST /v1/touches` gets: weeks between touches to a person, new people a day, the send window's days, open opportunity), no touch is created: the step succeeds at once with status `skipped`, `reason` `contact_limit`, the `rule`, the guardrail's `message` and `nextAllowedAt`, charges nothing, and the run goes on. Its output then has no `touchId`. A refusal by the send window's day rule alone (`agent_send_window`) is deferred instead, because a workflow has no agent to retry: the touch is created due at the window's start time on its next day (America/New_York; Monday to Friday at 08:00 by default), at most a week out, the output's `deferredUntil` says so, and the step waits with its 14 days counted from then. Refused again on that day (the new-people cap, for example), the step skips as above. The new-people cap, spacing and open opportunity are never deferred, so a skip on a day outside the window can still name `rule` `agent_send_window` when another rule fails at the same time (the verdict names the rule that clears last). A touch the send pass gives up on (status `failed`) stays in Today for a retry, and the step keeps waiting. With no send, the wait times out after 14 days: the step then fails with `wait timed out: touch.sent` and charges nothing.
+A send step with a body (or LinkedIn `text`) creates a touch that waits for approval in Today. Without one, the touch is created planned and is not in Today until Kenso's writer drafts it (workspaces with the `accounts_writer` flag) or a person writes it on the account. The run stays `waiting` meanwhile. Once a person approves it, the Accounts send pass sends it where sending is on for the workspace, and the step succeeds with status `sent` and charges one send credit. A touch a person skips or deletes ends the step with status `skipped` or `deleted` and charges nothing. When the workspace's Contact limits refuse the touch (the same check an agent's `POST /v1/touches` gets: weeks between touches to a person, new people a day, the send window's days, open opportunity), no touch is created: the step succeeds at once with status `skipped`, `reason` `contact_limit`, the `rule`, the guardrail's `message` and `nextAllowedAt`, charges nothing, and the run goes on. Its output then has no `touchId`. A refusal by the send window's day rule alone (`agent_send_window`) is deferred instead, because a workflow has no agent to retry: the touch is created due at the window's start time on its next day (America/New_York; Monday to Friday at 08:00 by default), at most a week out, the output's `deferredUntil` says so, and the step waits with its 14 days counted from then. Refused again on that day (the new-people cap, for example), the step skips as above. The new-people cap, spacing and open opportunity are never deferred, so a skip on a day outside the window can still name `rule` `agent_send_window` when another rule fails at the same time (the verdict names the rule that clears last). A touch the send pass gives up on (status `failed`) stays in Today for a retry, and the step keeps waiting. With no send, the wait times out after 14 days: the step then fails with `wait timed out: touch.sent` and charges nothing.
 
 ### Outcome codes
 
-These codes start a failed step's `errorMessage`. The step fails as `permanent` and Ken never runs it again on its own: the first three because running it twice could act twice, `draft_changed` because the run no longer tests one draft.
+These codes start a failed step's `errorMessage`. The step fails as `permanent` and Kenso never runs it again on its own: the first three because running it twice could act twice, `draft_changed` because the run no longer tests one draft.
 
 | Code | Meaning | Do |
 |---|---|---|
@@ -230,7 +230,7 @@ When the user asks why a workflow fails, or for a daily check:
 |---|---|---|
 | `setup` | a missing app, secret or permission; the run waits in Needs attention | the user fixes it in Settings, then `retry` the runs (`bulk` with `action="retry"` for many) |
 | `budget` | a credit or spend limit; `atLimit` decided pause, ask or hold | raise the limit on the user's yes (step 5), or wait for the limit to reset, then `retry` |
-| `temporary` | a provider error Ken retries with backoff by itself | wait; `retry` only to skip the backoff |
+| `temporary` | a provider error Kenso retries with backoff by itself | wait; `retry` only to skip the backoff |
 | `permanent` | bad input on the record, or a definition bug | a bad record: skip the step or set its output. A definition bug: fix the draft, test and publish (steps 2 to 5), then start new runs (step 6). `restart` and `replay` keep the run's version, so they repeat the bug |
 
 4. Say what the recovery costs before you start it: `restart` charges again only the steps it re-runs and keeps the paid outputs, `replay` charges every step from `from_node_id` on (every step without it), `retry` charges the released step when it runs, and skip and set-output charge nothing. For a bulk action, give the run count and an upper bound from `workflows(operation="estimate-create", client_id=..., workflow_id=12, records=40)`, and wait for a yes.
@@ -257,6 +257,6 @@ Send `patch` (RFC 6902 operations) or the whole `definition`. A stale `base_vers
 - A campaign workflow on a client's campaign decides who that campaign sends to. Publishing, unpublishing or bulk-cancelling one needs a yes that names that client, with its source (who said it, where and when).
 - Never retry a call that answered 404 on every id (step 0).
 
-## No Ken account yet
+## No Kenso account yet
 
-These steps run on the Ken MCP server, which signs in with a Ken account. If the user has none, send them to https://app.ken.so/get-started to create one, then sign in when the agent asks.
+These steps run on the Kenso MCP server, which signs in with a Kenso account. If the user has none, send them to https://app.ken.so/get-started to create one, then sign in when the agent asks.

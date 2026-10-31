@@ -7,7 +7,7 @@ description: Keep every live campaign stocked with leads, at the right volume, o
 
 ## What this run does
 
-Once a week, or when someone asks, keep every live campaign in the workspace with enough leads, the right daily volume, healthy inboxes and its winning tests, and turn ideas into proposals a person approves in Ken AI. Ken applies a change only inside the campaign's Autopilot and its bounds; anything else becomes a proposal.
+Once a week, or when someone asks, keep every live campaign in the workspace with enough leads, the right daily volume, healthy inboxes and its winning tests, and turn ideas into proposals a person approves in Kenso. Ken applies a change only inside the campaign's Autopilot and its bounds; anything else becomes a proposal.
 
 Every call takes `client_id`, the workspace id. Send it when the user can see more than one workspace. These operations sit behind the `agent_templates` flag: while it is off they answer not found. Say the team is not on for this workspace yet, and stop.
 
@@ -41,6 +41,6 @@ Change campaigns only through `agent_team(operation="create-action")`. A result 
 
 End with one short summary in your own reply: what changed (with each undo deadline), what you proposed, and what to watch next week. A failed write (`refused`, or an error) goes in that summary with its code, and is never retried. Undo an applied action only when a person asks: `agent_team(operation="undo-action", action_id=...)`.
 
-## No Ken account yet
+## No Kenso account yet
 
-These steps run on the Ken MCP server, which signs in with a Ken account. If the user has none, send them to https://app.ken.so/get-started to create one, then sign in when the agent asks.
+These steps run on the Kenso MCP server, which signs in with a Kenso account. If the user has none, send them to https://app.ken.so/get-started to create one, then sign in when the agent asks.

@@ -33,7 +33,7 @@ Studio is in beta behind the workspace's `studio` flag, and its operations are s
 | The user says | Start at |
 |---|---|
 | "Fill the audit template for Northwind." | Step 1 |
-| "Fill the pages waiting for your agent on Ken Studio template 41." | `studio_pages(operation="run-list", template_id=41)`, take the runs with `executor` `"agent"`, read each with `studio_pages(operation="run-get", run_id=77)` for its pages, then Step 4 |
+| "Fill the pages waiting for your agent on Kenso Studio template 41." | `studio_pages(operation="run-list", template_id=41)`, take the runs with `executor` `"agent"`, read each with `studio_pages(operation="run-get", run_id=77)` for its pages, then Step 4 |
 | "They asked to see the work." / "Send each target a sample campaign." | "Sample campaign for a prospect" below |
 | "Is anyone reading the page?" | Step 8 |
 
@@ -67,7 +67,7 @@ Then check what the fill guide says the fields read, before you spend anything:
 - **The homepage** for starters that scrape it: the account needs a primary domain that loads without a login.
 - **Datasets** for `benchmark-report` and `case-study`: `studio_templates(operation="datasets-list", template_id=41)`.
 - **Template settings** such as the event details or a webhook endpoint: a template still holding a starter's example values is not ready to run.
-- **Ken Search** finds people only in the United States, the United Kingdom, Canada, Australia, Ireland and New Zealand.
+- **Kenso Search** finds people only in the United States, the United Kingdom, Canada, Australia, Ireland and New Zealand.
 
 Recipes cannot read Knowledge yet (`knowledge.*` is empty at fill time), so the fill never uses the workspace's Knowledge files.
 
@@ -75,8 +75,8 @@ Recipes cannot read Knowledge yet (`knowledge.*` is empty at fill time), so the 
 
 | `executor` | Who writes the `prompt` and `grade` steps | Cost | Use it for |
 |---|---|---|---|
-| `"ken"` (default) | Ken AI | model tokens at 2x cost, plus data steps | many accounts, unattended |
-| `"agent"` | you, with your own model | no token charge for the steps you write; data steps at rate card; a `ken.copy` step still runs on Ken AI | a few accounts, on your own subscription |
+| `"ken"` (default) | Kenso | model tokens at 2x cost, plus data steps | many accounts, unattended |
+| `"agent"` | you, with your own model | no token charge for the steps you write; data steps at rate card; a `ken.copy` step still runs on Kenso | a few accounts, on your own subscription |
 
 With `"ken"`, estimate first and show the user the number: `studio_pages(operation="run-estimate", template_id=41, account_count=25, executor="ken")` returns `credits` and a per-account `breakdown`. Run only after a yes:
 
@@ -124,7 +124,7 @@ A `needs_review` page failed a grade after its retries or holds data that broke 
 ## Step 7 - Use it in a touch
 
 - **Accounts:** put the person's link in the next touch you draft for them (the `accounts` skill), or use "Use in next touch" on the account's Assets tab. The touch waits for a person in Today, and it can be approved only once the page is ready.
-- **Campaigns:** a step carries the merge tag `asset_link`, written in double curly braces, and Ken AI builds each company's page one step ahead from the campaign's pinned template; slot fallbacks cover anything not filled yet. Pinning is the `studio-template` skill.
+- **Campaigns:** a step carries the merge tag `asset_link`, written in double curly braces, and Kenso builds each company's page one step ahead from the campaign's pinned template; slot fallbacks cover anything not filled yet. Pinning is the `studio-template` skill.
 
 ## Step 8 - Read engagement
 
@@ -140,7 +140,7 @@ For a campaign's pages, `studio_pages(operation="asset-engagement-get", campaign
 ## After it ships
 
 - **Hand edits:** `studio_pages(operation="customize", asset_id=901, overrides={"headline": "Six people who should hear about Fernway first"})`. Overrides merge over the fill; a null value removes one; `reset=True` drops them all. A live page is republished with the edit.
-- **Refill:** `studio_pages(operation="refill", asset_id=901)` reruns the recipe with Ken AI's executor, charged like a fill. A live page keeps its links.
+- **Refill:** `studio_pages(operation="refill", asset_id=901)` reruns the recipe with Kenso's executor, charged like a fill. A live page keeps its links.
 - **New template version:** `studio_pages(operation="update-version", asset_id=901)` moves one page to the latest published version and refills only what changed. Ask first: it is charged.
 - **Retired** pages (30 days after the account's last activity) come back with `republish` for 1 credit.
 
@@ -161,10 +161,10 @@ When a prospect asks to see the work, build them a real sample: their campaign, 
 | A page, on its first link (shared or person) | 1 credit |
 | More links on the same page | free |
 | Republishing a retired page | 1 credit |
-| Ken AI writing `prompt` and `grade` steps (executor `"ken"`, refill, update-version) | model tokens at 2x cost |
+| Kenso writing `prompt` and `grade` steps (executor `"ken"`, refill, update-version) | model tokens at 2x cost |
 | Your own agent writing them (executor `"agent"`) | no token charge |
 | A `ken.copy` step, on any path | model tokens at 2x cost |
-| Data steps | rate card; today's (`bind`, Ken Search, `chart.data`, scraping, `webhook`, `dataset`) cost nothing |
+| Data steps | rate card; today's (`bind`, Kenso Search, `chart.data`, scraping, `webhook`, `dataset`) cost nothing |
 | Previews, hosting, PDFs | free |
 
 ## What this skill cannot do yet
@@ -181,6 +181,6 @@ Open with `load_skill("studio-asset", reference="references/<file>")`:
 - `studio-fill.md`: filling a page with your own model, from prepare to submit, with a worked example.
 - `sample-campaign-for-prospect.md`: the whole sample-campaign recipe, from the reply to the draft.
 
-## No Ken account yet
+## No Kenso account yet
 
-These steps run on the Ken MCP server, which signs in with a Ken account. If the user has none, send them to https://app.ken.so/get-started to create one, then sign in when the agent asks.
+These steps run on the Kenso MCP server, which signs in with a Kenso account. If the user has none, send them to https://app.ken.so/get-started to create one, then sign in when the agent asks.

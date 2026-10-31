@@ -52,7 +52,7 @@ Linking changes the variable's text, so the same yes rule as step 3 applies on a
 With custom tiers on (`account_signals(operation="account-tiers-get")` shows `placement` `prompt`), a tiers prompt places each account: it picks the tier whose description fits the account best, with the body as instructions. `tierPromptId` on the ladder names the Everyone tiers prompt.
 
 - Tier descriptions: `tier_descriptions=[{"tier": 1, "text": "Who belongs in Tier 1"}, ...]`, each tier once, up to 1,000 characters. Only a tiers prompt takes them; an update replaces the list.
-- Describe who belongs with what the account data shows (industry, size, signals Ken records). Funding alone is not a buying event: do not make a recent round the reason an account is Tier 1.
+- Describe who belongs with what the account data shows (industry, size, signals Kenso records). Funding alone is not a buying event: do not make a recent round the reason an account is Tier 1.
 - Saving the ladder or the prompt never moves an account by itself; the tiers apply at each account's next move.
 
 ## Errors

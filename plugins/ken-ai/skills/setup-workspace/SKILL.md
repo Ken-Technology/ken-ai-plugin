@@ -5,7 +5,7 @@ description: Set up a workspace end to end - confirm intent, research the websit
 
 # Setup Workspace
 
-Onboarding for a new Ken AI workspace. Works on every plan, including Free.
+Onboarding for a new Kenso workspace. Works on every plan, including Free.
 
 Trigger on "Please set up my workspace", "set up my workspace", "onboard me", "get me started", or a fresh workspace with empty company settings.
 
@@ -126,7 +126,7 @@ Suggest inviting the people who will review campaigns or handle replies. Collect
 
 - Roles are changed later by an admin in the team settings: https://app.ken.so/settings/users
 - `code="USER_LIMIT_REACHED"`: relay `error.message` and `error.recovery.summary` as the upgrade path, then continue.
-- If the invite fails because the workspace is not linked to an organization, do **not** invite as a staff user and do not retry. Tell the user Ken AI support needs to link the workspace to its owner's organization first (give them the workspace id and the owner's email), then invites will work.
+- If the invite fails because the workspace is not linked to an organization, do **not** invite as a staff user and do not retry. Tell the user Kenso support needs to link the workspace to its owner's organization first (give them the workspace id and the owner's email), then invites will work.
 
 Invites are skippable.
 
@@ -183,6 +183,6 @@ Errors arrive as `{success: false, error: {code, category, message, recovery, ..
 
 A Free user reaches the hand-off with the company profile and context written, the logo set (if they had a URL), invites sent within seats, blocklist and integrations guidance given, and an upgrade pointer for sending infrastructure, with zero error-shaped plan output.
 
-## No Ken account yet
+## No Kenso account yet
 
-These steps run on the Ken MCP server, which signs in with a Ken account. If the user has none, send them to https://app.ken.so/get-started to create one, then sign in when the agent asks.
+These steps run on the Kenso MCP server, which signs in with a Kenso account. If the user has none, send them to https://app.ken.so/get-started to create one, then sign in when the agent asks.

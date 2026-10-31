@@ -18,8 +18,8 @@ Every call takes `client_id`, the workspace id. Send it when the user can see mo
 
 ## The rules
 
-- **Paid steps need a yes with the price the tool gives.** New domains, warmed inboxes and Ken AI mailboxes cost credits (or a Stripe checkout on some workspaces). Quote the price from the tool: the domain search result, the credit estimate or the claim's own description. Never quote a price from memory, and never call a paid step free.
-- **A connect link is for the owner to open.** A mailbox or LinkedIn connect link goes to the person who owns that mailbox or account, and the connect finishes in Ken AI under the member who started it. Never open it for them or pass it to someone else.
+- **Paid steps need a yes with the price the tool gives.** New domains, warmed inboxes and Kenso mailboxes cost credits (or a Stripe checkout on some workspaces). Quote the price from the tool: the domain search result, the credit estimate or the claim's own description. Never quote a price from memory, and never call a paid step free.
+- **A connect link is for the owner to open.** A mailbox or LinkedIn connect link goes to the person who owns that mailbox or account, and the connect finishes in Kenso under the member who started it. Never open it for them or pass it to someone else.
 - **Secrets pass through once.** Take a mailbox password or a provider key only to make the call that needs it. Never repeat it, store it in a note or put it in a summary.
 - **Setup is not sending.** Nothing here launches a campaign. Launches, and limit or pause changes on a client's campaign or inboxes, need a person's yes, and on a client's workspace that yes names the client.
 
@@ -53,18 +53,18 @@ When they name a daily volume ("2,000 a day"), load `infra-planning` first to si
 
 ## Step 2 - Claim warmed inboxes
 
-Ken AI keeps pre-warmed domains ready to claim. These operations are for workspace members, and need the workspace's `agent_send` flag (404 while it is off).
+Kenso keeps pre-warmed domains ready to claim. These operations are for workspace members, and need the workspace's `agent_send` flag (404 while it is off).
 
 1. `domain_setup(operation="inbox-stock-get")` returns `claimableDomains` and a count per mailbox type (`gmail`, `outlook`).
 2. Propose one claim per domain: the mailbox type and 1 to 5 mailboxes, each with a username, first name and last name. Give the price stated in the claim operation's own description (its full docs in `describe_tools`) and the total for the mailboxes, and wait for the yes.
-3. `domain_setup(operation="inbox-stock-create-claim", mailbox_type="gmail", mailboxes=[{"username": "maya", "first_name": "Maya", "last_name": "Chen"}], idempotency_key="acme-claim-2026-10-27-1")`. Reuse the same `idempotency_key` to retry the same claim; a new key is a new claim. A claim takes up to a few minutes, and its mailboxes read `warmup` until Ken AI activates them.
+3. `domain_setup(operation="inbox-stock-create-claim", mailbox_type="gmail", mailboxes=[{"username": "maya", "first_name": "Maya", "last_name": "Chen"}], idempotency_key="acme-claim-2026-10-27-1")`. Reuse the same `idempotency_key` to retry the same claim; a new key is a new claim. A claim takes up to a few minutes, and its mailboxes read `warmup` until Kenso activates them.
 4. Refusals: 402 with `UPGRADE_REQUIRED` (Free plan), 402 with `INSUFFICIENT_CREDITS` (add credits at https://app.ken.so/settings/billing, then claim again), 402 at the new-payer limit and 400 for daily capacity (do not retry: tell the user what the message says).
 
 ## Step 3 - Connect Google or Microsoft mailboxes
 
 `domain_setup(operation="inboxes-create-connect-session", provider="google", purpose="campaign")` (or `provider="microsoft"`) returns `authorizationUrl` and `expiresAt`.
 
-- The mailbox owner opens `authorizationUrl` before `expiresAt` and signs in. The connect finishes in Ken AI, where the member who started the session must be signed in, in this workspace.
+- The mailbox owner opens `authorizationUrl` before `expiresAt` and signs in. The connect finishes in Kenso, where the member who started the session must be signed in, in this workspace.
 - When the company blocks new apps, a Google Workspace or Entra admin trusts the app first through `adminUrl` (or `adminConsentUrl` on Microsoft).
 - `purpose="primary"` connects a member's own work mailbox for 1:1 outreach. It is never used by campaigns or warmup.
 - Repeat per mailbox, then check `inboxes(operation="list")`.
@@ -82,7 +82,7 @@ Ken AI keeps pre-warmed domains ready to claim. These operations are for workspa
 
 These operations are for workspace members, and need the workspace's `sending_providers` flag.
 
-1. `sending_providers(operation="providers-list")` lists the providers Ken AI supports, with `termsForbidOutreach`, `defaultDailyCap`, `sendsFromProviderInboxes` and a docs link.
+1. `sending_providers(operation="providers-list")` lists the providers Kenso supports, with `termsForbidOutreach`, `defaultDailyCap`, `sendsFromProviderInboxes` and a docs link.
 2. When `termsForbidOutreach` is true, tell the user that provider's terms forbid cold outreach on their own account, and suggest another path.
 3. Connect it with `sending_providers(operation="create", provider="<slug>")` and the provider key the user pastes (the tool's key field). Then `sending_providers(operation="verify", connection_id=12)`.
 4. Add each sending address with `sending_providers(operation="create-identity", connection_id=12, email="maya@acme.com", display_name="Maya Chen")`. When `sendsFromProviderInboxes` is true, the address must already exist in the provider account.
@@ -121,6 +121,6 @@ Tracking links on each sending domain are set in `domain-selection`.
 - Run inbox placement tests for every caller. That read is for workspace members only.
 - Claim warmed inboxes, connect sending providers or track domain orders for callers outside the workspace's members, or while their flags are off.
 
-## No Ken account yet
+## No Kenso account yet
 
-These steps run on the Ken MCP server, which signs in with a Ken account. If the user has none, send them to https://app.ken.so/get-started to create one, then sign in when the agent asks.
+These steps run on the Kenso MCP server, which signs in with a Kenso account. If the user has none, send them to https://app.ken.so/get-started to create one, then sign in when the agent asks.

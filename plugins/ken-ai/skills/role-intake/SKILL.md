@@ -5,7 +5,7 @@ description: Turn a job link, pasted job text or a few answers into a saved role
 
 # Role Intake
 
-Turns the job the user wants to fill into a saved role in Ken AI, then sends them to the campaign builder for that role. A role holds the title, the hiring company, the place, the pay, and what a candidate must and should have. The recruiting campaign's search, qualification, segments and copy are all built from it.
+Turns the job the user wants to fill into a saved role in Kenso, then sends them to the campaign builder for that role. A role holds the title, the hiring company, the place, the pay, and what a candidate must and should have. The recruiting campaign's search, qualification, segments and copy are all built from it.
 
 Recruiting must be on for the workspace. When a roles call answers 404 `not_found` without naming a role id, recruiting is off: say so, and offer a campaign that finds customers instead.
 
@@ -44,6 +44,6 @@ Share the builder link for the saved role and stop there: https://app.ken.so/dem
 
 Tools return a normalized error envelope (`success: false`, `error.category`). A 400 `validation_failed` names the field: fix that field and save again. A 404 `not_found` on every roles call means recruiting is off for the workspace. On `plan_limit` or `billing`, surface `error.message` and `error.recovery.summary`; never retry blindly.
 
-## No Ken account yet
+## No Kenso account yet
 
-These steps run on the Ken MCP server, which signs in with a Ken account. If the user has none, send them to https://app.ken.so/get-started to create one, then sign in when the agent asks.
+These steps run on the Kenso MCP server, which signs in with a Kenso account. If the user has none, send them to https://app.ken.so/get-started to create one, then sign in when the agent asks.

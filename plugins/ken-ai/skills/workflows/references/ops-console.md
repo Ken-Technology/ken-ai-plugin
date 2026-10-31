@@ -1,6 +1,6 @@
 # Workflow ops console (staff only)
 
-Part of the `workflows` skill, for Ken staff only. Open it only when the caller is staff: the `admin_workflows` facade is listed for staff and nobody else. A customer who asks about stuck or failed runs gets `SKILL.md` step 7 on their own workspace, never this page.
+Part of the `workflows` skill, for Kenso staff only. Open it only when the caller is staff: the `admin_workflows` facade is listed for staff and nobody else. A customer who asks about stuck or failed runs gets `SKILL.md` step 7 on their own workspace, never this page.
 
 The console is fleet-wide. Every `admin_workflows` operation needs super_admin, sends no workspace header and takes no `client_id`: a target workspace travels as `workspace_id`. Writes are recorded as agent writes with an audit row, so give every write a `reason`.
 
@@ -48,7 +48,7 @@ The three AI flow workflows run `system.ai_flow@1` (asks the model what the old 
 
 `system.linkedin_actions` starts one run per due LinkedIn state of a lead and runs `system.linkedin_action@1` on it. A shadow run only decides (the action, the seat, or why not) and writes nothing. Staff compare its decisions with the LinkedIn scheduler's actions in `admin_misc(operation="admin-workflow-shadow-reports-list", system_key="system.linkedin_actions")`.
 
-Shadow runs are staff-only engine runs that write nothing. Lists hide them unless `is_shadow=true` is passed, and to anyone but Ken staff a shadow run is not found by id either. A shadow run calls the live providers on Ken's keys, reserves and charges no credits, saves no field, skips every step that would send or change data, writes no activity and notifies nobody. It does not count toward the event run cap, auto-pause, bulk actions or the step overview.
+Shadow runs are staff-only engine runs that write nothing. Lists hide them unless `is_shadow=true` is passed, and to anyone but Kenso staff a shadow run is not found by id either. A shadow run calls the live providers on Kenso's keys, reserves and charges no credits, saves no field, skips every step that would send or change data, writes no activity and notifies nobody. It does not count toward the event run cap, auto-pause, bulk actions or the step overview.
 
 ## Rules
 

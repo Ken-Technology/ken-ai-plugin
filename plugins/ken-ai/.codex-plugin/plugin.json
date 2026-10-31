@@ -1,27 +1,27 @@
 {
   "name": "ken-ai",
   "version": "2.1.0",
-  "description": "Ken AI skills: build cold email campaigns, handle replies, report results and keep sending healthy in your Ken workspace, through the Ken MCP server.",
+  "description": "Kenso skills: build cold email campaigns, handle replies, report results and keep sending healthy in your Kenso workspace, through the Kenso MCP server.",
   "author": {
-    "name": "Ken AI",
+    "name": "Kenso",
     "email": "development@ken.so"
   },
   "homepage": "https://ken.so",
   "repository": "https://github.com/Ken-Technology/ken-ai-plugin",
-  "keywords": ["ken-ai", "cold-email", "outbound", "campaigns", "mcp"],
+  "keywords": ["ken-ai", "kenso", "cold-email", "outbound", "campaigns", "mcp"],
   "skills": "./skills/",
   "mcpServers": "./.codex-plugin/mcp.json",
   "interface": {
-    "displayName": "Ken AI",
-    "shortDescription": "Run your Ken workspace: campaigns, replies, reports and deliverability",
-    "longDescription": "The skills Ken's own agents run, for your Ken workspace: build a campaign from an ICP to launch-ready, handle replies, review your pipeline, write client reports and keep sending healthy. The plugin connects the Ken MCP server (https://mcp.ken.so/mcp); sign in with your Ken account on first use. Each skill asks before it sends, launches or changes a live campaign.",
-    "developerName": "Ken AI",
+    "displayName": "Kenso",
+    "shortDescription": "Run your Kenso workspace: campaigns, replies, reports and deliverability",
+    "longDescription": "The skills Kenso's own agents run, for your Kenso workspace: build a campaign from an ICP to launch-ready, handle replies, review your pipeline, write client reports and keep sending healthy. The plugin connects the Kenso MCP server (https://mcp.ken.so/mcp); sign in with your Kenso account on first use. Each skill asks before it sends, launches or changes a live campaign.",
+    "developerName": "Kenso",
     "category": "Developer Tools",
     "capabilities": ["Interactive", "Write"],
     "websiteURL": "https://ken.so",
     "defaultPrompt": [
-      "Build a new cold email campaign in my Ken workspace",
-      "Go through my Ken replies and draft answers for me to approve"
+      "Build a new cold email campaign in my Kenso workspace",
+      "Go through my Kenso replies and draft answers for me to approve"
     ]
   }
 }

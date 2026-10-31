@@ -5,7 +5,7 @@ description: Triage and answer replies - sort threads by interest, skip out-of-o
 
 # Reply handling
 
-Replies are where a campaign turns into meetings, and where most of them leak: interested people who wait a day for an answer, a price question nobody answers, a yes that goes quiet. This skill goes through the inbox in Ken AI, sorts the replies, drafts an answer for each one that needs it and holds every draft for a person.
+Replies are where a campaign turns into meetings, and where most of them leak: interested people who wait a day for an answer, a price question nobody answers, a yes that goes quiet. This skill goes through the inbox in Kenso, sorts the replies, drafts an answer for each one that needs it and holds every draft for a person.
 
 It ends with each draft saved on its thread (or sent on the person's word), and a short list for the user: who replied, what they want, and what waits for them.
 
@@ -28,14 +28,14 @@ Every call takes `client_id`, the workspace id. Send it on every call when the u
 | Read the inbox, save drafts, send, classify | `threads` list, counts, get, list-messages, replace-draft, create-message, update, bulk-update, cancel | every member who can reply |
 | Reply templates | `replies` reply-templates-list, reply-templates-get (create, update and delete need workspace settings) | every member |
 | The reply agent's settings | `replies` autonomous-reply-settings-get (update needs workspace settings) | every member |
-| Ken AI drafts a reply for you | `threads` suggest | full access only |
+| Kenso drafts a reply for you | `threads` suggest | full access only |
 | Booking links and open times | `scheduler` links-create, links-suggested-times, meeting-types-list, meeting-types-slots, bookings-list | workspaces with Scheduler |
 | Open times without Scheduler | `calendar` get-availability | members with a connected calendar |
 | Writing style and account context | `knowledge` context | workspaces with Knowledge |
 
 When an operation is not listed for you, or answers 404 `not_found` on every id, that part is off for this workspace or this seat. Skip that step, tell the user in one sentence which part is not on, and carry on. Do not retry it. If `threads` itself is missing, stop: say the inbox is not available to this connection and send the user to `https://app.ken.so/replies`.
 
-Read the reply agent once: `replies(operation="autonomous-reply-settings-get")`. When it is on in `draft` mode, Ken AI may already have drafted on a thread, so check for a draft before you write one (Step 3). When it is on in `autonomous` mode, it answers some threads on its own: tell the user, and leave the threads it already answered.
+Read the reply agent once: `replies(operation="autonomous-reply-settings-get")`. When it is on in `draft` mode, Kenso may already have drafted on a thread, so check for a draft before you write one (Step 3). When it is on in `autonomous` mode, it answers some threads on its own: tell the user, and leave the threads it already answered.
 
 ## Step 1 - Read the inbox
 
@@ -87,7 +87,7 @@ For each thread that needs an answer:
 2. Check for a draft first: `threads(operation="get-draft", thread_id="thr_...")`. A 404 means there is none. If a person wrote the draft, leave the thread and tell the user.
 3. Find a template that fits: `replies(operation="reply-templates-list")`, then `replies(operation="reply-templates-get", reply_template_id=12)`. Template bodies keep raw tokens such as `{firstName}`: fill them from the thread and contact yourself, and never save or send a token unfilled.
 4. When Knowledge is on, read the writing style and what the workspace says about its offer and prices once per session: `knowledge(operation="context", purpose="answer cold email replies about pricing and meetings")`. When the thread has an `accountId`, add `account_id` for that account's files and history. Use only what the pack says.
-5. Write the draft: short, in the sender's voice, one clear next step. For full-access members Ken AI can write a first version: `threads(operation="suggest", thread_id="thr_...", action="custom", tone_or_instruction="Answer the pricing question from the Starter template and offer two times")`. It returns a body and saves nothing. Check it against the rules above before you use it.
+5. Write the draft: short, in the sender's voice, one clear next step. For full-access members Kenso can write a first version: `threads(operation="suggest", thread_id="thr_...", action="custom", tone_or_instruction="Answer the pricing question from the Starter template and offer two times")`. It returns a body and saves nothing. Check it against the rules above before you use it.
 6. Save it on the thread: `threads(operation="replace-draft", thread_id="thr_...", body="Hi Maya, ...")`. If the result has `kept_person_draft: true`, a person's draft was there and nothing was saved: tell the user.
 
 ## Step 4 - Offer real meeting times
@@ -123,7 +123,7 @@ What the send can answer:
 | 403 | an agent cannot send from a member's own mailbox | the person sends it from the inbox |
 | 409 `invalid_state`, `confirmSuppressed` | the contact opted out or is blocked | do not send; tell the user why |
 | 409 `inbox_paused` or `inbox_send_blocked` | the sending inbox cannot send now | pick another inbox with the user, or wait for `nextAllowedAt` |
-| 409 `outcome_unknown` | Ken AI cannot tell whether it queued | read the thread before anything else; never resend blind |
+| 409 `outcome_unknown` | Kenso cannot tell whether it queued | read the thread before anything else; never resend blind |
 
 ## Step 6 - Nudge the yeses that went quiet
 
@@ -153,6 +153,6 @@ An interested contact who stopped answering is the cheapest meeting you will fin
 
 `references/situations.md` holds the playbook per situation with example drafts. `references/inbox-fields.md` holds the thread fields, tab and interest values, and every send error. Open one with `load_skill("reply-handling", reference="references/situations.md")`.
 
-## No Ken account yet
+## No Kenso account yet
 
-These steps run on the Ken MCP server, which signs in with a Ken account. If the user has none, send them to https://app.ken.so/get-started to create one, then sign in when the agent asks.
+These steps run on the Kenso MCP server, which signs in with a Kenso account. If the user has none, send them to https://app.ken.so/get-started to create one, then sign in when the agent asks.

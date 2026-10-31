@@ -18,10 +18,10 @@ A person launches the campaign. You build it and hand it over.
 ## Rules
 
 - **A person approves every launch and send.** You may create a trigger on a Draft campaign. Launching, resuming or raising volume is the person's click, and on a client's campaign it needs a yes that names that client, with its source (who said it, where, when).
-- **A funding round is not a buying event by itself.** In Ken AI's own campaign data, people at funded companies reply no more than people at same-size companies with no funding (1.01x). The money pays for a plan, usually hiring first. Write about that plan, to the person who runs it. Never open with "congrats on the raise".
-- **Signals are noisy. Gate before you spend.** In Ken AI's own hiring-signal runs, only about 1 in 4 matched job titles was the role the signal was meant to find. A free gate on titles, size, country, language and duplicates removed about 70% of signals before anything was charged.
+- **A funding round is not a buying event by itself.** In Kenso's own campaign data, people at funded companies reply no more than people at same-size companies with no funding (1.01x). The money pays for a plan, usually hiring first. Write about that plan, to the person who runs it. Never open with "congrats on the raise".
+- **Signals are noisy. Gate before you spend.** In Kenso's own hiring-signal runs, only about 1 in 4 matched job titles was the role the signal was meant to find. A free gate on titles, size, country, language and duplicates removed about 70% of signals before anything was charged.
 - **Never invent** a round size, a job title, a date or a name. Quote the signal as the source states it, with its date. An amount the source leaves blank is "not stated", never 0.
-- **Never name a data vendor** to a client. Signals come from Ken AI.
+- **Never name a data vendor** to a client. Signals come from Kenso.
 - Skip companies already worked elsewhere: target accounts (the Accounts lane works them), live conversations and the blocklist.
 
 ## Step 0 - Check what is on
@@ -102,7 +102,7 @@ Each email quotes its own company's signal. Keep the facts per company (the job 
 
 `saved_searches(operation="import_to_campaign", campaign_id=8123, selected_person_ids=[90011, 90012], await_ready=True)`
 
-The import skips people already in the campaign. To carry each company's signal facts as custom variables, import a CSV instead: `contacts(operation="contact-imports-create", source="csv", campaign_id=8123, csv_content="...", column_mappings=[...])`, one row per person with the job title or round use in its own column. Then hand it over: the person reviews and launches it in Ken AI. Repeat weekly for a fresh list.
+The import skips people already in the campaign. To carry each company's signal facts as custom variables, import a CSV instead: `contacts(operation="contact-imports-create", source="csv", campaign_id=8123, csv_content="...", column_mappings=[...])`, one row per person with the job title or round use in its own column. Then hand it over: the person reviews and launches it in Kenso. Repeat weekly for a fresh list.
 
 **Mode A, always on.** A trigger watches for the signal and adds each new match to a Trigger campaign by itself. Try the filters with the searches in Step 2 first, then:
 
@@ -131,6 +131,6 @@ Report the signal, the gate funnel, who you picked and why, the campaign and tri
 - No email find outside the people search's six countries.
 - No test fire for a trigger.
 
-## No Ken account yet
+## No Kenso account yet
 
-These steps run on the Ken MCP server, which signs in with a Ken account. If the user has none, send them to https://app.ken.so/get-started to create one, then sign in when the agent asks.
+These steps run on the Kenso MCP server, which signs in with a Kenso account. If the user has none, send them to https://app.ken.so/get-started to create one, then sign in when the agent asks.
