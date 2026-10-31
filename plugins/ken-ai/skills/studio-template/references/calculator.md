@@ -1,6 +1,6 @@
 # Calculator playbook
 
-A calculator puts a number on a cost the account lives with, starting from their own figures, and lets them change every input. The gallery has no calculator starter for now. `studio-template-builder.md` (in this folder) holds the bundle format, the kit and every validation rule; this file covers what to build, including the one hard constraint: Alpine runs only as its CSP build.
+A calculator puts a number on a cost the account lives with, starting from their own figures, and lets them change every input. Check the Kenso template library for one first: `studio_templates(operation="starters-list", type="calculator")`. `studio-template-builder.md` (in this folder) holds the bundle format, the kit and every validation rule; this file covers what to build, including the one hard constraint: Alpine runs only as its CSP build.
 
 ## What it is for
 
@@ -108,4 +108,4 @@ It embeds the sender's booking page when `link.booking_url` is on the booking al
 
 ## Starter
 
-None in the gallery for now: the ROI calculator starter left it while it is rebuilt without an inline script. Build from `studio-template-builder.md` and this playbook, and keep the formula in the Liquid and in each `x-text` in step.
+Search the Kenso template library with `studio_templates(operation="starters-list", type="calculator")` and copy the closest one. With none there, build from `studio-template-builder.md` and this playbook, and keep the formula in the Liquid and in each `x-text` in step.

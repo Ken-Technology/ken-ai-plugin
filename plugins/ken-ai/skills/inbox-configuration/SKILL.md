@@ -14,7 +14,7 @@ Never call inbox create, disconnect, or username rename. Restate any update / bu
 - `inboxes(operation="list", client_id=...)` - inventory (optional `status`)
 - `inboxes(operation="get", inbox_id=...)` - one inbox
 
-Summarize per inbox: address, domain, daily limit, display name. The inboxes page is https://app.ken.so/delivery?tab=inboxes.
+Summarize per inbox: address, domain, daily limit, display name. The inboxes page is https://app.ken.so/<workspace id>/delivery?tab=inboxes.
 
 ## 2. Daily limits
 
@@ -60,7 +60,7 @@ Forward to the client's own external email only:
 
 | Code | What to tell the user |
 |------|------------------------|
-| `PLAN_FEATURE_NOT_AVAILABLE` | Managed sending infrastructure is on paid plans - upgrade at https://app.ken.so/settings/billing. Show `error.recovery.summary` when present. |
+| `PLAN_FEATURE_NOT_AVAILABLE` | Managed sending infrastructure is on paid plans - upgrade at https://app.ken.so/<workspace id>/settings/billing. Show `error.recovery.summary` when present. |
 | `INBOX_LIMIT_REACHED` | Show `used` / `limit` / `remaining`. Offer: stay within remaining allocation (or rebalance limits), or upgrade. |
 
 If they need more daily send than they have, load `infra-planning`. When headroom is zero, help them get more from existing inboxes instead of framing it as a system error.

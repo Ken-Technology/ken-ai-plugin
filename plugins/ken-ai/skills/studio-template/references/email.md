@@ -1,6 +1,6 @@
 # Email format
 
-A template with `"format": "email"` is a cold email, not a page. A published version is pinned to a sequence step, and each lead gets the template rendered for them one step ahead of the send. Needs the workspace's `studio` and `studio_email` flags, and `html_steps` to pin. Without `studio_email`, `studio_templates(operation="create", template_format="email")` answers 400 `feature_disabled`. No email starter is in the starter gallery yet (`studio_templates(operation="starters-list")` lists none), so start blank: `studio_templates(operation="create", name="Personal note", template_type="other", template_format="email")`.
+A template with `"format": "email"` is a cold email, not a page. A published version is pinned to a sequence step, and each lead gets the template rendered for them one step ahead of the send. Needs the workspace's `studio` and `studio_email` flags, and `html_steps` to pin. Without `studio_email`, `studio_templates(operation="create", template_format="email")` answers 400 `feature_disabled`. No email template is in the Kenso template library yet (`studio_templates(operation="starters-list")` lists none), so start blank: `studio_templates(operation="create", name="Personal note", template_type="other", template_format="email")`.
 
 ## The bundle
 

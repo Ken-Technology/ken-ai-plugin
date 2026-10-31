@@ -31,13 +31,13 @@ Every call takes `client_id`, the workspace id. Send it on every call when the u
 | CRM sync health | `crm` connections-list, sync-get | every member |
 | Top-of-funnel numbers (optional) | `analytics_campaign` query | staff, or the `generative_ui` flag on for the workspace |
 
-Opportunities is in beta. If `opportunities` is not listed for you, or `opportunities(operation="list")` answers 404 `not_found`, stop: say "Opportunities is not on for this workspace yet" and send the user to `https://app.ken.so/demo/accounts/opportunities`. Do not retry. Any other part that is missing: skip it, say which, and carry on.
+Opportunities is in beta. If `opportunities` is not listed for you, or `opportunities(operation="list")` answers 404 `not_found`, stop: say "Opportunities is not on for this workspace yet" and send the user to `https://app.ken.so/<workspace id>/demo/accounts/opportunities`. Do not retry. Any other part that is missing: skip it, say which, and carry on.
 
 Then check whether the CRM is feeding deals in:
 
 `crm(operation="connections-list")`, then for each live connection `crm(operation="sync-get", connection_id=3)`.
 
-If `status` is paused, `lastError` is set, `needsAttentionCount` is above 0 or `queueDepth` is large, say first that deal data may be behind, with the numbers, and point the user to `https://app.ken.so/settings/integrations/crm`. There is no "sync now" from here.
+If `status` is paused, `lastError` is set, `needsAttentionCount` is above 0 or `queueDepth` is large, say first that deal data may be behind, with the numbers, and point the user to `https://app.ken.so/<workspace id>/settings/integrations/crm`. There is no "sync now" from here.
 
 ## Step 1 - Read the pipeline
 
@@ -60,7 +60,7 @@ Check each open deal against these signals. `references/stale-signals.md` has th
 | Too long in its stage | days since `stageChangedAt` above the stage's threshold |
 | Close date passed | `closeDate` before today on an open deal |
 | No next step | `nextStep` empty |
-| No recent activity | nothing on the account in the last 14 days (below) |
+| No recent activity | nothing on the deal or its account in the last 14 days: `opportunities(operation="list", stale_days=14)` lists these open deals, quietest first, each with `lastActivityAt` |
 | Stage does not match what happened | for example a meeting-booked stage with no meeting on the calendar, or a meeting-held stage whose meeting was cancelled |
 | Late stage with no amount | `amount` empty at proposal or later |
 

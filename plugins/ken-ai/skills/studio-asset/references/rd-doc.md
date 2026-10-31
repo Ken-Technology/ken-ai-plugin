@@ -12,7 +12,7 @@ A workspace's copy may have changed slots or steps. Read its own `studio.json` f
 - **Research on the account.** `dossier` and `why_now` bind `account.dossier.summary` and `account.dossier.why_now`, from the account's latest succeeded research run. Read it with `accounts(operation="get", account_id=3101, expand="research")`. A missing or stale dossier is not fatal (the page leans on the site), but the plan is sharper with one. Refreshing it with `committee(operation="research", account_id=3101)` needs the `accounts_research` flag and is charged, so ask first. A campaign page built for a lead's company has no dossier at all.
 - **Buyers in Kenso Search's countries.** People search covers the United States, the United Kingdom, Canada, Australia, Ireland and New Zealand only. An account that sells elsewhere finds no one: the leads and emails fall back and the page shows its fallback.
 - **The sender's booking link.** The button goes to the sender's booking URL. Without one it renders nothing.
-- **The offer.** `offer` binds `knowledge.offer`, which is empty today (Studio fills cannot read Knowledge yet), so the offer paragraph stays hidden.
+- **The offer.** `offer` binds `knowledge.offer`, which the Knowledge pack does not have (it has `knowledge.stable` and `knowledge.scoped`), so it still falls back and the offer paragraph stays hidden. Bind `knowledge.stable` if the offer should come from Knowledge.
 
 ## What each field needs
 
@@ -22,7 +22,7 @@ Required slots are marked yes. Slots without a static fallback are covered by `f
 |---|---|---|---|---|
 | `site` | no | object | `site` (scrape) | their homepage, markdown, up to 12,000 characters. Never shown |
 | `dossier`, `why_now` | no | 4,000 and 1,000 characters | binds | the research dossier. Never shown |
-| `offer` | no | 300 | bind | `knowledge.offer`, empty today |
+| `offer` | no | 300 | bind | `knowledge.offer`, which falls back (bind `knowledge.stable` for a Knowledge offer) |
 | `strategy` | yes | `intro`, `audience`, `offer`, `channels`, `goal`, each 40 to 900 characters | `plan` | the site, the dossier and why now. `intro` is the one bet; `audience` is who is in and who is out; `offer` is the low-effort next step the emails ask for; `channels` is Email 1 plus a LinkedIn connect on day 0, then email follow-ups; `goal` is what a good first two weeks look like |
 | `segments` | yes | 2 to 4 items: `label` at most 28, `sub` at most 80, `value` a whole number, `tests` up to 4 `{name, hypothesis}` | `plan` | four cuts of their market. The first is the one sampled and the largest. The values are how many of the first 1,000 sends go to each and add up to 1,000. A test is `"<choice>: <A> vs <B>"` over a pain, offer, angle or ask, never a subject line |
 | `segment_notes` | no | 600 | `plan` | why the first segment goes first |

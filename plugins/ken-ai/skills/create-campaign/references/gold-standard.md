@@ -2,7 +2,7 @@
 
 Two operator-written campaigns (campaigns 431 and 2157) are the quality bar for every sequence the email-copywriting stage produces. Study them before drafting. The default AI draft is a 6-7/10; the difference between that and these is not talent, it is a set of concrete habits listed below.
 
-The copy is reproduced as sent, with three updates so it matches today's rules: signatures use the sender variables (the originals hard-coded the sender name), the final PS variable uses the standard name `{{Final PS Line}}`, and Exemplar 2's sign-up link sits on plain words instead of a bare URL (its company name is plain because that CTA link is the email's one link).
+The copy is reproduced as sent, with four updates so it matches today's rules: signatures use the sender variables (the originals hard-coded the sender name), the sender's company is the placeholder Northwind (never copy a company name from an exemplar: sign with the sender's own company), the final PS variable uses the standard name `{{Final PS Line}}`, and Exemplar 2's sign-up link sits on plain words instead of a bare URL (its company name is plain because that CTA link is the email's one link).
 
 **Learn the habits, not the letter.** These emails predate the spam-word budget, the PS rules and the link rules. Do not copy their "free trials" or "guarantee included" wording (spam tiers), the PS on every email (the default is Email 1 and the last email, formatted `PS: `), or the shortest close without a PS (about 33 static words: count the whole body, greeting through signature, against the lint's 40-word floor). The word bands today: Email 1 50-80 static words, follow-ups 30-60, one value-stack email up to ~100.
 
@@ -96,7 +96,7 @@ Hey {firstName},
 I created a newsletter that emails you 10 qualified leads that match your ICP every morning, and it also includes a personalized email you can send to them.
 
 You don't need to pay anything, just sign up if you want it:
-[Sign up here](https://ken.so/daily)
+[Sign up here](https://northwind.example/daily)
 
 Best,
 {sender_first_name} {sender_last_name} - Founder at Northwind

@@ -133,4 +133,4 @@ Copy one into the workspace as draft version 1:
 - `studio_templates(operation="create", starter_slug="rd-ken-native")`
 - `studio_templates(operation="create", starter_slug="rd-your-product")`
 
-For `rd-doc`, set the workspace's offer in Knowledge (`knowledge.offer`), or `next_steps` skips the offer line. For `rd-your-product`, replace the endpoint URL in the `run` step and the copy that describes the check before you publish.
+For `rd-doc`, the `offer` bind reads `knowledge.offer`, which the Knowledge pack does not have, so it falls back and `next_steps` skips the offer line. Bind `knowledge.stable` instead if the offer should come from Knowledge. For `rd-your-product`, replace the endpoint URL in the `run` step and the copy that describes the check before you publish.

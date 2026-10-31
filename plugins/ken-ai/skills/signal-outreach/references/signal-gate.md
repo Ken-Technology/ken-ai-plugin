@@ -42,7 +42,7 @@ Drop titles or excerpts with gender markers from other languages (`m/w/d`, `w/m`
 
 ## Size and country
 
-Use the user's ICP. Without one, the hiring run above kept companies of 2 to 200 employees: at that size a few new roles are a real plan, while at 5,000 they are noise. The people search covers six countries (United States, United Kingdom, Canada, Ireland, Australia, New Zealand); keep companies elsewhere in a separate list and say so.
+Use the user's ICP. Without one, the hiring run above kept companies of 2 to 200 employees: at that size a few new roles are a real plan, while at 5,000 they are noise. The people search covers six countries (United States, United Kingdom, Canada, Ireland, Australia, New Zealand); keep companies elsewhere in a separate list, say so, and find their decision makers by name with the email finder (SKILL.md Step 3).
 
 ## Duplicates
 

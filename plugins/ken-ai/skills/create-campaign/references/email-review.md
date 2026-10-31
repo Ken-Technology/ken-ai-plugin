@@ -31,7 +31,7 @@ Code runs this lint on every email before saving; any failure is a REJECT. Check
 - [ ] **Spintax balanced:** `{option a|option b}` - every brace closes, two or more non-empty options. Also REJECT any spintax that passes: the sequence save reads `{a|b}` as a lead variable with a fallback and rejects it. Only a listed lead variable with a plain fallback (`{firstName|there}`) may use `|`.
 - [ ] **No em-dashes** in subject or body (simple `-` only).
 - [ ] **Subject 1-60 characters** on every step, follow-ups included (`{{Subject Line}}` is fine).
-- [ ] **Body 40-180 words**, counted on the whole body (greeting through signature and PS).
+- [ ] **Body length:** the lint's `body_words` rule passes (`email_copy(operation="lint", ...)`, run on every email before this checklist; see Checklist 3).
 - [ ] **At most 1 link per email**, counting raw URLs, markdown links, `<a>` tags, tracking tokens and the signature company link.
 - [ ] **No unresolved placeholders:** no `[Company]` / `[Name]` / `[First Line]` square brackets, no `TODO` / `TBD`, no double-brace token other than a declared `{{Title Case}}` AI variable or an existing `{{tracking_link:ID}}` in a live body.
 - [ ] **No unsourced events:** the static copy names no event about the prospect (a raise, a hire, a launch, a promotion) unless the segment itself is defined by it; a per-lead event belongs in an AI variable. A funding round is not a buying event: write to what the money pays for, never "congrats on the raise".
@@ -55,10 +55,7 @@ A static opener that fails (a)-(d) is a REJECT. A failing sample is fixed in its
 
 #### Spam words (budgeted - count and report per email - HARD)
 - [ ] Report every spam word as `word (tier)` ([`references/spam-words.md`](references/spam-words.md)).
-- [ ] **NEVER tier = REJECT:** "free", "credit card", phishing vocabulary, fake `Re:`/`Fwd:`, the scam cluster.
-- [ ] **HIGH:** 2+ in one email = REJECT; one = FLAG with the safe alternative.
-- [ ] **MEDIUM:** 3+ in one email = REJECT; two from one cluster in a sentence = FLAG.
-- [ ] **Subjects:** any tiered word, `$`, `%` or stacked numbers = REJECT.
+- [ ] **Tiers:** the lint's `spam_never`, `spam_high`, `spam_medium` and `spam_subject` rules decide each REJECT and FLAG, and their matches are the words to report. Give the safe alternative for each. The lint does not read clusters: FLAG two MEDIUM words from one cluster in a sentence.
 - [ ] **Structural:** ALL CAPS, more than one `!`, URL shorteners, attachments = REJECT.
 - [ ] **No false or unverifiable claims:** cross-check every offer claim, price, time, case study and metric against the company context; nothing invented. FLAG what you cannot verify.
 
@@ -103,7 +100,7 @@ A static opener that fails (a)-(d) is a REJECT. A failing sample is fixed in its
 - [ ] Paragraphs of 1-3 sentences with spacing; no ALL CAPS; plain text; no calendar link in Email 1.
 
 #### Brevity and punch (HARD - the #1 operator complaint)
-- [ ] **Count the static body words** of every email (prose + CTA; not the greeting, AI-variable lines, or signature; a static PS is excluded but capped at ~35 words in at most 1-2 emails). Bands: **Email 1 50-80 words, follow-ups 30-60.** REJECT an Email 1 over 80 or a follow-up over 60, except one value-stack email per sequence (~100 words, numbered lines with real numbers). FLAG an email under its band. The lint's 40-word floor on the whole body still applies. Report each count.
+- [ ] **Word bands:** the lint's `static_words` rule checks each email's band and gives its count; report each count. Its over-band REJECT stands except on one value-stack email per sequence (~100 words, numbered lines with real numbers), which you judge. A static PS is outside the count: cap it at ~35 words in at most 1-2 emails.
 - [ ] Run the "cut 30%" pass: if it loses 30% without losing meaning, REJECT with the tighter version.
 - [ ] FLAG long multi-clause sentences and staccato one-line fragments.
 
@@ -137,7 +134,7 @@ A static opener that fails (a)-(d) is a REJECT. A failing sample is fixed in its
 - [ ] **Proof shape:** before + action + specific outcome + timeframe. FLAG adjective-only proof.
 - [ ] Word reduction, read-aloud, feature-to-story.
 
-No deterministic copy checker is in the MCP yet: count words, links and spam words and check first lines and merge fields by reading. Optional second opinion: `email_copy(operation="grade", subject_key="<campaign>-<segment>-<step>", copy="<plain text>")` is a model's read of clarity, CTA, reply odds and odd wording (label keep, rewrite or start_over), not a lint: it counts no words and checks no spam tier, first person or merge field. A weird_word Yes is a FLAG. Prefix a follow-up's copy with `This is a follow-up.` and a newline; `refresh=True` re-grades changed copy (campaign edit access). Quota: 20 a minute, 500 a day.
+Run the lint first on every email: `email_copy(operation="lint", subject="<subject>", body="<body>", step_order=<n>, variables=[<AI variable names with a prompt>], custom_variable_keys=[<registered keys>], is_finance_vertical=<bool>)`. It checks Checklist 1, the word bands, the Email 1 first-line checks and bridge, the spam tiers and the merge fields in code, with no model call and no quota, and returns pass, fail or skipped per rule with the matched text. Fold its rejects and flags into the review: a failed rule at `reject` is a REJECT and at `flag` is a FLAG, each with its matches. It cannot judge truth, the offer, the CTA or the voice: read those yourself. Optional second opinion: `email_copy(operation="grade", subject_key="<campaign>-<segment>-<step>", copy="<plain text>")` is a model's read of clarity, CTA, reply odds and odd wording (label keep, rewrite or start_over), not a lint: it counts no words and checks no spam tier, first person or merge field. A weird_word Yes is a FLAG. Prefix a follow-up's copy with `This is a follow-up.` and a newline; `refresh=True` re-grades changed copy (campaign edit access). Quota: 20 a minute, 500 a day.
 
 ## Score decision
 

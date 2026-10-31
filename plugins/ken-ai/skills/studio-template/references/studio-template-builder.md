@@ -7,7 +7,7 @@ Keep this open while you write a Studio template bundle. A template is built onc
 
 The build loop, in short:
 
-1. Start from a starter: `studio_templates(operation="starters-list")`, then `studio_templates(operation="create", starter_slug="rd-doc")`. Or start blank: `studio_templates(operation="create", name="Site notes", template_type="audit", template_format="page")`.
+1. Start from the Kenso template library: `studio_templates(operation="starters-list", q="deal room")`, read one with `studio_docs(operation="starters-get", slug="deal-room")`, then `studio_templates(operation="create", starter_slug="deal-room")`. Or start blank: `studio_templates(operation="create", name="Site notes", template_type="audit", template_format="page")`.
 2. Read the files: `studio_templates(operation="pull", template_id=41)`.
 3. Write or edit the files in your own environment, with this page and the type playbook open.
 4. Check without storing: `studio_templates(operation="validate", template_id=41, text_files={"studio.json": "...", "template.liquid": "..."})`. Fix by rule id. Repeat until `errorCount` is 0.
@@ -336,7 +336,7 @@ Supplied at render, never filled by the recipe. Recipes fill only `data.*`.
 
 | Variable | Fields | Notes |
 |---|---|---|
-| `account` | `name`, `domain`, `industry`, `size_band`, `employee_count`, `hq_location`, `linkedin_url`, `why_now`, `angle`, `fit_score`, `dossier.summary`, `dossier.why_now`, `dossier.angle`, `dossier.fit_score` | `size_band` is `1-10`, `11-50`, `51-200`, `201-500`, `501-1000`, `1001-5000`, `5001-10000` or `10001+`. `dossier` also carries the keys of the latest research run. Any field can be null. A page built for a campaign lead's company also has `description`, and an empty `dossier` |
+| `account` | `name`, `domain`, `industry`, `size_band`, `employee_count`, `hq_location`, `linkedin_url`, `why_now`, `angle`, `fit_score`, `dossier.summary`, `dossier.why_now`, `dossier.angle`, `dossier.fit_score` | `size_band` is `1-10`, `11-50`, `51-200`, `201-500`, `501-1000`, `1001-5000`, `5001-10000` or `10001+`. `dossier` also carries the keys of the latest research run. Any field can be null. A page built for a campaign lead's company also has `description`, and an empty `dossier`. `signals` (the account's newest signals, see `bind` under Recipe steps) is read by the recipe and email templates; a page shows it by binding it into a slot |
 | `person` | `first_name`, `last_name`, `title`; on a recruiting page also `current_title`, `current_company`, `location`, `skills` (a list of strings), `experience_summary`, `linkedin_url` | Per-person links only. **Null on the shared link and during the fill**, so every use needs `\| default:`. A recruiting page is the exception: it is filled per candidate, so `person` is set during its fill too |
 | `sender` | `name`, `first_name`, `last_name`, `title`, `signature_html` | `title` is null today. The sender's email is never a variable |
 | `brand` | `name`, `logo_url`, `colors.primary`, `colors.secondary`, `fonts.heading`, `fonts.body` | **`colors` and `fonts` are null today.** `logo_url` is null unless the workspace has its own brand |
@@ -344,10 +344,11 @@ Supplied at render, never filled by the recipe. Recipes fill only `data.*`.
 | `asset_url` | | Base URL of `assets/`, no trailing slash: `{{ asset_url \| append: '/logo.png' }}` serves `assets/logo.png` |
 | `role` | `title`, `company`, `location`, `remote_policy` (`onsite`, `hybrid`, `remote` or null), `pay_range` (text like "$150k-$180k a year", empty text when the role has no pay), `description` (at most 4000 characters), `highlights` (the must-haves, at most 10), `job_url`, `booking_url` | Recruiting pages only, during the fill and on the page; absent everywhere else. `booking_url` is null during the fill and equals `link.booking_url` on the page |
 | `roles` | A list shaped like `role`: the campaign's primary role first, then its open extra roles, at most 4 | Recruiting pages only, during the fill and on the page |
+| `defaults.<slot>` | One key per slot that has a `fallback` | The slot's fallback as the page would render it; use it in prompts for owner-set details such as an event's name, date and agenda. A Liquid fallback is rendered over the fill's variables; a list, object, number or boolean comes as it is. A fallback renders here with the recipe text rules (output tags and the recipe filters, no `{% %}` tags), not the page's full Liquid; a slot without a fallback, or whose fallback does not render that way, has no key, and the validator refuses an `inputs` or bind `from` that reads it. Recipe only (prompt text, `inputs`, tool `args`, bind `from`, grade `rubric`): a template keeps reading `data.<slot>`, which shows the fallback when no step filled it. No step writes `defaults` |
 
-`brand.colors.*`, `brand.fonts.*` and `sender.title` are null today, so every use needs `| default:`. `fallback.liquid` and Liquid slot fallbacks see the same variables, with empty `data`.
+`brand.colors.*` and `brand.fonts.*` are null unless the workspace brand kit sets them (and always while its `brand_kit` flag is off), and `sender.title` is null today, so every use needs `| default:`. `fallback.liquid` and Liquid slot fallbacks see the same variables, with empty `data`.
 
-Recipes also read `knowledge.*` (the workspace's Knowledge, in `bind` and `inputs`). It is empty today, so a `knowledge.*` bind falls back. Templates cannot read `knowledge`.
+Recipes also read `knowledge`, in `bind` and `inputs`: the pack `knowledge.context` returns for the workspace and, on a page for an account, that account. `knowledge.stable` holds the workspace-wide items (instructions, company files) and `knowledge.scoped` the account's files, signals and facts; each item has `citationId`, `kind`, `title` and `text`. There is no flat `knowledge.offer`: a bind to it falls back. With the `knowledge` flag off the pack is empty and a `knowledge.*` bind falls back. Templates cannot read `knowledge`.
 
 ## Kit snippets
 
@@ -506,7 +507,7 @@ The recipe fills `data.*` for one account, in order. Every step is `{"id", "kind
 
 - `id`: unique in the recipe.
 - `to`: `"data.<slot>"` or a list of them; every slot is declared in `slots`.
-- `inputs` and Liquid read only Kenso variables, `knowledge.*`, or `data.<slot>` that an earlier step fills. Order the steps so writers come before readers.
+- `inputs` and Liquid read only Kenso variables, `knowledge.*`, `defaults.<slot>` (a slot that has a `fallback`, see Kenso variables), or `data.<slot>` that an earlier step fills. Order the steps so writers come before readers.
 - Recipe text (a prompt's `prompt`, a grade's `rubric`, every string in a tool's `args` and a dataset's `where`) takes output tags only: `{{ account.name }}`, `{{ data.leads[0].name }}`, `{{ data.why_now | default: 'no news' }}`. Filters: `default`, `upcase`, `downcase`, `capitalize`, `strip`, `size`, `join`, `truncate`, `json`. A `{% %}` tag (`if`, `for`, `assign`) fails validation (`recipe-liquid-tag`), because the runner refuses it on every fill and every page would fall back. Put a condition in words instead ("skip the industry line when it is blank"); `template.liquid` and `fallback.liquid` keep the full tag set.
 - `requires` (optional, every kind but `bind`): the `data.<slot>` paths the step cannot work without, each written by an earlier step, such as `["data.candidates"]`. When one is empty (null, blank text, an empty list or object) or its step failed, the step does not run: no model or tool call, no charge, it is recorded `skipped`, and its slots fall back. A step that requires those slots skips in turn. Put it on every prompt that writes from search or tool results, so a failed search never turns into invented people.
 - `person` is null while the recipe runs (pages fill once per account; person fields bind per link). Read `person.*` in the template, not in the recipe. Recruiting pages are the exception: they fill once per candidate, so `person.*`, `role.*` and `roles` are set while the recipe runs, and a `prompt` reads them in `inputs`.
@@ -514,7 +515,9 @@ The recipe fills `data.*` for one account, in order. Every step is `{"id", "kind
 
 ### bind
 
-Copies one value into one slot. Fields: `from` (starts with `account.`, `person.`, `role.` or `knowledge.`, including `account.dossier.*`), `to` (one slot). A missing or empty source is not an error: the slot falls back.
+Copies one value into one slot. Fields: `from` (starts with `account.`, `person.`, `role.`, `knowledge.` or `defaults.`, including `account.dossier.*` and `account.signals`), `to` (one slot). A missing or empty source is not an error: the slot falls back.
+
+`account.signals` is a list of `{type, title, date, source_url}`, newest first, at most 10. `date` is `YYYY-MM-DD`, and `source_url` is there only when the signal has a web address. On an account page it holds that account's signals; on a campaign page, those of the workspace's account at the company's domain. It is empty on accounts with no signals: fall back to `account.dossier.why_now`. A page template does not see it, so bind it into an array slot to show it.
 
 ```json
 {"id": "why_now", "kind": "bind", "from": "account.dossier.why_now", "to": "data.why_now"}
@@ -528,6 +531,7 @@ Fields: `tool`, `args`, `to`. `ken.copy` also takes a step-level `model`. Args a
 |---|---|---|
 | `ken_search.people` | `company`: `"account"` (default, the account's domain), a domain, or `"any"` to search across companies (needs at least one filter). `filters`: a camelCase Kenso Search people filter object (`currentTitles`, `seniorityLevels` from Entry, Individual, Senior, Manager, Director, VP, CLevel, Owner; `industries` as lowercase LinkedIn industries; `companyHeadcount {min, max}`; `countries`, where people exist only in United States, United Kingdom, Canada, Australia, Ireland and New Zealand, so any other country finds no one). `titles`, `seniorities`, `departments`, `locations`: lists that override those filters. `limit` 1 to 30, default 10 | People records (`name`, `title`, `company`, `linkedin_url`, ...), never an email address or phone number |
 | `ken_search.companies` | `filters`: a camelCase Kenso Search account filter object (`industries`, `hiringSurge`, `headcountGrew`, `raisedFundingRecently`, ...). Without `filters` it finds lookalikes of `company` (`"account"` default, or a domain). `mode`: `filters` or `lookalikes`, inferred. `limit` 1 to 50, default 10 | Company records; never the account itself |
+| `ken_search.count` | `kind`: `companies` or `people`. `segments`: 1 to 8 `{label, filters}`, `label` at most 28 characters, `filters` the filter object `ken_search.companies` or `ken_search.people` takes (companies also take `employeesCount {min, max}` and `countries`). Every filter key must be known, and each segment must narrow the search | `[{label, value}]` in segment order, `value` the exact Kenso Search total, ready for `ken/chart`. Use for charts of market counts; never invent numbers. The step writes an array slot, and one failed segment fails it |
 | `scrape.page` | `url` (default `https://{{ account.domain }}`; a bare host gets `https://`), `maxChars` 200 to 20,000 (default 12,000), `mode` `markdown` (default) or `metadata` | `{url, source, title, description, markdown, captured_at}`, emails and phone numbers removed. An account with no domain falls back |
 | `ken.copy` | `brief` (required: what to write, for whom, which facts), `kind` `email`, `headline` or `paragraph` (default), `tone`, `maxWords` (default 120, 14 or 80 by kind; at most 400) | A string, or a list of paragraphs when the slot is an array |
 | `chart.data` | `from` (`"data.segments"` or `"{{ data.segments }}"`), `label` and `value` (item fields, default `label` and `value`, dotted paths work), `top` 1 to 50, `sort` `none` (default), `desc` or `asc` | `[{label, value}]` for `ken/chart`, labels cut to 28 characters |
@@ -535,6 +539,7 @@ Fields: `tool`, `args`, `to`. `ken.copy` also takes a step-level `model`. Args a
 
 ```json
 {"id": "leads", "kind": "tool", "tool": "ken_search.people", "args": {"company": "any", "filters": "{{ data.search }}", "limit": 30}, "to": "data.candidates"}
+{"id": "market", "kind": "tool", "tool": "ken_search.count", "args": {"kind": "companies", "segments": [{"label": "Software 50-200", "filters": {"industries": ["software development"], "employeesCount": {"min": 50, "max": 200}}}, {"label": "Software 201-1000", "filters": {"industries": ["software development"], "employeesCount": {"min": 201, "max": 1000}}}]}, "to": "data.market"}
 ```
 
 ### prompt
@@ -677,13 +682,13 @@ The loop:
 | `recipe-field-missing` | error | Add the kind's required fields: bind `from`, `to`; tool `tool`, `to`; prompt `prompt`, `to`; grade `rubric`, `on`; webhook `url`, `to`; dataset `dataset`, `to` |
 | `recipe-field-unknown` | warning | Remove the field; for a tool step, tool arguments go inside `args` |
 | `recipe-to` | error | Point `to` at `data.<slot>` and declare that slot |
-| `recipe-input` | error | List only Kenso variables (`role` and `roles` too on a recruiting page), `knowledge.*` or slots an earlier step fills; move the writing step earlier |
-| `recipe-bind-from` | error | Start `from` with `account.`, `person.`, `role.` or `knowledge.`; a template reads `data.*` slots directly, no bind needed |
-| `recipe-tool` | error | Use `ken_search.people`, `ken_search.companies`, `enrich.email`, `scrape.page`, `ken.copy` or `chart.data` |
+| `recipe-input` | error | List only Kenso variables (`role` and `roles` too on a recruiting page), `knowledge.*`, `defaults.<slot>` of a slot whose `fallback` renders as recipe text (no `{% %}` tags or other filters), or slots an earlier step fills; move the writing step earlier |
+| `recipe-bind-from` | error | Start `from` with `account.`, `person.`, `role.`, `knowledge.` or `defaults.` (a slot whose `fallback` renders as recipe text); a template reads `data.*` slots directly, no bind needed |
+| `recipe-tool` | error | Use `ken_search.people`, `ken_search.companies`, `ken_search.count`, `enrich.email`, `scrape.page`, `ken.copy` or `chart.data` |
 | `recipe-webhook-url` | error | Use an absolute https URL |
 | `recipe-webhook-timeout` | error | Set `timeout_s` above 0 and at most 30 |
 | `recipe-grade-on` | error | Grade only `data.<slot>` targets an earlier step fills; put the grade after the writer |
-| `recipe-value` | error | Fix the value's shape: `args` an object, `inputs` strings, `headers` static strings, `where` entries `{column, op: eq/in/between, value}`, `limit` a whole number above 0, `retries` a whole number 0 or more, `pass_score` 0 to 10 |
+| `recipe-value` | error | Fix the value's shape: `args` an object, `inputs` strings, `headers` static strings, `where` entries `{column, op: eq/in/between, value}`, `limit` a whole number above 0, `retries` a whole number 0 or more, `pass_score` 0 to 10, a `ken_search.count` step a `kind` of `companies` or `people` and 1 to 8 `{label, filters}` segments into an array slot |
 | `recipe-requires` | error | List `data.<slot>` paths in an array, each a declared slot an earlier step writes in its `to`; a `bind` step takes no `requires` |
 | `recipe-grade-checks` | error | Make `checks` an object of `banned` (non-blank strings, at most 100, each at most 80 characters), `skip` (field names, at most 50) and the `no_*` switches as `true` or `false`; remove any other key |
 | `recipe-liquid-tag` | error | Remove the `{% %}` tag from the prompt, rubric, tool args or dataset `where`; use output tags (`{{ x \| default: 'text' }}`) and put conditions in words |
@@ -775,4 +780,4 @@ One playbook per page type, in the `studio-template` skill's `references/`. Open
 - `event.md`: a personal invite to a dinner or webinar with an RSVP form (starter `event-invite`).
 - `calculator.md`: an interactive calculator prefilled with the account's numbers (no starter for now).
 - `recruiting.md`: a page for one candidate about a role, or the open roles that fit them (starters `role-pitch`, `roles-for-you`). Needs the `recruiting` flag.
-- `email.md`: the `email` format, for any type: a cold email pinned to a sequence step. No email starter is in the gallery yet, so start blank with `template_format="email"`. Needs the `studio_email` flag.
+- `email.md`: the `email` format, for any type: a cold email pinned to a sequence step. No email template is in the Kenso template library yet, so start blank with `template_format="email"`. Needs the `studio_email` flag.

@@ -28,7 +28,7 @@ A workspace can rename and add stages. Map each live stage to the nearest row by
 
 ## No recent activity
 
-Nothing on the account in the last 14 days. Activity is any of:
+Nothing on the deal or its account in the last 14 days. `opportunities(operation="list", stale_days=14)` finds the open deals that match, quietest first, and every deal row carries `lastActivityAt`: the latest of `stageChangedAt`, `updatedAt` and the newest timeline entry on the deal or its account. It does not see touches, threads or meetings, so read those for the deals it returns. Activity is any of:
 
 - a touch sent, or a person's touch approved (`account_touches` list),
 - an email or LinkedIn message either way (`threads` list, `direction` and the newest message time),

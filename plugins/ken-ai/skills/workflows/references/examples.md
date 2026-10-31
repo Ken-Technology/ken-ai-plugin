@@ -16,7 +16,7 @@ Then replace the `<fill in: your ICP in two sentences>` criteria with an update 
 - `promote` turns the company into an account. On a lead trigger it runs before the research and the send.
 - `crm` creates or updates the company in the connected HubSpot or Salesforce by its domain. It has `"onFailure": "continue"`, so a CRM outage does not stop the research and the email. A workspace with no CRM connected sees `app_not_connected` at publish: connect one, or remove the step.
 - `research` writes why now from the signal and its details (`{{trigger.payload}}`, such as the funding round), and an angle ready to paste into the email.
-- `email` drafts a first email to the lead (`to: "record"`) with a body built from `{{research.angle}}`. Because it has a body, the touch waits in Today for approval and never sends on its own. Without a body it would stay planned, out of Today, until Kenso's writer or a person writes it.
+- `email` drafts a first email to the lead (`to: "record"`) with a body built from `{{research.angle}}`. Because it has a body, the touch waits in Today for approval and never sends on its own. Without a body it would stay planned, out of Today, until Ken's writer or a person writes it.
 
 ```json
 {

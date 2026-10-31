@@ -30,9 +30,9 @@ Every call takes `client_id`, the workspace id. Send it when the user can see mo
 3. `linkedin(operation="list")` - the LinkedIn accounts.
 4. `billing(operation="credits-get")` - credits, for the paid paths.
 
-New domains and warmed inboxes need a paid plan. On a Free workspace, say so and point to https://app.ken.so/settings/billing.
+New domains and warmed inboxes need a paid plan. On a Free workspace, say so and point to https://app.ken.so/<workspace id>/settings/billing.
 
-If an operation this skill names is not listed for you, or answers 404, that part is not on for this workspace or this caller. Say which part in one sentence, point to https://app.ken.so/delivery?tab=inboxes, and carry on with the rest. Do not retry it.
+If an operation this skill names is not listed for you, or answers 404, that part is not on for this workspace or this caller. Say which part in one sentence, point to https://app.ken.so/<workspace id>/delivery?tab=inboxes, and carry on with the rest. Do not retry it.
 
 Tell the user what they have in one short block: active inboxes and domains, inboxes still warming, the daily capacity (the daily limits of active inboxes added up), LinkedIn accounts, and credits.
 
@@ -58,7 +58,7 @@ Kenso keeps pre-warmed domains ready to claim. These operations are for workspac
 1. `domain_setup(operation="inbox-stock-get")` returns `claimableDomains` and a count per mailbox type (`gmail`, `outlook`).
 2. Propose one claim per domain: the mailbox type and 1 to 5 mailboxes, each with a username, first name and last name. Give the price stated in the claim operation's own description (its full docs in `describe_tools`) and the total for the mailboxes, and wait for the yes.
 3. `domain_setup(operation="inbox-stock-create-claim", mailbox_type="gmail", mailboxes=[{"username": "maya", "first_name": "Maya", "last_name": "Chen"}], idempotency_key="acme-claim-2026-10-27-1")`. Reuse the same `idempotency_key` to retry the same claim; a new key is a new claim. A claim takes up to a few minutes, and its mailboxes read `warmup` until Kenso activates them.
-4. Refusals: 402 with `UPGRADE_REQUIRED` (Free plan), 402 with `INSUFFICIENT_CREDITS` (add credits at https://app.ken.so/settings/billing, then claim again), 402 at the new-payer limit and 400 for daily capacity (do not retry: tell the user what the message says).
+4. Refusals: 402 with `UPGRADE_REQUIRED` (Free plan), 402 with `INSUFFICIENT_CREDITS` (add credits at https://app.ken.so/<workspace id>/settings/billing, then claim again), 402 at the new-payer limit and 400 for daily capacity (do not retry: tell the user what the message says).
 
 ## Step 3 - Connect Google or Microsoft mailboxes
 
@@ -92,6 +92,8 @@ These operations are for workspace members, and need the workspace's `sending_pr
 
 When the user bought domains before, check where the orders are: `domain_orders(operation="domain-orders-list", active_only=True)` and `domain_orders(operation="get", order_id=301)`. An order waiting on payment continues with `domain_orders(operation="resume-checkout", order_id=301)`; send the user the checkout link it returns. Cancel an order only when the user asks. New searches and orders go through `domain-selection`. These operations are for workspace members.
 
+**Website question (workspaces with domain pages).** Before you order or import domains, ask the person: "What should people see when they open these domains? A rebuild of your website (recommended) or a redirect to your website?" A rebuild shows a copy of their home page on every one of these domains; a redirect sends visitors to their website, as today. Never choose for them. Pass the answer as `website_mode`: `page` for the rebuild, `redirect` for the redirect. Where domain pages are on, an order or import is refused without it; in any other workspace, do not ask and leave `website_mode` out. For a workspace member, the operation `outbound-site-get` is listed only where domain pages are on. For domains that already exist, `website(operation="outbound-site-domain-get", domain_id=...)` shows a domain's mode; an `unset` domain gets the same question, and the answer goes through `domains(operation="update", domain_id=..., changes={"website_mode": ...})` with their answer.
+
 ## Step 7 - The link host
 
 The link host (for example `go.acme.com`) serves Studio pages and the open pixel from the workspace's own domain. It exists only when the workspace has Studio or account sending on (404 otherwise: skip this step).
@@ -105,19 +107,18 @@ Tracking links on each sending domain are set in `domain-selection`.
 ## Step 8 - LinkedIn accounts
 
 1. `linkedin(operation="create-connect-session")` returns a link for the account owner to open and sign in. To reconnect an account that dropped, pass its `linkedin_account_id`.
-2. `linkedin(operation="list")` shows the accounts and their state afterwards. In the app: https://app.ken.so/delivery?tab=linkedinAccounts.
+2. `linkedin(operation="list")` shows the accounts and their state afterwards. In the app: https://app.ken.so/<workspace id>/delivery?tab=linkedinAccounts.
 3. To put accounts on a campaign: read `campaigns(operation="list-linkedin-accounts", campaign_id=42)`, show the change, and after a yes `campaigns(operation="replace-linkedin-accounts", campaign_id=42, linkedin_account_ids=[5, 6])`. It replaces the whole list, so send every account the campaign keeps.
 
 ## Step 9 - Check and hand over
 
 - Each new inbox: `inboxes(operation="get-warmup", inbox_id=301)`. New inboxes warm before they send at volume: plan on two to three weeks before full volume.
-- Each new domain, once its DNS is in: `domains(operation="verify-dns", domain_id=12)`, then `domains(operation="get-health", domain_id=12)`.
+- Each new domain, once its DNS is in: `domains(operation="verify-dns", domain_id=12)`, then `domains(operation="get-health", domain_id=12)`. Its `spfStatus`, `dkimStatus`, `dmarcStatus` and `mxStatus` (`pass`, `fail` or `unknown`) come from the last check, dated by `checkedAt`: run `domains(operation="domain-health-checks-create", domain_ids=[12])` after the records change, then read it again.
 - Report: what is connected, what is warming and until when, what the user still has to do (DNS records, sign-ins, admin consent, payments), and the daily capacity now and once warm.
 - Next: `inbox-configuration` for names, signatures, forwarding and limits; `deliverability-guard` once mail is flowing.
 
 ## What this skill cannot do yet
 
-- Check SPF, DKIM and DMARC on their own. Domain health shows DNS state, but there is no dedicated record check.
 - Run inbox placement tests for every caller. That read is for workspace members only.
 - Claim warmed inboxes, connect sending providers or track domain orders for callers outside the workspace's members, or while their flags are off.
 

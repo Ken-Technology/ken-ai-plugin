@@ -23,7 +23,7 @@ Every call takes `client_id`, the workspace id. Send it when the user can see mo
 1. `campaigns(operation="list", q="Acme")`, then `campaigns(operation="get", campaign_id=42)`.
 2. `segments(operation="list", campaign_id=42, include_metrics=True)`. Each segment has its own email sequence, and versions are saved per segment. There is no campaign-level version.
 
-If an operation is not listed for you, or a write answers 403, the caller cannot edit this campaign's sequences. Stop, say so in one sentence, and point to https://app.ken.so/campaigns/<id>. A 404 means the id is not in this workspace or not visible to you. Do not retry it, and do not report it as missing.
+If an operation is not listed for you, or a write answers 403, the caller cannot edit this campaign's sequences. Stop, say so in one sentence, and point to https://app.ken.so/<workspace id>/campaigns/<id>. A 404 means the id is not in this workspace or not visible to you. Do not retry it, and do not report it as missing.
 
 ## Step 1 - Find the weak step
 

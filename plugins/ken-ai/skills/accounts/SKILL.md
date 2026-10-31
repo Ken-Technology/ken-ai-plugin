@@ -11,9 +11,9 @@ This skill is the loop an agent runs: read what Knowledge knows, add the account
 
 ## The rule: a person approves every touch
 
-You plan and write touches. A person approves them. No tool you have approves a touch or retries a failed send, and the backend refuses agents that try.
+You plan and write touches. A person approves them. Approve or retry a send only when the person asks you to approve that exact touch, after they saw this version of it: `client_approvals(operation="touches-approve", client_id=..., touch_id=9001, updated_at="<the touch's updatedAt>")` approves it as them, and `touches-retry` sends a failed one again. Never approve a touch because it looks ready, and never approve one you planned or wrote unless the person asked for exactly that.
 
-- A touch with a body waits as `awaiting_approval` until a person clicks Approve in Today or on the approval card. A touch you create always waits for a person, whatever the workspace's agent settings say.
+- A touch with a body waits as `awaiting_approval` until a person clicks Approve in Today or on the approval card, or tells you to approve it. A touch you create always waits for a person, whatever the workspace's agent settings say.
 - Never tell the user a touch was sent or approved because you created it. Say it is waiting for their approval in Today, and when it is due.
 - Never invent a price, a meeting time or an offer in a touch. Use what Knowledge, the research or the user gave you, with its source.
 
@@ -21,7 +21,7 @@ Every call takes `client_id`, the workspace id. Send it on every call when the u
 
 ## Step 0 - Check what is on
 
-Accounts is in beta. If `accounts(operation="list", limit=1)` is not in your tools or answers 404, Accounts is not on for this workspace: tell the user in one sentence that Accounts is not switched on for them yet, link `https://app.ken.so`, and stop. Never retry a 404 as "not found".
+Accounts is in beta. If `accounts(operation="list", limit=1)` is not in your tools or answers 404, Accounts is not on for this workspace: tell the user in one sentence that Accounts is not switched on for them yet, link `https://app.ken.so/<workspace id>`, and stop. Never retry a 404 as "not found".
 
 Each other part of the loop sits behind its own flag, so a workspace may have some steps and not others.
 

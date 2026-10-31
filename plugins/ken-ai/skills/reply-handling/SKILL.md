@@ -11,7 +11,7 @@ It ends with each draft saved on its thread (or sent on the person's word), and 
 
 ## The rules
 
-- **A person approves every send.** You draft. A person sends from the inbox at `https://app.ken.so/replies`, or tells you "send it" for that exact draft. Never send a reply the person has not seen, and never send several at once on a general "go ahead".
+- **A person approves every send.** You draft. A person sends from the inbox at `https://app.ken.so/<workspace id>/replies`, or tells you "send it" for that exact draft. Never send a reply the person has not seen, and never send several at once on a general "go ahead".
 - **Never invent a price, a time, an offer, a result or an attachment.** A price or offer comes from a reply template or the workspace's Knowledge. A meeting time comes from the scheduler or the calendar (Step 4). When you do not have one, leave a clear gap such as `[price - confirm]` and tell the person. Never write "I've attached".
 - **Replies are distinct contacts.** Out-of-office, auto-replies and bounces are not replies. Never count or report opens.
 - **Unsubscribes stay unsubscribed.** Never answer an opt-out. Never set `confirm_suppressed` unless the person asked for that one reply after you told them the contact opted out.
@@ -33,7 +33,7 @@ Every call takes `client_id`, the workspace id. Send it on every call when the u
 | Open times without Scheduler | `calendar` get-availability | members with a connected calendar |
 | Writing style and account context | `knowledge` context | workspaces with Knowledge |
 
-When an operation is not listed for you, or answers 404 `not_found` on every id, that part is off for this workspace or this seat. Skip that step, tell the user in one sentence which part is not on, and carry on. Do not retry it. If `threads` itself is missing, stop: say the inbox is not available to this connection and send the user to `https://app.ken.so/replies`.
+When an operation is not listed for you, or answers 404 `not_found` on every id, that part is off for this workspace or this seat. Skip that step, tell the user in one sentence which part is not on, and carry on. Do not retry it. If `threads` itself is missing, stop: say the inbox is not available to this connection and send the user to `https://app.ken.so/<workspace id>/replies`.
 
 Read the reply agent once: `replies(operation="autonomous-reply-settings-get")`. When it is on in `draft` mode, Kenso may already have drafted on a thread, so check for a draft before you write one (Step 3). When it is on in `autonomous` mode, it answers some threads on its own: tell the user, and leave the threads it already answered.
 
@@ -46,10 +46,10 @@ Start with the counts, then the To Reply tab:
 `threads(operation="list", tab="to_reply", sort="oldest_waiting", limit=50)`
 
 - Tabs: `to_reply`, `other`, `automated`, `not_interested`, `saved`, `done`, `sent`, `all`. Narrow with `campaign_id`, `channel` (`email` or `linkedin`), `interest`, `is_read`, `has_reminder` or `q` (text search). Page with `cursor` while `pagination.hasMore` is true.
-- Each row has `direction`: `inbound` when the contact wrote last, `outbound` when you did. Only `inbound` rows wait for an answer.
-- `sort="oldest_waiting"` lists the thread whose newest message is oldest first, across pages, and an `inbound` row carries `waitingSince`, when that message arrived. Answer in that order, so the replies that waited longest go first.
+- Each row has `direction`: `inbound` when the contact wrote last, `outbound` when you did. A row that carries `waitingSince` waits for you: every `inbound` row, and a thread you already answered that a due reminder brought back, even when it reads `outbound`.
+- `sort="oldest_waiting"` lists the thread that has waited longest first, across pages, by `waitingSince`: when the contact's newest message arrived, or, for a thread you already answered that a due reminder brought back, when that reminder came due (a follow-up, not an unanswered reply). Answer in that order, so the replies that waited longest go first.
 
-Done when you have every `inbound` thread in To Reply (or the scope the user named), with its `interest`.
+Done when you have every thread in To Reply that carries `waitingSince` (or the scope the user named), with its `interest`.
 
 ## Step 2 - Sort them
 
@@ -105,7 +105,7 @@ If none of these is available, write `[2-3 times - confirm]` in the draft and te
 
 Show the user one block per thread: the contact and company, the situation, what they said in one line, the draft, and the template or Knowledge it used. Then ask which to send.
 
-The person sends from `https://app.ken.so/replies`, or approves one draft by name in chat. Only then:
+The person sends from `https://app.ken.so/<workspace id>/replies`, or approves one draft by name in chat. Only then:
 
 `threads(operation="create-message", thread_id="thr_...", body="Hi Maya, ...", sender_email_id=88, idempotency_key="reply-thr_123-v1")`
 

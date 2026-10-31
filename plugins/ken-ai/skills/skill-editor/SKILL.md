@@ -14,7 +14,7 @@ A skill reaches agents when it is on (`active`), reviewed (`status` `ok`) and ha
 
 ## Rules
 
-- **Admins edit shared skills.** A skill with `visibility` `workspace`, every Kenso skill included, changes only through a workspace admin; a private skill belongs to the person who made it. When `canEdit` is false or a save answers 403, propose the change instead: `knowledge(operation="suggestion-create", kind="change", file_id=..., base_version=..., old_text="...", new_text="...", reason="...")`. It waits in Review at `https://app.ken.so/demo/knowledge/review`.
+- **Admins edit shared skills.** A skill with `visibility` `workspace`, every Kenso skill included, changes only through a workspace admin; a private skill belongs to the person who made it. When `canEdit` is false or a save answers 403, propose the change instead: `knowledge(operation="suggestion-create", kind="change", file_id=..., base_version=..., old_text="...", new_text="...", reason="...")`. It waits in Review at `https://app.ken.so/<workspace id>/demo/knowledge/review`.
 - **A yes before each save.** Show the change as before and after, in the skill's own words, and save after the person agrees. Pass a `reason`; History shows it.
 - **Read, then write.** `knowledge(operation="get", file_id=...)` returns `version`; pass it as `base_version`. `version_conflict` means someone saved since: read again, merge, show, save.
 - **Keep the approvals.** A skill must never let an agent send, launch, book, spend credits, or change a campaign's schedule or volume without a person's yes. Keep every approval step and "a person approves" line. When a requested edit would remove one, say so and leave that part out.
@@ -26,7 +26,7 @@ A skill reaches agents when it is on (`active`), reviewed (`status` `ok`) and ha
 
 ## Step 0: Check Knowledge is on
 
-`knowledge(operation="list", level="skill")`. When it is refused or answers 404, Knowledge is off for this workspace: say so in one sentence with the link `https://app.ken.so/demo/knowledge` and stop. Never retry it.
+`knowledge(operation="list", level="skill")`. When it is refused or answers 404, Knowledge is off for this workspace: say so in one sentence with the link `https://app.ken.so/<workspace id>/demo/knowledge` and stop. Never retry it.
 
 ## Step 1: Find the skill
 
@@ -38,7 +38,7 @@ The list gives each skill's `id`, `name`, `cmd`, `active`, `status`, `visibility
 
 ## Step 2: Read it
 
-`knowledge(operation="get", file_id=...)` returns `body`, `version`, `canEdit`, `cmd`, `trigger`, `triggerStatus`, `active`, `status` and `visibility`. Summarize it for the person: what it does, when it runs, its steps, and anything that looks out of date. Link it: `https://app.ken.so/demo/knowledge/f/<file id>`.
+`knowledge(operation="get", file_id=...)` returns `body`, `version`, `canEdit`, `cmd`, `trigger`, `triggerStatus`, `active`, `status` and `visibility`. Summarize it for the person: what it does, when it runs, its steps, and anything that looks out of date. Link it: `https://app.ken.so/<workspace id>/demo/knowledge/f/<file id>`.
 
 Kenso's own current text of a Kenso skill is the `skill://ken-ai/<name>/SKILL.md` resource. Compare with it to see what the workspace changed.
 
@@ -58,13 +58,15 @@ Kenso's own current text of a Kenso skill is the `skill://ken-ai/<name>/SKILL.md
 
 - History: `knowledge(operation="versions-list", file_id=...)` lists every version, newest first, with its author, `reason` and `bodyMd`.
 - Restore one on a yes: `knowledge(operation="versions-restore", file_id=..., version=<the one to bring back>, base_version=<the current version>)`. It becomes a new version, so nothing is lost and the restore can itself be undone.
-- Back to Kenso's current text: the reset icon on an edited Kenso skill in the Knowledge tab (the file's toolbar, next to History) writes it as a new version. An agent can also reset once the reset operation ships. Until then, restoring the last version Kenso wrote brings back Kenso's text as of that version.
+- Back to Kenso's current text, on a yes: `knowledge_prompts(operation="knowledge-files-reset", file_id=..., base_version=<the current version>)`. It writes Kenso's text as a new version, so the edits stay in History. Only a Kenso skill resets. The reset icon in the Knowledge tab (the file's toolbar, next to History) does the same.
 
 ## Step 6: When Kenso updates a skill
 
 Kenso updates an untouched copy in place, as a new version named "Ken updated <name>". An edited copy keeps the workspace's text; the app shows a banner with See changes, Keep mine and Reset to new.
 
-To bring Kenso's changes into an edited copy: read Kenso's current text (Step 2), show the person what Kenso changed next to what the workspace changed, and on a yes save the merged text as the whole `body`. Keep mine is only in the app.
+- **Merge:** read Kenso's current text (Step 2), show the person what Kenso changed next to what the workspace changed, and on a yes save the merged text as the whole `body`. Then mark Kenso's update as taken: `knowledge_prompts(operation="knowledge-files-keep-edits", file_id=..., base_version=<the version the save returned>)`. Without it the file still shows Kenso's update as waiting.
+- **Keep mine**, on a yes: `knowledge_prompts(operation="knowledge-files-keep-edits", file_id=..., base_version=...)`. The text stays as it is, no version is written, and `kenSkillUpdateAvailable` turns false until Kenso ships a newer version.
+- **Reset to new**: the reset in Step 5.
 
 ## Step 7: Draft a new skill
 
@@ -79,8 +81,6 @@ To bring Kenso's changes into an edited copy: read Kenso's current text (Step 2)
 
 ## What this skill cannot do yet
 
-- Reset a Kenso skill to Kenso's current text. Use the reset icon in the Knowledge tab.
-- Keep mine on Kenso's update banner. Use the app.
 - Edit a skill's references. They stay Kenso's.
 - Delete a Kenso skill. Switch it off.
 - Change a built-in skill for a workspace that has no Kenso skill copies.
@@ -93,6 +93,7 @@ To bring Kenso's changes into an edited copy: read Kenso's current text (Step 2)
 | 403 `forbidden` or `permission_denied` | Only an admin can change it: propose it with `suggestion-create`, or ask a workspace admin |
 | 409 `version_conflict` | Read again, merge, show, save |
 | 409 `invalid_state` on delete | A Kenso skill: switch it off instead |
+| 409 `invalid_state` on reset or keep-edits | Not a Kenso skill, or Kenso no longer ships it: say so |
 | 409 `too_few_tasks` or `no_skills_folder` on a draft | Too few finished tasks, or the workspace has no Skills folder: say so |
 | 429 on a draft | A draft is already running for the person: wait for it |
 | 400 on `cmd` | Lowercase words joined by hyphens, up to 40 characters |

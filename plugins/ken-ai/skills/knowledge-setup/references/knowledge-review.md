@@ -26,7 +26,7 @@ To change the mode or rate (admins): `knowledge_review(operation="settings-updat
 
 ## Read the queue
 
-1. Count: `knowledge_review(operation="suggestion-counts")` returns `pendingCount` (a floor when `isCapped` is true).
+1. Count: `knowledge_review(operation="suggestion-counts")` returns `pendingCount`, an exact count (`isCapped` is always false).
 2. List: `knowledge_review(operation="suggestion-list", status="pending", limit=50)`. Filters: `kind` (`change`, `addition`, `new_file`, `fact`), `file_id`, `folder_id`, `account_id`, `source_type` with `source_ref` (one source, as a Review chip names it), `is_spot_check`. Pass `pagination.nextCursor` back unchanged for the next page.
 3. One suggestion in full: `knowledge_review(operation="suggestion-get", suggestion_id=...)`, with its old and new text, file name, facts, source and author.
 
@@ -58,4 +58,4 @@ Tell the person it is waiting in Review for someone with edit rights.
 
 ## Export
 
-`knowledge_review(operation="export-create")` (or `folder_id=` for one folder) starts a zip of markdown. `knowledge_library(operation="export-content", export_id=<its id>)` downloads it, for the member who asked only, for 24 hours: `status` `running` means read it again in a minute, and a built zip up to 2 MiB comes back as `contentBase64`. A bigger one returns a note instead: export one folder at a time, or send the person to Knowledge in the app.
+`knowledge_review(operation="export-create")` (or `folder_id=` for one folder) starts a zip of markdown. `knowledge_library(operation="export-content", export_id=<its id>)` downloads it, for the member who asked only, for 24 hours: `status` `running` means read it again in a minute, and a built zip up to 2 MiB comes back as `contentBase64`. A bigger one returns `downloadLink` instead: give it to the person who asked, who opens it without signing in until `downloadLinkExpiresAt` (15 minutes). Read the export again for a new link.

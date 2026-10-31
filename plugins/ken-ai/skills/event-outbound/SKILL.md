@@ -20,7 +20,7 @@ This skill picks or adds the event, builds its list, matches it to your accounts
 
 ## Step 0 - Check what is on
 
-Event outbound needs the Accounts and Event outbound flags. If `outbound_events(operation="list")` is not in your tools or answers 404, tell the user in one sentence that Event outbound is not switched on for their workspace yet, link `https://app.ken.so`, and stop. Never retry a 404 as "not found".
+Event outbound needs the Accounts and Event outbound flags. If `outbound_events(operation="list")` is not in your tools or answers 404, tell the user in one sentence that Event outbound is not switched on for their workspace yet, link `https://app.ken.so/<workspace id>`, and stop. Never retry a 404 as "not found".
 
 Planning touches also uses the `accounts` skill's tools (`accounts`, `account_touches`). Importing people into a campaign uses `contacts`.
 

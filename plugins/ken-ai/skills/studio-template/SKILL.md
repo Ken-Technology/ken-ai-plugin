@@ -1,6 +1,6 @@
 ---
 name: studio-template
-description: Build, edit and manage Studio templates - pick or copy a starter, write the bundle, validate, preview on real accounts, publish, manage versions and datasets, and pin a template to a campaign.
+description: Build, edit and manage Studio templates - start one from the Kenso template library or blank, write the bundle, validate, preview on real accounts, publish, manage versions and datasets, and pin a template to a campaign.
 ---
 
 # Studio templates
@@ -15,7 +15,7 @@ Every call takes `client_id`, the workspace id. Send it on every call when the u
 
 Studio is in beta behind the workspace's `studio` flag, and its operations are staff exposure until the flag is on for the workspace.
 
-- If `studio_templates` is not in your tool list, or `studio_templates(operation="list")` answers 404, Studio is not on for this workspace. Say so in one sentence and point to https://app.ken.so/demo/studio. Do not retry, and never read the 404 as "no templates".
+- If `studio_templates` is not in your tool list, or `studio_templates(operation="list")` answers 404, Studio is not on for this workspace. Say so in one sentence and point to https://app.ken.so/<workspace id>/demo/studio. Do not retry, and never read the 404 as "no templates".
 - A 404 on one id while other calls work means the id belongs to another workspace or was deleted. Check `client_id` and the id.
 - Extra flags: `recruiting` for recruiting templates, `studio_email` for the email format, `rd_docs` for Google Drive and OneDrive doc exports. Without one, that part answers 400 `feature_disabled` or is left out of the list: tell the user which part is off and carry on with the rest.
 
@@ -65,9 +65,9 @@ Check what exists first: `studio_templates(operation="list", template_type="audi
 
 The copy gets the source's latest published files (else its draft) and its datasets as draft version 1. Pages and links are not copied.
 
-To start from a starter, list the gallery with `studio_templates(operation="starters-list")` (each has `slug`, `name`, `type`, `format`, `description`, `showcases`) and copy one:
+To start from the Kenso template library, search it with `studio_templates(operation="starters-list", q="deal room")` (filters `type`, `category`, `needs` and `featured`; each template has `slug`, `name`, `type`, `format`, `description`, `category`, `tags`, `needs`, `coverUrl` and `samples` with a preview `url`). Read one's sections and recipe with `studio_docs(operation="starters-get", slug="deal-room")`, then copy it:
 
-`studio_templates(operation="create", starter_slug="rd-doc", name="Campaign we built for you")`
+`studio_templates(operation="create", starter_slug="deal-room", name="Deal room for Brightwave")`
 
 To start blank: `studio_templates(operation="create", name="Pipeline teardown", template_type="audit", template_format="page")`.
 
@@ -82,7 +82,9 @@ The bundle is `studio.json`, `template.liquid`, an optional `fallback.liquid`, `
 - With no shell (Claude Desktop, claude.ai, ChatGPT), keep the files in the conversation and send them inline in `text_files`. Add an image from a public URL with `files={"assets/logo.png": {"fromUrl": "https://example.com/logo.png"}}` (5 MB at most).
 - Reference assets as `{{ asset_url | append: '/logo.png' }}`, never as a relative `assets/logo.png`.
 - Recipe prompts use facts from their inputs only. Put a `requires` on every prompt that writes from a search or tool result, so an empty result falls back instead of inventing people.
-- Recipes cannot read Knowledge yet: `knowledge.*` is empty at fill time, so a `knowledge.*` bind always falls back. Put offer text in the prompt or a dataset instead.
+- Recipes read Knowledge through the `knowledge.context` pack: bind `knowledge.stable` (instructions, company files, the same for every account) or `knowledge.scoped` (the page's account's files, signals and facts). There is no flat `knowledge.offer`, so that bind falls back. With the `knowledge` flag off the pack is empty and a `knowledge.*` bind falls back too.
+
+**Brand kit.** Style the page from the workspace brand kit, never from a color or font you pick: `brand.colors.primary`, `brand.colors.accent`, `brand.fonts.heading`, `brand.fonts.body`, `brand.logo_url`, `brand.icon_url` and `brand.name`. Any of them can be null, so give each a `| default:`, assigned once at the top of `template.liquid`: `{%- assign accent = brand.colors.primary | default: '#4f00d0' -%}`. Never hard-code a brand color or font the kit has. Read the kit with `studio_docs(operation="brand-kit-get")` (flag `brand_kit`). When it is empty, offer `studio_docs(operation="brand-kit-suggest")`, which reads the workspace's website and saves nothing, and save only what the user agrees to with `studio_docs(operation="brand-kit-update", fill_empty_only=True, ...)`.
 
 ## Step 4 - Validate, then push
 
@@ -142,7 +144,7 @@ Publish refuses with 409 `invalid_state` on validation errors (each detail names
 | Rename, retype, change format, slug or description | `studio_templates(operation="update", template_id=41, changes={"name": "Site notes"})`. Files change only through push |
 | Version history | `studio_templates(operation="list-versions", template_id=41)`: status, `builtBy` (`ken` or `customer_agent`) and validation per version |
 | One version | `studio_templates(operation="get-version", template_id=41, version_id=57)` for its file list and manifest; `studio_templates(operation="pull", template_id=41, version=57)` for its files |
-| Go back to an older version | pull that version, push its files with `delete_missing=True` (binaries come back as download links: upload them again), validate, preview, publish. There is no restore operation, and live pages move only with `update_live` |
+| Go back to an older version | `studio_templates(operation="restore-version", template_id=41, version_id=57)` copies that published version's files, binaries included, into the draft as a new version. It does not publish: validate, preview, then publish. Live pages move only with `update_live` |
 | Move one page to the new version | `studio_pages(operation="update-version", asset_id=901)`: a live page refills only the changed steps and stays on its links. Costs like a refill, so ask first |
 | Copy a template | `studio_templates(operation="duplicate", template_id=41)` |
 | Delete | only when the user asks. `studio_templates(operation="delete", template_id=41)` fails while pages are live; `force=True` retires them first, so ask before you send it |
@@ -166,7 +168,7 @@ Pinning, unpinning or pinning an email template to a sequence step changes what 
 - Publish, `update_live`, `update-version`, `force=True` and dataset deletes change live pages: ask first and say the cost.
 - Never invent prices, customers, numbers or quotes in fallbacks, samples or prompts. Fallbacks read only Kenso variables.
 - Vendor names (the scraper, the search provider, the model) never appear on a page a prospect reads.
-- Prospects never read "reverse demo" or "demo": the starters ban both in their grade checks; keep that.
+- Prospects never read "reverse demo" or "demo": the Kenso template library bans both in its grade checks; keep that.
 - A structural change to a live template (new sections, new slots, a new recipe) is a new version and a publish, never a hand edit on single pages.
 - Every write is recorded as the connected user through your client, for example "Maya via Claude Code". A script that calls the MCP endpoint directly sends the header `X-Ken-Mcp-Client` with its client name.
 
@@ -176,9 +178,7 @@ Previews, validation, pushes, hosting and PDFs are free. Publishing is free. Pag
 
 ## What this skill cannot do yet
 
-- Recipes cannot read Knowledge (`knowledge.*` is empty), so the offer and proof come from prompts and datasets.
-- No email starter is in the gallery; email templates start blank.
-- No restore operation for an old version: pull and push its files instead.
+- No email template is in the Kenso template library; email templates start blank.
 - `enrich.email` is not available as a recipe tool: its slot always falls back.
 
 ## References

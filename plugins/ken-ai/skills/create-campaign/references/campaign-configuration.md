@@ -58,6 +58,7 @@ Writable here with `campaigns(operation="update", ...)`:
 | `sending_start_time` / `sending_end_time` | `"09:00"` / `"17:00"` when agreed |
 | `sending_timezone` | `America/New_York` for a fixed zone, or `"prospect"` for a window local to each lead |
 | `ramp_up_days` | 0-30 scheduled sending days; only when the user asks for a ramp |
+| `excluded_countries` | The plan's excluded countries as ISO codes or names (`["DE", "Austria"]`); `[]` (default) blocks none. Imports drop a lead from a listed country and the sequencer skips one already on the campaign. Each call replaces the whole list |
 
 A campaign created without a schedule gets the house window (Mon-Fri 10:00-18:00 ET). Gap-fill picks up a schedule or daily-cap change on its next pass, about every 10 minutes.
 

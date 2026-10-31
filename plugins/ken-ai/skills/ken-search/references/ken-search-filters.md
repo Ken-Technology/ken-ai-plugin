@@ -42,6 +42,8 @@ This page is the filter metadata for the skill. Do not call `search(operation="g
 - `foundedYear` - `{ "min": N, "max": N }`
 - `companyFundingAmount` - `{ "min": N, "max": N }`, total funding raised by the current company in whole USD (each bound optional, at least 0, min no greater than max)
 - `companyFundedWithinDays` - Integer 1-3650: the current company last raised within this many days
+- `companyWebTechAny` / `companyWebTechAll` / `companyWebTechExclude` - Technology keys Kenso found for the current company's domain (its website's pages, DNS records and job posts): any of, all of, none of. Look the keys up with `saved_searches(operation="list-web-technologies")` (a 400 means the technology filters are not launched yet). Exclude only matches companies with at least one detected technology
+- `companyWebTechCategories` - Technology category keys from `saved_searches(operation="list-web-technologies", kind="category")`: the company runs any technology in one of them
 - `companyTypes` - `"Public Company"`, `"Privately Held"`, `"Non Profit"`, `"Government Agency"`, `"Sole Proprietorship"`, `"Partnership"`, `"Educational Institution"`, `"Self Employed"`
 - `companyHeadquarters` - HQ locations (e.g. `["United States"]`; only the 6 supported countries)
 - `excludeCompanyHeadquarters` - Exclude companies headquartered here
@@ -105,6 +107,8 @@ Supported countries: United Kingdom, United States, Canada, Ireland, New Zealand
 - `fundingRoundTypes` / `excludeFundingRoundTypes` - e.g. `["Series A", "Seed"]`
 - `fundingAmount` - `{ "min": N, "max": N }` in USD
 - `raisedFundingRecently` + `raisedFundingWithinDays` (default 180, max 3650)
+- `webTechAny` / `webTechAll` / `webTechExclude` - Technology keys Kenso found for the company's domain (its website's pages, DNS records and job posts): any of, all of, none of. Look the keys up with `saved_searches(operation="list-web-technologies")` (a 400 means the technology filters are not launched yet). Exclude only matches companies with at least one detected technology
+- `webTechCategories` - Technology category keys from `saved_searches(operation="list-web-technologies", kind="category")`: the company runs any technology in one of them
 - `headcountGrew` + `minHeadcountGrowthPct`, `headcountDeclined` + `minHeadcountDeclinePct`, `crossedSizeBandUp`, `enteredSizeBands`
 - `newlyFounded` + `newlyFoundedWithinYears`
 - `leadershipChange` - `{ "types": [...], "seniorityLevels": [...], "months": N }`

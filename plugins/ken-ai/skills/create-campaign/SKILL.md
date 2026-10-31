@@ -22,7 +22,7 @@ The work runs in stages. Each stage produces one thing, ends at a gate where a p
 ## Step 0 - Preflight
 
 1. **Workspace.** `workspace(operation="list")` once. When the user can see more than one workspace, ask which one and send its id as `client_id` on every call.
-2. **Can this caller build campaigns?** The skill needs `campaigns(operation="create")`. If the campaigns tools are missing, or a write answers 403 `permission`, the user's role cannot build campaigns: stop with one sentence and send them to https://app.ken.so/campaigns. A 404 on every id means a feature is off or hidden for this caller, not that the data is missing: stop that part, never retry it as "not found".
+2. **Can this caller build campaigns?** The skill needs `campaigns(operation="create")`. If the campaigns tools are missing, or a write answers 403 `permission`, the user's role cannot build campaigns: stop with one sentence and send them to https://app.ken.so/<workspace id>/campaigns. A 404 on every id means a feature is off or hidden for this caller, not that the data is missing: stop that part, never retry it as "not found".
 3. **What is on.** These parts are optional and depend on the workspace:
 
 | Part | Needs | When it is off |
@@ -30,8 +30,8 @@ The work runs in stages. Each stage produces one thing, ends at a gate where a p
 | Campaign notes saved in Knowledge (plan, strategies, voice cards) | the `knowledge` feature | keep the notes in the chat and say they are not saved |
 | A recruiting campaign for a role | the `recruiting` feature (`roles`) | build a normal campaign or stop |
 | LinkedIn steps | LinkedIn accounts connected | email-only campaign |
-| Assigning inboxes from here | staff only | the user assigns inboxes at https://app.ken.so/campaigns/<campaign id> |
-| Placement tests | workspace admins | the check reports "not checked" |
+| Assigning inboxes from here | staff only | the user assigns inboxes at https://app.ken.so/<workspace id>/campaigns/<campaign id> |
+| Placement tests | Delivery view to read them, Delivery edit to start one (never a client seat); 2 a day and 8 in 30 days per workspace | the check reports "not checked" |
 | HTML steps | the `html_steps` feature | plain steps (the default) |
 
 4. **New or existing.** If the user names an existing campaign, read it with `campaigns(operation="get", campaign_id=...)`, then `segments(operation="list", campaign_id=...)`, and start at the first stage whose output is missing (see "Picking up a campaign" below).
@@ -116,7 +116,7 @@ Done when each variable's samples read well to the user.
 
 ### 8. Configuration
 
-Open `campaign-configuration`. It applies the settings the plan needs (contact limit, schedule, daily cap, AI workflows), runs the search import into the campaign, and checks what can only be set in the app. Inbox assignment from here is staff-only; everyone else assigns inboxes at https://app.ken.so/campaigns/<campaign id>. Starting the AI workflows (`campaign_flow(operation="start_workflows", ...)`) spends credits: run it only on the user's yes.
+Open `campaign-configuration`. It applies the settings the plan needs (contact limit, schedule, daily cap, AI workflows), runs the search import into the campaign, and checks what can only be set in the app. Inbox assignment from here is staff-only; everyone else assigns inboxes at https://app.ken.so/<workspace id>/campaigns/<campaign id>. Starting the AI workflows (`campaign_flow(operation="start_workflows", ...)`) spends credits: run it only on the user's yes.
 
 Done when every setting matches the plan, or the user has the list of what to change in the app.
 
@@ -124,7 +124,7 @@ Done when every setting matches the plan, or the user has the list of what to ch
 
 Open `verify-campaign`. It is read-only: `campaign_flow(operation="can_launch", campaign_id=...)`, the full checklist (segments, sequences, prompts, workflows, settings, tracking links), the prelaunch gate (domain authentication, warmup, placement, schedule and caps, merge fields render, a 50 to 200 lead canary) and a list audit (duplicates, blocklist, free mail, unverified emails). Each check reports PASS, FAIL or "not checked" with the reason. Fixes go back to the stage that owns them, after a yes.
 
-Done when the report is in the chat. Hand the user the campaign at https://app.ken.so/campaigns/<campaign id> to launch it themselves.
+Done when the report is in the chat. Hand the user the campaign at https://app.ken.so/<workspace id>/campaigns/<campaign id> to launch it themselves.
 
 ## Picking up a campaign
 
@@ -146,10 +146,9 @@ A recruiting campaign fills one role, needs the `recruiting` feature, and is cre
 
 ## What this skill cannot do yet
 
-- A deterministic copy checker is not in the tools yet: review runs the rubric by reading, and `email_copy(operation="grade", ...)` is a model's score, not a lint.
 - Domain authentication is read from the last stored DNS snapshot (`domain_setup(operation="list")`), not checked per message.
 - No tool answers "do we already hold these people" for a whole list across the workspace; only one email at a time. Verify reports the overlap as "not checked".
-- Placement tests are for workspace admins, and inbox assignment from here is staff-only.
+- A workspace can start 2 placement tests a day and 8 in 30 days, and a client seat cannot start one. Inbox assignment from here is staff-only.
 
 ## Report back
 

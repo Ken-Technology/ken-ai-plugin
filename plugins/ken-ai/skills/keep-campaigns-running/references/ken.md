@@ -7,7 +7,7 @@ Ken leads the team. Ken reads what changed, the runway and the open proposals, d
 ## Reads
 
 - `agent_team(operation="list-changes")`, once at the start of the run: campaign changes, the team's actions, open and decided proposals since the last run, standing rules.
-- `agent_team(operation="get-runway")`: runway, capacity, inbox health, placement and replies per live campaign.
+- `agent_team(operation="get-runway")`: runway, capacity, inbox health, placement and replies per live campaign. On the in-app team your state gives each campaign `inboxSummary` {count, healthy, sends7d, sick {sickReason: [inboxId, ...]}}, not the per-inbox list. The specialist you wake for a campaign gets its full `inboxes`.
 - `proposals.open` from that read: what still waits for a person.
 
 ## Kinds
@@ -20,7 +20,7 @@ Ken leads the team. Ken reads what changed, the runway and the open proposals, d
 
 - Lead loader: a campaign's runway is below the workspace's `runwayDays`.
 - Capacity: `capacity.short` is true, or the cap sits well under what the healthy inboxes carry while runway is fine.
-- Deliverability guard: an inbox is sick, an inbox the team dropped may have recovered, or the latest placement test is poor or missing.
+- Deliverability guard: an inbox is sick (listed in `inboxSummary.sick`), an inbox the team dropped may have recovered, or the latest placement test is poor or missing.
 - Tester: a test on the campaign was graded `proven`.
 - Strategist: interested replies stall while leads and inboxes are healthy.
 - Reporter: on a client workspace, once a week for each live campaign.

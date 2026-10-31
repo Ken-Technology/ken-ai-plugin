@@ -11,7 +11,7 @@ Once a week, or when someone asks, keep every live campaign in the workspace wit
 
 Every call takes `client_id`, the workspace id. Send it when the user can see more than one workspace. These operations sit behind the `agent_templates` flag: while it is off they answer not found. Say the team is not on for this workspace yet, and stop.
 
-On Ken's in-app team, your first message already carries the workspace's state. Return your actions and proposals (the same kinds, args and reasons) in your turn result instead of calling the operations below, and only the kinds your role's brief allows.
+On Ken's in-app team, your first message already carries the workspace's state. Return your actions and proposals (the same kinds, args and reasons) in your turn result instead of calling the operations below, and only the kinds your role's brief allows. A turn about one campaign carries that campaign's full `inboxes` list. A turn without a campaign (Ken's plan and summary, the client update, a reply in a thread) gives each campaign `inboxSummary` instead: `count`, `healthy`, `sends7d` and `sick`, the sick inbox ids by `sickReason`.
 
 ## Start
 
@@ -35,7 +35,7 @@ Go through each live campaign with each specialist's checks. Each brief in `refe
 
 ## Rails
 
-Change campaigns only through `agent_team(operation="create-action")`. A result of `proposed` is normal: Ken turned it into a card for a person. Never retry it as another action. Everything else (copy, angles, new tests, schedule changes) is `create-proposal`. Never call other write operations on campaigns, sequences, inboxes or contacts. On a client workspace, a schedule or volume change needs the client's yes: put the person's sourced words in `clientYes`, or leave it out and say so in the reason.
+Change campaigns only through `agent_team(operation="create-action")`. A result of `proposed` is normal: Ken turned it into a card for a person. Never retry it as another action. Everything else (copy, angles, new tests, schedule changes) is `create-proposal`. Never call other write operations on campaigns, sequences, inboxes or contacts. On a client workspace, a schedule or volume change needs the client's yes: put the person's sourced words in `client_yes`, or leave it out and say so in the reason.
 
 ## Finish
 

@@ -24,7 +24,7 @@ Every call takes `client_id`, the workspace id. Send it on every call when the u
 
 Studio is in beta behind the workspace's `studio` flag, and its operations are staff exposure until the flag is on for the workspace.
 
-- If `studio_pages` is not in your tool list, or `studio_templates(operation="list")` answers 404, Studio is not on for this workspace. Say so in one sentence and point to https://app.ken.so/demo/studio. Do not retry, and never read the 404 as "not found".
+- If `studio_pages` is not in your tool list, or `studio_templates(operation="list")` answers 404, Studio is not on for this workspace. Say so in one sentence and point to https://app.ken.so/<workspace id>/demo/studio. Do not retry, and never read the 404 as "not found".
 - A 404 on one id while other calls work means another workspace's id or a deleted one.
 - Recruiting pages need `recruiting`; Google Drive and OneDrive doc exports need `rd_docs`; research refreshes need `accounts_research`. Tell the user which part is off and carry on with the rest.
 
@@ -55,7 +55,7 @@ Read the template's files with `studio_templates(operation="pull", template_id=4
 | `role-pitch`, role pitch for one candidate | `role` | `role-pitch.md` |
 | `roles-for-you`, roles for you | `roles` | `roles-for-you.md` |
 
-`studio_templates(operation="starters-list")` lists the gallery's current starters. The workspace's own `studio.json` always wins over a guide: a copy may have changed slots or steps. For a template that matches no starter, build the same table yourself from `slots` (required, limits, fallback) and `recipe` (which step fills each slot, and from what).
+`studio_templates(operation="starters-list")` searches the Kenso template library, and `studio_docs(operation="starters-get", slug="deal-room")` reads one template's sections and recipe. The workspace's own `studio.json` always wins over a guide: a copy may have changed slots or steps. For a template that matches no starter, build the same table yourself from `slots` (required, limits, fallback) and `recipe` (which step fills each slot, and from what).
 
 ## Step 2 - Pick the accounts and check their data
 
@@ -68,8 +68,6 @@ Then check what the fill guide says the fields read, before you spend anything:
 - **Datasets** for `benchmark-report` and `case-study`: `studio_templates(operation="datasets-list", template_id=41)`.
 - **Template settings** such as the event details or a webhook endpoint: a template still holding a starter's example values is not ready to run.
 - **Kenso Search** finds people only in the United States, the United Kingdom, Canada, Australia, Ireland and New Zealand.
-
-Recipes cannot read Knowledge yet (`knowledge.*` is empty at fill time), so the fill never uses the workspace's Knowledge files.
 
 ## Step 3 - Choose who writes, estimate, run
 
@@ -90,6 +88,8 @@ With `"ken"`, estimate first and show the user the number: `studio_pages(operati
 
 Create the run with `executor="agent"`; its pages wait in `draft`. Then open the fill guide for this path, `load_skill("studio-asset", reference="references/studio-fill.md")`, and fill one page at a time: `studio_pages(operation="prepare", asset_id=901)` runs the data steps and returns your instructions, you write the prompt slots from the inputs only, grade them yourself in a separate call, and `studio_pages(operation="submit", asset_id=901, data={...}, grade_results=[...], version_id=57)`. Report every grade verdict truthfully: a failed one sends the page to review.
 
+**Brand kit.** A page styles itself from the workspace brand kit through the template: `brand.colors.primary`, `brand.colors.accent`, `brand.fonts.heading`, `brand.fonts.body`, `brand.logo_url`, `brand.icon_url` and `brand.name`, each with a `| default:` (the template's `assign` pattern). Never hard-code a brand color or font in `data` or `customize` when the kit has one. Read it with `studio_docs(operation="brand-kit-get")` (flag `brand_kit`). When it is empty, offer `studio_docs(operation="brand-kit-suggest")` (reads the website, saves nothing) and save only what the user agrees to with `studio_docs(operation="brand-kit-update", fill_empty_only=True, ...)`. A page follows the live kit until its first link goes out, then keeps that brand: a later kit change, refill or `update_live` run never restyles a page that was sent.
+
 ## Step 5 - Follow the run and gate each page
 
 Follow it with `studio_pages(operation="run-get", run_id=77)`: `state` (`queued`, `running`, `completed`, `failed`, `cancelled`), counts, and each page's state. A fill takes minutes: check back with gaps, not in a loop. List the results with `studio_pages(operation="list", template_id=41, state="ready,needs_review,failed")`.
@@ -102,7 +102,7 @@ Read each page with `studio_pages(operation="get", asset_id=901)`: `data`, `slot
 4. Confidentiality: no email address or phone number except the sender's own, no other client's names or data, no vendor or tool names, no "demo".
 5. You read it once through `previewUrl`, on desktop and mobile.
 
-A `needs_review` page failed a grade after its retries or holds data that broke a rule. Refill it once (`studio_pages(operation="refill", asset_id=901)`, charged like a fill), or ask a person to review it on its Customize screen (https://app.ken.so/demo/studio/pages/901/customize): their save there moves it to `ready`; your own `customize` edit does not.
+A `needs_review` page failed a grade after its retries or holds data that broke a rule. Refill it once (`studio_pages(operation="refill", asset_id=901)`, charged like a fill), or ask a person to review it on its Customize screen (https://app.ken.so/<workspace id>/demo/studio/pages/901/customize): their save there moves it to `ready`; your own `customize` edit does not.
 
 ## Step 6 - Create the links
 
@@ -139,9 +139,19 @@ For a campaign's pages, `studio_pages(operation="asset-engagement-get", campaign
 
 ## After it ships
 
-- **Hand edits:** `studio_pages(operation="customize", asset_id=901, overrides={"headline": "Six people who should hear about Fernway first"})`. Overrides merge over the fill; a null value removes one; `reset=True` drops them all. A live page is republished with the edit.
+- **Hand edits:** `studio_pages(operation="customize", asset_id=901, overrides={"headline": "Six people who should hear about Fernway first"})`. Overrides merge over the fill; a null value removes one. `studio_pages(operation="customize", asset_id=901, reset=True)` drops them all, with the page's own layout and Kenso-value overrides. A live page is republished with the edit. Errors: 400 `unknown_slot`, `link-domain-blocked`, or a value that breaks its slot schema.
+- **Edit one page's layout** (its text, sections, styles or images, on this page only; the template and the other pages stay as they are):
+  1. Read: `studio_pages(operation="get", asset_id=901, include_source=True)`. `data.source.template` is the page's `template.liquid` (its own copy when `source.own` is true, else its version's), `source.sections` its sections list, `source.token` the save token.
+  2. Edit `source.template` as text. Change only what the ask needs, so the next template update merges cleanly.
+  3. Save: `studio_pages(operation="customize", asset_id=901, layout={"template": "<the whole edited template>"}, expected="<source.token>")`. Add `"sections": [{"id": "hero", "label": "Hero"}]` when you add, remove or reorder `data-section` elements. Validation errors come back like a push's (`file:line` and the rule): fix and save again.
+  4. A `409` with `concurrent_change` means the page was saved after your read: read it again and re-apply your edit to the new source. Never resend your old template.
+  - A new image: `studio_docs(operation="create-upload-url", asset_id=901, path="assets/hero.png", content_type="image/png", size_bytes=48213)` returns `uploadId`, `url`, `headers` and `path`, the name the API gave the image (`assets/hero-1a2b3c4d5e6f.png`). PUT the bytes to `url` with exactly the returned `headers`, then save with `layout={"template": "<the edited template>", "files": {"assets/hero-1a2b3c4d5e6f.png": {"uploadId": "<uploadId>"}}}`, where the template shows it as `<img src="{{ asset_url | append: '/hero-1a2b3c4d5e6f.png' }}" alt="">`. Use the returned `path`, not the one you asked for: any other key is `invalid_path`. `{"assets/hero-1a2b3c4d5e6f.png": null}` removes one.
+  - An image already on the web: `"files": {"assets/hero.png": {"fromUrl": "https://..."}}` makes Kenso fetch it (png, jpg, gif, webp or avif, at most 5 MB, 20 a save). Kenso stores it under a new name such as `assets/hero-1a2b3c4d5e6f.png`. Write the template with the name you asked for (`<img src="{{ asset_url | append: '/hero.png' }}" alt="">`): the same save rewrites that reference to the stored name, and the answer's `data.layout.renamed` maps each requested path to its stored one (`{"assets/hero.png": "assets/hero-1a2b3c4d5e6f.png"}`). Only a reference after the `/` that follows the `asset_url` output tag, after `append: '/`, or after a quote, and ending at a quote, `)`, `?`, `#`, `,`, `>` or a space, is rewritten; a URL on another host is left alone.
+  - Kenso values on this page only: `ken_overrides={"account": {"name": "Fernway Health"}, "brand": {"colors": {"primary": "#0f766e"}}}` (account `name`, `domain`, `industry`, `size_band`; sender `name`, `first_name`, `last_name`, `title`; brand `logo_url`, `name` (the name templates show; `product_name` does the same), `colors`, `fonts`). `logo_url` must be under `https://api.ken.so/media/`: the page blocks images from other hosts. A null value removes one; a null group (`{"brand": null}`) drops that group. `person.*` stays per link.
+  - Back to the template: `reset_layout=True` drops the page's layout, `reset_ken_overrides=True` its Kenso-value overrides.
+  - A page with its own layout stays on its version when the template publishes. `studio_pages(operation="update-version", asset_id=901)` merges the new version into it and returns the run with `layoutMerge` (`clean` or `identical`). The run merges again when it finishes, so read the page after it and check `layoutConflict`. A `409` with `layout_conflict` lists the clashing lines and moved nothing: ask the user, then call again with `layout="keep"` (stay on this version; returns `{"kept": true}`, no run and no charge; a page a run is filling answers `studio_page_building`, so wait for the run and read the page first) or `layout="take"` (drop this page's layout for the new version; its slot overrides stay).
 - **Refill:** `studio_pages(operation="refill", asset_id=901)` reruns the recipe with Kenso's executor, charged like a fill. A live page keeps its links.
-- **New template version:** `studio_pages(operation="update-version", asset_id=901)` moves one page to the latest published version and refills only what changed. Ask first: it is charged.
+- **New template version:** `studio_pages(operation="update-version", asset_id=901)` moves one page to the latest published version and refills only what changed. Ask first: it is charged. A page with its own layout merges first; see "Edit one page's layout" for a `layout_conflict`.
 - **Retired** pages (30 days after the account's last activity) come back with `republish` for 1 credit.
 
 ## Sample campaign for a prospect
@@ -169,7 +179,6 @@ When a prospect asks to see the work, build them a real sample: their campaign, 
 
 ## What this skill cannot do yet
 
-- Studio fills cannot read Knowledge, so the offer and proof come from the template, its datasets or its endpoint.
 - No tool checks a page for leaked data or poached leads: you read the page's `data` yourself (Step 5).
 - No tool sets a new workspace's plan, so a separate sample workspace needs a person to confirm it is on the Free plan.
 

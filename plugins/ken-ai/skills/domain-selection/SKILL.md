@@ -11,7 +11,7 @@ Review live sending domains. On a paid plan, search names and order them. Credit
 
 Before any search or order:
 
-1. `billing(operation="billing_subscription", client_id=...)`. Plans that buy Kenso domains, with billing Active or Trialing: Platform (`planType` Platform), Dfy, grandfathered Starter / Growth / Core (all credit plans), and VIP (`planType` Premium, exempt). If Free, or `PLAN_FEATURE_NOT_AVAILABLE`, stop adds: Free cannot buy Kenso domains or inboxes and connects its own inboxes in the app, or upgrades to Platform at https://app.ken.so/settings/billing; show `error.recovery.summary` when present. If `managedByWorkspace` is set (white-label child), record `caps.mailboxes` and `caps.domains`; its credits are run by the parent workspace.
+1. `billing(operation="billing_subscription", client_id=...)`. Plans that buy Kenso domains, with billing Active or Trialing: Platform (`planType` Platform), Dfy, grandfathered Starter / Growth / Core (all credit plans), and VIP (`planType` Premium, exempt). If Free, or `PLAN_FEATURE_NOT_AVAILABLE`, stop adds: Free cannot buy Kenso domains or inboxes and connects its own inboxes in the app, or upgrades to Platform at https://app.ken.so/<workspace id>/settings/billing; show `error.recovery.summary` when present. If `managedByWorkspace` is set (white-label child), record `caps.mailboxes` and `caps.domains`; its credits are run by the parent workspace.
 2. `billing(operation="credits-get", client_id=...)`. Record `exempt` and `display.available`.
 3. `domain_orders(operation="purchase-capacity", client_id=...)`. Read `remaining`, `planDaily`, `planDailyEnforced`, `existingCapacity`, `emailLimit`. `planDaily` is emails/day. Do not compute `emailLimit / 30`.
 4. `planDailyEnforced` true, or missing: daily send is a hard cap. If `remaining` is 0, stop new orders and work with existing domains. `planDailyEnforced` false (credit plans): `remaining` is a planning figure, and credits are the limit.
@@ -33,7 +33,7 @@ Advice is not an order. Search before claiming a name is free.
 - `domain_setup(operation="get_tags", domain_id=...)` - mailbox tags
 - `domains(operation="verify_tracking_dns", domain_id=...)` - only when the user set an open-pixel hostname and asks. It checks the apex record, not the `link.{apex}` click host
 
-Summarize names, status, tracking posture. Domains and inboxes page: https://app.ken.so/delivery?tab=inboxes.
+Summarize names, status, tracking posture. Domains and inboxes page: https://app.ken.so/<workspace id>/delivery?tab=inboxes.
 
 ## 4. Search
 
@@ -45,7 +45,7 @@ Each hit has `price` and a registrar quote, both money objects in minor units (c
 
 What the user pays for the first year:
 
-- Credit plans, when the hit has `priceMillicredits`: that many millicredits (ceil(registrar quote x 1.03) x 50 credits). `renewalPriceMillicredits`, when present, is the yearly renewal.
+- Credit plans, when the hit has `priceMillicredits`: that many millicredits ((ceil(registrar quote x 1.03) + 1) x 50 credits). `renewalPriceMillicredits`, when present, is the yearly renewal.
 - Exempt workspaces, or a hit without `priceMillicredits`: `price` at Stripe checkout. It already includes Kenso's markup, so show it as is.
 
 Show name, the first-year price, and Google/Microsoft availability flags. Do not put Google inboxes on a name that is not Google-available.
@@ -55,6 +55,10 @@ Show name, the first-year price, and Google/Microsoft availability flags. Do not
 Requires workspace admin (backend FullAccess). After the user confirms names, platforms, mailbox identities, forwarding URL, and the total:
 
 On a credit plan, price the cart first: `billing(operation="credit-estimates-create", client_id=..., kind="infra", items=[...])` with one `domain_registration` item per distinct registrar quote (`registrarPriceUsd`), `ken_inbox_monthly` for Google/Microsoft mailboxes, and `azure_domain_monthly` for Azure domains. Show `display.summary`. The order needs the registration plus the first month of its inboxes in available credits. If `sufficient` is false, show `display.availability` and shrink the cart or buy credits first.
+
+**Website question (workspaces with domain pages).** Before you order domains, ask the person: "What should people see when they open these domains? A rebuild of your website (recommended) or a redirect to your website?" A rebuild shows a copy of their home page on every one of these domains; a redirect sends visitors to their website, as today. Never choose for them. Pass the answer as `website_mode`: `page` for the rebuild, `redirect` for the redirect. Where domain pages are on, the order is refused without it; in any other workspace, do not ask and leave `website_mode` out. For a workspace member, the operation `outbound-site-get` is listed only where domain pages are on.
+
+In a workspace with domain pages, `checkout` is refused because it cannot carry the answer. Order there with `domain_orders(operation="domain-orders-create", client_id=..., forwarding_url=..., website_mode=..., domains=[...])`; each domain carries its name, platform, mailboxes and the search hit's registrar quote as is (the operation's full docs list the fields).
 
 `domain_orders(operation="checkout", client_id=..., forwarding_url=..., domains=[...])`
 
@@ -86,9 +90,9 @@ Surface the envelope `message` plus `refusal.code`, metrics, and `remedy`.
 
 | Code | What to tell the user |
 |------|------------------------|
-| `PLAN_FEATURE_NOT_AVAILABLE` | Free cannot buy Kenso infrastructure. Connect your own inboxes in the app, or upgrade to Platform at https://app.ken.so/settings/billing. Show `error.recovery.summary` when present. |
-| `INSUFFICIENT_CREDITS` | Not enough credits for the registration plus the first month of the order's inboxes. Show the message (it carries the credits needed and available). Shrink the cart, or buy credits at https://app.ken.so/settings/billing and retry. Dfy: the Kenso team adds credits. White-label child: ask the parent workspace. |
-| `FREE_CREDITS_NOT_ELIGIBLE` | Free and bonus credits can't pay for domains or inboxes, and the bought credits fall short. Show the message (it carries the credits needed, the credits that can pay, and the free part). Buy credits at https://app.ken.so/settings/billing and retry. Dfy: the Kenso team adds credits. White-label child: ask the parent workspace. |
+| `PLAN_FEATURE_NOT_AVAILABLE` | Free cannot buy Kenso infrastructure. Connect your own inboxes in the app, or upgrade to Platform at https://app.ken.so/<workspace id>/settings/billing. Show `error.recovery.summary` when present. |
+| `INSUFFICIENT_CREDITS` | Not enough credits for the registration plus the first month of the order's inboxes. Show the message (it carries the credits needed and available). Shrink the cart, or buy credits at https://app.ken.so/<workspace id>/settings/billing and retry. Dfy: the Kenso team adds credits. White-label child: ask the parent workspace. |
+| `FREE_CREDITS_NOT_ELIGIBLE` | Free and bonus credits can't pay for domains or inboxes, and the bought credits fall short. Show the message (it carries the credits needed, the credits that can pay, and the free part). Buy credits at https://app.ken.so/<workspace id>/settings/billing and retry. Dfy: the Kenso team adds credits. White-label child: ask the parent workspace. |
 | `INBOX_LIMIT_REACHED` | Show `used` / `limit` / `remaining`. Rebalance existing mailboxes, or upgrade. |
 | "exceeds your daily send capacity" | The cart exceeds remaining daily send on a plan with a hard cap. Shrink it. It is not a mailbox-slot limit. |
 | "workspace mailbox cap" / "workspace domain cap" | White-label child at its parent's cap. Shrink the cart or ask the parent workspace to raise it. |
