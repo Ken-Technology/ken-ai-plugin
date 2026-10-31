@@ -5,7 +5,7 @@ description: Build a cold email campaign from plan to launch-ready - plan, audie
 
 # Create a campaign
 
-This skill takes one campaign from "build a campaign for this ICP and offer" to a Draft campaign in Ken AI that is ready to launch: a plan, the audience, segments, a sequence per segment, reviewed copy, AI variable prompts, settings and a prelaunch check. It ends with a report that says PASS or FAIL per check and a link where the user launches the campaign themselves.
+This skill takes one campaign from "build a campaign for this ICP and offer" to a Draft campaign in Kenso that is ready to launch: a plan, the audience, segments, a sequence per segment, reviewed copy, AI variable prompts, settings and a prelaunch check. It ends with a report that says PASS or FAIL per check and a link where the user launches the campaign themselves.
 
 The work runs in stages. Each stage produces one thing, ends at a gate where a person says yes, and has a stage reference that holds its full rules. This body is the map: open the stage reference when you reach the stage, and follow it.
 
@@ -15,7 +15,7 @@ The work runs in stages. Each stage produces one thing, ends at a gate where a p
 - **A client's live campaign needs that client's yes.** Any schedule, volume, pause or sequence change on a client's campaign that is already sending needs a yes that names that client, with its source (who said it, where, when). Pass the source in `sending_days_requested_by` on `campaigns(operation="update", ...)`. Without it, leave the change undone and say what you need.
 - **Never invent.** No prices, times, offers, pay, case studies, metrics or lead magnets that the workspace's own material does not show. Ask, or leave it out.
 - **Replies, not opens.** Goals and results are replies, positive (interested) replies and clicks. Replies are distinct contacts; an out-of-office is not a reply; opens are never a goal or a reported number.
-- **No vendor names to clients.** Never name the email-finding, verification or sending providers behind Ken AI.
+- **No vendor names to clients.** Never name the email-finding, verification or sending providers behind Kenso.
 - **A structural copy change is a new version.** On a live campaign, improved copy replaces the live steps and is checkpointed as a version. Never add it as a Variant B: variants are live A/B arms that send.
 - **A funding round is not a buying event.** Write to the plan the money pays for, never "congrats on the raise".
 
@@ -155,6 +155,6 @@ A recruiting campaign fills one role, needs the `recruiting` feature, and is cre
 
 After each gate, one short status: the stage, what was written (ids), what waits on the user. At the end: the campaign id and name, each segment with its sequence and review score, the AI variables per segment, the settings applied and the ones left for the app, the verify report, and the link to launch.
 
-## No Ken account yet
+## No Kenso account yet
 
-These steps run on the Ken MCP server, which signs in with a Ken account. If the user has none, send them to https://app.ken.so/get-started to create one, then sign in when the agent asks.
+These steps run on the Kenso MCP server, which signs in with a Kenso account. If the user has none, send them to https://app.ken.so/get-started to create one, then sign in when the agent asks.

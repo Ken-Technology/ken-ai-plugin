@@ -1,8 +1,8 @@
 {
   "name": "ken-ai-plugin",
-  "description": "Ken AI plugins for Claude Code - the skills Ken's own agents run, for your Ken workspace, through the Ken MCP server.",
+  "description": "Kenso plugins for Claude Code - the skills Kenso's own agents run, for your Kenso workspace, through the Kenso MCP server.",
   "owner": {
-    "name": "Ken AI",
+    "name": "Kenso",
     "email": "development@ken.so"
   },
   "plugins": [
@@ -10,7 +10,7 @@
       "name": "ken-ai",
       "source": "./plugins/ken-ai",
       "version": "2.1.0",
-      "description": "Ken AI skills for Claude Code and other coding agents: build cold email campaigns, handle replies, report results and keep sending healthy in your Ken workspace, through the Ken MCP server."
+      "description": "Kenso skills for Claude Code and other coding agents: build cold email campaigns, handle replies, report results and keep sending healthy in your Kenso workspace, through the Kenso MCP server."
     }
   ]
 }

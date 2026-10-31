@@ -1,6 +1,6 @@
 # free-distribution (retired)
 
-The hand-kept overrides that used to build `Ken-Technology/cold-email-skills` are gone, and so are `scripts/build-free.mjs` and the workflow that published them. One generator in ken-backend now writes the public tree from Ken's MCP skills (`mcp/src/ken_mcp/skills`):
+The hand-kept overrides that used to build `Ken-Technology/cold-email-skills` are gone, and so are `scripts/build-free.mjs` and the workflow that published them. One generator in ken-backend now writes the public tree from Kenso's MCP skills (`mcp/src/ken_mcp/skills`):
 
 ```bash
 cd mcp && uv run python scripts/build_skill_packages.py write --files-out <new empty dir>

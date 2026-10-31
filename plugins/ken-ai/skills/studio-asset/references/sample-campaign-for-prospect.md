@@ -33,7 +33,7 @@ If you cannot name their buyers from a real source, stop and say exactly what is
 
 ## 4. Build the sample page
 
-Use the `rd-doc` starter (a doc with strategy, segments, a planning funnel, 8 to 10 real leads from Ken Search and the first emails, downloadable as a PDF), or `rd-ken-native` for a lighter one-page version. Open its fill guide first (`references/rd-doc.md` or `references/rd-ken-native.md`): it lists what the page needs and why a page falls back.
+Use the `rd-doc` starter (a doc with strategy, segments, a planning funnel, 8 to 10 real leads from Kenso Search and the first emails, downloadable as a PDF), or `rd-ken-native` for a lighter one-page version. Open its fill guide first (`references/rd-doc.md` or `references/rd-ken-native.md`): it lists what the page needs and why a page falls back.
 
 1. Find the workspace's template: `studio_templates(operation="list", template_type="reverse_demo")`. With none, building one from the starter is the `studio-template` skill.
 2. Estimate and run it on the one account:
@@ -54,7 +54,7 @@ Read it with `studio_pages(operation="get", asset_id=901)`. Every check must pas
 
 - **Grade:** the page is `ready` and its latest grade passed. A `needs_review` page never goes out.
 - **Filled:** every slot the page shows is `filled`, not on its fallback. On `rd-doc` only `dossier`, `why_now` and `offer` may be empty.
-- **Real numbers:** every number is real. The audience and lead counts come from what Ken Search returned; the funnel is labeled as planning numbers; claims about the prospect's customers or results appear on their site word for word.
+- **Real numbers:** every number is real. The audience and lead counts come from what Kenso Search returned; the funnel is labeled as planning numbers; claims about the prospect's customers or results appear on their site word for word.
 - **Confidentiality:** no email address or phone number of any lead (names and LinkedIn URLs prove the work; finding emails is the paid part), no other client's name, data or results, no vendor or tool names, and never "demo" or "reverse demo".
 - **No poaching:** no lead works at the prospect itself, at your own company, or at one of your clients.
 - **Read it:** open `previewUrl` once, top to bottom, on desktop and mobile.
@@ -78,5 +78,5 @@ In under 12 lines: who replied and what they said (quoted), which campaign it ca
 | The reply is not a real ask | stop; say what it was |
 | Research too thin to name their buyers | stop; say what is missing |
 | The page fails the gate after one refill | stop; no link, no draft that promises a sample |
-| Their buyers sit outside Ken Search's countries (United States, United Kingdom, Canada, Australia, Ireland, New Zealand) | the leads will be empty: say so before you run |
+| Their buyers sit outside Kenso Search's countries (United States, United Kingdom, Canada, Australia, Ireland, New Zealand) | the leads will be empty: say so before you run |
 | A person's draft is already on the thread | leave it; hand over the links |

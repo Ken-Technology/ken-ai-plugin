@@ -21,7 +21,7 @@ The platform runs the data steps now (data steps are charged at rate card) and a
 | Field | What it holds |
 |---|---|
 | `assetId`, `versionId` | the page and the template version this recipe fills. Send `versionId` back as `version_id` on submit |
-| `variables` | Ken variables: `account`, `sender`, `brand`, `link`, `knowledge`. `person` is null: one page serves everyone at the account, and person fields bind per link when the page renders |
+| `variables` | Kenso variables: `account`, `sender`, `brand`, `link`, `knowledge`. `person` is null: one page serves everyone at the account, and person fields bind per link when the page renders |
 | `data` | the slots filled so far: data step outputs plus any slots you sent |
 | `instructions` | the `prompt` and `grade` steps for you, in recipe order |
 | `deferred` | `{stepId, kind, waitsFor}`: steps that wait for a slot an earlier instruction writes (a slot they read or `require`) |
@@ -100,7 +100,7 @@ Submit returns the page. Read `state` and `slotStatus` (`filled`, `fallback` or 
 |---|---|---|
 | `state: "ready"` | done | create links (step 7) |
 | a slot you sent is `failed` | The platform dropped the value: it broke its schema, a rule in step 3, or links to a blocked domain. The page shows that slot's fallback | check the value against `schema` and the rules, fix it, submit again |
-| `state: "needs_review"` | a grade verdict failed, or the data could not be validated | rewrite and resubmit with a passing verdict, or ask the user to review it on the page's Customize screen in Ken: their save there marks it ready (your own customize does not) |
+| `state: "needs_review"` | a grade verdict failed, or the data could not be validated | rewrite and resubmit with a passing verdict, or ask the user to review it on the page's Customize screen in Kenso: their save there marks it ready (your own customize does not) |
 | `state: "failed"` | a required slot has no value and no fallback | write that slot and submit again |
 | a slot stays `fallback` | no step wrote it, or its step was skipped | fine when the fallback reads well; tell the user which slots fell back and why |
 
@@ -113,7 +113,7 @@ Link the page as the `studio-asset` skill describes: `studio_pages(operation="cr
 ## Costs
 
 - No token charge for the `prompt` and `grade` steps: your own model wrote and graded the copy.
-- Data steps the platform ran during prepare are charged at rate card: email found 1 credit, qualification 0.05, personalization 0.3. Today's data steps (`bind`, Ken Search, `chart.data`) cost nothing, scraping is free until the rate card prices it, and `webhook` and `dataset` steps are free. A `ken.copy` tool step is a model call the platform runs, so it costs tokens at 2x model cost on this path too.
+- Data steps the platform ran during prepare are charged at rate card: email found 1 credit, qualification 0.05, personalization 0.3. Today's data steps (`bind`, Kenso Search, `chart.data`) cost nothing, scraping is free until the rate card prices it, and `webhook` and `dataset` steps are free. A `ken.copy` tool step is a model call the platform runs, so it costs tokens at 2x model cost on this path too.
 - Prepare needs the Ask permission. Before it runs a paid step, it checks the balance (402), your monthly credit limit (402 `member_credit_limit_reached`) and takes one unit of the daily page quota (429). On any of these, stop and tell the user; calling prepare again does not help.
 - The page credit comes with its first link, as on every path.
 

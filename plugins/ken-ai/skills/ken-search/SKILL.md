@@ -5,7 +5,7 @@ description: Create and validate people-search filters for the 280M+ contact dat
 
 # Lead Search Skill
 
-Build people-search filters for the Ken AI contact database (280M+ people), check that the lead count fits the campaign, and save the filters as a saved search.
+Build people-search filters for the Kenso contact database (280M+ people), check that the lead count fits the campaign, and save the filters as a saved search.
 
 ## Inputs
 
@@ -109,6 +109,6 @@ Validate and count as for any search. A candidate audience is smaller than a buy
 
 If a step errors, continue when possible and note it. On `plan_limit` or `billing`, surface `error.message` and `error.recovery.summary`; never retry blindly.
 
-## No Ken account yet
+## No Kenso account yet
 
-These steps run on the Ken MCP server, which signs in with a Ken account. If the user has none, send them to https://app.ken.so/get-started to create one, then sign in when the agent asks.
+These steps run on the Kenso MCP server, which signs in with a Kenso account. If the user has none, send them to https://app.ken.so/get-started to create one, then sign in when the agent asks.

@@ -65,7 +65,7 @@ Credits, in plain words: the binds and `scrape.page` are free. The prompt costs 
 
 ## Alpine under the CSP
 
-Studio pages run under a Content Security Policy with no `'unsafe-eval'` and no inline script of their own: only Ken's scripts run inline, each with the response's nonce, and validation refuses a template's inline `<script>` and `on*` handlers (`csp-inline-script`). Standard Alpine turns every directive into code with `new Function`, so it does not run there, and loading it from unpkg fails `csp-script-src`. The only Alpine the policy allows is the CSP build, `https://cdn.jsdelivr.net/npm/@alpinejs/csp@3/dist/cdn.min.js`, which evaluates directives with its own parser. The pattern that works:
+Studio pages run under a Content Security Policy with no `'unsafe-eval'` and no inline script of their own: only Kenso's scripts run inline, each with the response's nonce, and validation refuses a template's inline `<script>` and `on*` handlers (`csp-inline-script`). Standard Alpine turns every directive into code with `new Function`, so it does not run there, and loading it from unpkg fails `csp-script-src`. The only Alpine the policy allows is the CSP build, `https://cdn.jsdelivr.net/npm/@alpinejs/csp@3/dist/cdn.min.js`, which evaluates directives with its own parser. The pattern that works:
 
 1. Load the CSP build with `defer`. There is no inline script to register an `Alpine.data` component in.
 2. Put the state in an `x-data` object literal, with the prefilled numbers printed into it by Liquid.

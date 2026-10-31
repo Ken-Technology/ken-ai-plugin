@@ -28,7 +28,7 @@ What the earlier reverse-demo doc pipeline (before Studio) taught:
 
 | `data-section` | What it holds | Reads |
 |---|---|---|
-| `cover` | Logo or brand name, "An outbound campaign for {account}", who prepared it, the greeting, a "What's inside" list | Ken variables only |
+| `cover` | Logo or brand name, "An outbound campaign for {account}", who prepared it, the greeting, a "What's inside" list | Kenso variables only |
 | `strategy` | The one bet, who it targets and skips, the offer, the channels, the goal | `data.strategy` |
 | `segments` | Bar chart of sends per segment, one card per segment with its A vs B tests | `data.segments`, `data.segment_notes` |
 | `funnel` | Funnel chart for 1,000 sends, the sequence in three steps | `data.funnel`, `data.funnel_notes` |

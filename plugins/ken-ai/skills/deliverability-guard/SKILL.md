@@ -5,7 +5,7 @@ description: Triage deliverability when bounces are up, inboxes look unhealthy o
 
 # Deliverability guard
 
-Use this when "bounces are up", "are my inboxes healthy?" or "why did sends drop?". You read the holds Ken AI already placed, deliverability by domain and inbox, domain health, warmup and blocklists. You apply the thresholds, find what is causing it, and propose a fix. Bad bounces burn domains for every campaign that sends from them, so act on a threshold the same day, but never on your own.
+Use this when "bounces are up", "are my inboxes healthy?" or "why did sends drop?". You read the holds Kenso already placed, deliverability by domain and inbox, domain health, warmup and blocklists. You apply the thresholds, find what is causing it, and propose a fix. Bad bounces burn domains for every campaign that sends from them, so act on a threshold the same day, but never on your own.
 
 Every call takes `client_id`, the workspace id. Send it when the user can see more than one workspace. Dates are ISO-8601 instants (`2026-10-20T00:00:00Z`). Rates come back as fractions from 0 to 1.
 
@@ -34,13 +34,13 @@ Every call takes `client_id`, the workspace id. Send it when the user can see mo
 
 If an operation this skill names is not listed for you, or answers 404, say which check is not available here in one sentence, point to https://app.ken.so/delivery?tab=inboxes, and carry on with the rest. Do not retry a 404 as "not found".
 
-## Step 1 - The holds Ken AI already placed
+## Step 1 - The holds Kenso already placed
 
-`analytics(operation="auto-pauses-list")` lists the inboxes, domains, campaigns and workspace holds Ken AI paused on its own, newest first, from the last 7 days plus any older one still active. Each has a `scope`, a `reason`, the `rate` and `threshold` that tripped it, and `isActive`.
+`analytics(operation="auto-pauses-list")` lists the inboxes, domains, campaigns and workspace holds Kenso paused on its own, newest first, from the last 7 days plus any older one still active. Each has a `scope`, a `reason`, the `rate` and `threshold` that tripped it, and `isActive`.
 
 - `isActive` true means it still blocks sending. `blockedUntil` says until when; a campaign stays paused until someone resumes it.
 - A domain hold blocks that domain's inboxes, not its campaigns.
-- A `workspace` hold blocks every inbox until Ken AI support releases it. Tell the user to contact support.
+- A `workspace` hold blocks every inbox until Kenso support releases it. Tell the user to contact support.
 - `references/auto-pause-reasons.md` says what each reason means and what to check next.
 
 The list is often empty. An empty list means no automatic hold, not that all is well.
@@ -80,7 +80,7 @@ Say which cause the numbers point to, and the numbers. Mark it as your read when
 
 ## Step 6 - Warmup
 
-`inboxes(operation="get-warmup", inbox_id=301)` shows whether warmup is on and how far along it is. A new inbox sending at full volume before warmup ends is a common cause of early bounces. `inboxes(operation="update-warmup", inbox_id=301, enabled=True)` turns warmup on for an inbox that has a warmup subscription. It never enrolls one that has none: that is a Ken AI support step.
+`inboxes(operation="get-warmup", inbox_id=301)` shows whether warmup is on and how far along it is. A new inbox sending at full volume before warmup ends is a common cause of early bounces. `inboxes(operation="update-warmup", inbox_id=301, enabled=True)` turns warmup on for an inbox that has a warmup subscription. It never enrolls one that has none: that is a Kenso support step.
 
 ## Step 7 - Placement tests
 
@@ -109,10 +109,10 @@ After each change, read it back (`campaigns(operation="get", campaign_id=42)`, `
 
 ## What this skill cannot do yet
 
-- Gate bounces per domain. Ken AI pauses inboxes, campaigns and domains on its own for the reasons in the reference, but no per-domain bounce-rate gate exists yet.
+- Gate bounces per domain. Kenso pauses inboxes, campaigns and domains on its own for the reasons in the reference, but no per-domain bounce-rate gate exists yet.
 - Check SPF, DKIM and DMARC on their own. Domain health shows DNS state, but there is no dedicated record check.
 - Run placement tests for every caller. They are for workspace members only.
 
-## No Ken account yet
+## No Kenso account yet
 
-These steps run on the Ken MCP server, which signs in with a Ken account. If the user has none, send them to https://app.ken.so/get-started to create one, then sign in when the agent asks.
+These steps run on the Kenso MCP server, which signs in with a Kenso account. If the user has none, send them to https://app.ken.so/get-started to create one, then sign in when the agent asks.

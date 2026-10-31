@@ -5,15 +5,15 @@ description: Review a member's Today queue - what needs them now, grouped by kin
 
 # Today review
 
-Today in Ken AI is one member's queue for the day: touches waiting for approval or failed, tasks due, meetings, replies waiting, signals, new leads, paused account plans and setup steps. The member sees it at `https://app.ken.so/<workspace id>/today`.
+Today in Kenso is one member's queue for the day: touches waiting for approval or failed, tasks due, meetings, replies waiting, signals, new leads, paused account plans and setup steps. The member sees it at `https://app.ken.so/<workspace id>/today`.
 
 Trigger on "what needs me today?", "clear my queue", "go through my Today", or the start of a member's day.
 
-This skill reads the queue in the member's time zone, groups it, works the touches the member points at (draft, rewrite, grade, snooze, skip), clears the rows they are done with, shows the questions Ken AI asked them, and hands every approval back to them.
+This skill reads the queue in the member's time zone, groups it, works the touches the member points at (draft, rewrite, grade, snooze, skip), clears the rows they are done with, shows the questions Kenso asked them, and hands every approval back to them.
 
 ## The rule: the member approves every send
 
-You draft, rewrite, grade, snooze and skip. Only a person approves. No tool you have approves a touch, retries a failed send, or answers a question Ken AI asked, and the backend refuses agents that try.
+You draft, rewrite, grade, snooze and skip. Only a person approves. No tool you have approves a touch, retries a failed send, or answers a question Kenso asked, and the backend refuses agents that try.
 
 - A touch with a body waits as `awaiting_approval` until the person clicks Approve in Today or on the approval card. Never say a touch was sent or approved because you wrote it: say it waits for their approval, and when it is due.
 - Retrying a failed send is the person's button too.
@@ -29,12 +29,12 @@ Today and touches are in beta. They are staff-only until these flags are on for 
 |---|---|---|
 | Today | `today` get, update | `today` and `accounts` |
 | Touches: read, edit, snooze, skip, undo | `account_touches` list, get, update, snooze, skip, undo | `accounts` |
-| Ken AI writes or grades a touch | `account_touches` draft, rewrite, feedback | `accounts_writer` |
-| Questions Ken AI asks | `ken_questions` list, get | `notifications`, and staff only for now whatever the flags |
+| Kenso writes or grades a touch | `account_touches` draft, rewrite, feedback | `accounts_writer` |
+| Questions Kenso asks | `ken_questions` list, get | `notifications`, and staff only for now whatever the flags |
 
 - `today` is not listed, or answers 404: Today is not on for this workspace. Stop, say so in one sentence, and link `https://app.ken.so/<workspace id>/today`. Do not retry, and do not read the 404 as "nothing to do".
 - 403 `member_required`: Today belongs to a member, and this connection has no person behind it (an opaque API key). Ask the member to connect as themselves.
-- `draft`, `rewrite` or `feedback` missing or 404: the member can still edit text with `update`; say Ken AI drafting is not on for them.
+- `draft`, `rewrite` or `feedback` missing or 404: the member can still edit text with `update`; say Kenso drafting is not on for them.
 - `ken_questions` missing or 404: skip step 5 without comment.
 
 ## Step 1 - Read Today
@@ -84,7 +84,7 @@ Touch row `touch_9001` is touch id `9001`. Read it first: `account_touches(opera
 
 | The member wants | Call | Note |
 |---|---|---|
-| Ken AI to write it | `account_touches(operation="draft", client_id=..., touch_id=9001)` | a planned touch with no body, on email, LinkedIn connect or message, or call. Charged. It lands `awaiting_approval` with a rationale and its sources |
+| Kenso to write it | `account_touches(operation="draft", client_id=..., touch_id=9001)` | a planned touch with no body, on email, LinkedIn connect or message, or call. Charged. It lands `awaiting_approval` with a rationale and its sources |
 | it shorter, warmer, more specific, or in their voice | `account_touches(operation="rewrite", client_id=..., touch_id=9001, instruction="shorter")` | `shorter`, `warmer`, `more_specific`, `in_my_voice`. Charged. Stores nothing: show the result, then save it on a yes |
 | a grade | `account_touches(operation="feedback", client_id=..., touch_id=9001)` | free: a score 0 to 10, a band (`keep`, `rewrite`, `start_over`, `write_first`) and five bars with notes |
 | their own edit saved | `account_touches(operation="update", client_id=..., touch_id=9001, changes={"body": "Hi Maya, ..."})` | from `planned`, `drafted`, `awaiting_approval` or `failed`; a body puts it up for approval |
@@ -129,7 +129,7 @@ Report back: what waits for the member (by group, with counts), what you changed
 ## What this skill cannot do yet
 
 - Read the one approvals queue across lanes: there is no tool for it. Today's touch rows, `data.batches` and the approval card cover what the member approves.
-- Approve, retry a failed send, or answer a question Ken AI asked: those stay with the person, on purpose.
+- Approve, retry a failed send, or answer a question Kenso asked: those stay with the person, on purpose.
 - Act on a reply, a meeting or an account plan from here: use the `reply-handling`, `meeting-prep-and-followup` and `accounts` skills.
 
 ## Troubleshooting
@@ -145,6 +145,6 @@ Report back: what waits for the member (by group, with counts), what you changed
 | `not_draftable` on draft | that channel cannot be drafted | the member writes it |
 | 409 `nothing_to_undo` or `concurrent_change` on undo | something else changed the touch | read it and tell the member |
 
-## No Ken account yet
+## No Kenso account yet
 
-These steps run on the Ken MCP server, which signs in with a Ken account. If the user has none, send them to https://app.ken.so/get-started to create one, then sign in when the agent asks.
+These steps run on the Kenso MCP server, which signs in with a Kenso account. If the user has none, send them to https://app.ken.so/get-started to create one, then sign in when the agent asks.

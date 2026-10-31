@@ -9,7 +9,7 @@ The single source of truth for a campaign's lifecycle status. Every stage that d
 | 0 | Draft | `draft` | Campaign is being configured. Initial state on create. No processing. |
 | 1 | Building | `building` | Backend is preparing the campaign (enrichment, qualification, segmentation). |
 | 2 | Ready | `ready` | Configuration complete, contacts enriched, awaiting send. |
-| 3 | Sending | `active` | Active outreach. Email sequences are being delivered through the Ken sequencer. |
+| 3 | Sending | `active` | Active outreach. Email sequences are being delivered through the Kenso sequencer. |
 | 4 | Paused | `paused` | Sending temporarily halted. Resume returns the campaign to Sending. |
 | 5 | Completed | `completed` | All contacts processed and the sequence has finished for everyone. |
 | 6 | Error | `error` | Backend hit a fatal error and stopped. Requires manual intervention. |

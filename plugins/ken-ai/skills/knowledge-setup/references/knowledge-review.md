@@ -17,12 +17,12 @@ The workspace's review mode decides what goes live by itself. Read it with `know
 | Mode | What waits for a person |
 |---|---|
 | `review_all` | Everything. |
-| `exceptions` (the default) | Skills and instructions, pricing and commercial terms, and company-wide facts and files. The rest goes live once Ken's checks pass, with undo. |
+| `exceptions` (the default) | Skills and instructions, pricing and commercial terms, and company-wide facts and files. The rest goes live once Kenso's checks pass, with undo. |
 | `auto` | Skills and instructions, and pricing. Company-wide changes go live too, except while the auto-approve pause holds. A share of live changes (the spot-check rate) comes back to Review as spot checks. |
 
-Ken pauses auto-approve by itself when people reject too many spot checks. Spot checks a person dismisses in Review count toward that pause; a dismissal through these tools is an agent's decision and does not.
+Kenso pauses auto-approve by itself when people reject too many spot checks. Spot checks a person dismisses in Review count toward that pause; a dismissal through these tools is an agent's decision and does not.
 
-To change the mode or rate (admins): `knowledge_review(operation="settings-update", review_mode="exceptions")`, or `spot_check_rate=0.1`. To lift the pause after an admin agreed: `knowledge_review(operation="settings-update", auto_approve_paused=false)`. Only `false` is accepted: Ken sets the pause itself.
+To change the mode or rate (admins): `knowledge_review(operation="settings-update", review_mode="exceptions")`, or `spot_check_rate=0.1`. To lift the pause after an admin agreed: `knowledge_review(operation="settings-update", auto_approve_paused=false)`. Only `false` is accepted: Kenso sets the pause itself.
 
 ## Read the queue
 

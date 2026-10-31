@@ -1,8 +1,8 @@
-# Ken AI skills for coding agents
+# Kenso skills for coding agents
 
-The skills Ken's own agents run, for your Ken workspace: build campaigns, handle replies, report results and keep sending healthy. The plugin connects the Ken MCP server (`https://mcp.ken.so/mcp`); sign in with your Ken account when your agent asks. Each skill runs on the Ken tools your role can use, and asks before it sends, launches or changes a live campaign.
+The skills Kenso's own agents run, for your Kenso workspace: build campaigns, handle replies, report results and keep sending healthy. The plugin connects the Kenso MCP server (`https://mcp.ken.so/mcp`); sign in with your Kenso account when your agent asks. Each skill runs on the Kenso tools your role can use, and asks before it sends, launches or changes a live campaign.
 
-No Ken account yet? Create one at https://app.ken.so/get-started. For cold email skills that need no account, see [Ken-Technology/cold-email-skills](https://github.com/Ken-Technology/cold-email-skills).
+No Kenso account yet? Create one at https://app.ken.so/get-started. For cold email skills that need no account, see [Ken-Technology/cold-email-skills](https://github.com/Ken-Technology/cold-email-skills).
 
 ## Install
 
@@ -13,7 +13,7 @@ Claude Code:
 /plugin install ken-ai@ken-ai-plugin
 ```
 
-Cursor, Codex, GitHub Copilot CLI, VS Code, Grok Build and any other agent it finds on your machine, skills and Ken MCP server together:
+Cursor, Codex, GitHub Copilot CLI, VS Code, Grok Build and any other agent it finds on your machine, skills and Kenso MCP server together:
 
 ```
 npx plugins add Ken-Technology/ken-ai-plugin
@@ -25,7 +25,15 @@ Skills only, into any agent that reads Agent Skills:
 npx skills add Ken-Technology/ken-ai-plugin
 ```
 
-This copies the skills but not the server: also add the Ken MCP server, `https://mcp.ken.so/mcp`, to your agent ([steps for each agent](https://ken.so/mcp)).
+This copies the skills but not the server: also add the Kenso MCP server, `https://mcp.ken.so/mcp`, to your agent ([steps for each agent](https://ken.so/mcp)).
+
+In Claude Code, for example:
+
+```
+claude mcp add --transport http kenso https://mcp.ken.so/mcp
+```
+
+The server URL has not changed. Configs that already name the server `ken` keep working.
 
 ## Skills
 
@@ -53,7 +61,7 @@ This copies the skills but not the server: also add the Ken MCP server, `https:/
 | `role-intake` | Turn a job link or a few answers into a saved role, then build a campaign that finds candidates for it. |
 | `setup-workspace` | Set up a workspace: company profile, logo, invites, blocklist and integrations links, then your first campaign. |
 | `signal-outreach` | Email companies when a signal fires (hiring, funding, new leaders), gated for free first, with copy about the plan behind it. |
-| `skill-editor` | View, edit, switch on or off and restore the skills in Knowledge > Skills, Ken's defaults included. |
+| `skill-editor` | View, edit, switch on or off and restore the skills in Knowledge > Skills, Kenso's defaults included. |
 | `studio-asset` | Fill a Studio template for an account or candidate, check the page, then create each person's link to use in a touch. |
 | `studio-template` | Build or edit a Studio template: write the bundle, validate it, preview it on real accounts, publish it and manage its versions. |
 | `tam-builder` | Size a market and build the list: every company that fits, why it fits, who to write to, saved with its stats. |

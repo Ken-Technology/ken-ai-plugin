@@ -1,9 +1,9 @@
 {
   "name": "ken-ai",
   "version": "2.1.0",
-  "description": "Ken AI skills for Claude Code and other coding agents: build cold email campaigns, handle replies, report results and keep sending healthy in your Ken workspace, through the Ken MCP server.",
+  "description": "Kenso skills for Claude Code and other coding agents: build cold email campaigns, handle replies, report results and keep sending healthy in your Kenso workspace, through the Kenso MCP server.",
   "author": {
-    "name": "Ken AI",
+    "name": "Kenso",
     "email": "development@ken.so",
     "url": "https://ken.so"
   },
@@ -13,6 +13,7 @@
   "license": "MIT",
   "keywords": [
     "ken-ai",
+    "kenso",
     "cold-email",
     "outbound",
     "campaigns",

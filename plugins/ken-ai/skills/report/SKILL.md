@@ -15,9 +15,9 @@ Every call takes `client_id`, the workspace id. Send it when the user can see mo
 - **Never report opens.** Open tracking is off for deliverability, so open numbers mean nothing.
 - **Three interested replies, or none.** Quote exactly three, from three different people, or leave the section out. Never pad it with a neutral or out-of-office reply.
 - **N/A, never 0, for anything you could not read.** A 0 says nothing happened; N/A says you do not know. Every N/A that only the reader can fill (meetings held, pipeline, cost per meeting) becomes a question under "Where we need you".
-- **No benchmarks yet.** There is no benchmark field in Ken AI, so write N/A for any benchmark row and never quote an "industry average". Use a benchmark only when the user gives you one with its source.
+- **No benchmarks yet.** There is no benchmark field in Kenso, so write N/A for any benchmark row and never quote an "industry average". Use a benchmark only when the user gives you one with its source.
 - **No vendor names.** Never name a sending provider, data vendor, mailbox host or AI model maker in the report. Say "your sending domains", "our data", "the AI".
-- **Names as the app shows them.** Use each campaign's and segment's name exactly as it appears in Ken AI. Never an internal label such as "plan 3" or "v2 series".
+- **Names as the app shows them.** Use each campaign's and segment's name exactly as it appears in Kenso. Never an internal label such as "plan 3" or "v2 series".
 - **Never invent results or work.** Meetings, pipeline, revenue, costs and "what we did this week" come from a tool or from the user. When neither has it, write N/A or leave the line out.
 - **A person sends it.** You draft the report and the cover email. Never send it, and never create a share that emails anyone, without a yes.
 
@@ -27,7 +27,7 @@ Every call takes `client_id`, the workspace id. Send it when the user can see mo
 2. **The campaigns.** `campaigns(operation="list", limit=100)`. Keep every campaign that sent in the window (Step 1 tells you). Name each one as the app does.
 3. **The reader.** Ask who it is for if the user did not say: the client's contact name for the greeting, and the sender's first name for the sign-off.
 
-If an operation this skill names is not listed for you, or answers 404 on a campaign the user named, stop and say: "I can't read those results from here. They are in Ken AI at https://app.ken.so/campaigns/<id>." Do not retry a 404 as "not found", and do not report a campaign as missing because one read failed.
+If an operation this skill names is not listed for you, or answers 404 on a campaign the user named, stop and say: "I can't read those results from here. They are in Kenso at https://app.ken.so/campaigns/<id>." Do not retry a 404 as "not found", and do not report a campaign as missing because one read failed.
 
 ## Step 1 - The numbers
 
@@ -104,6 +104,6 @@ Return the report and the cover email as text in your reply.
 - Compare against a benchmark. There is no benchmark field yet, so benchmarks are N/A.
 - Count meetings held, or read the reader's CRM pipeline. Both are N/A until the reader gives them.
 
-## No Ken account yet
+## No Kenso account yet
 
-These steps run on the Ken MCP server, which signs in with a Ken account. If the user has none, send them to https://app.ken.so/get-started to create one, then sign in when the agent asks.
+These steps run on the Kenso MCP server, which signs in with a Kenso account. If the user has none, send them to https://app.ken.so/get-started to create one, then sign in when the agent asks.

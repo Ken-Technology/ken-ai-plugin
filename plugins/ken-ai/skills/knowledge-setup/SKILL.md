@@ -5,7 +5,7 @@ description: Set up and keep up a workspace's Knowledge - company, offer and pri
 
 # Knowledge setup
 
-Knowledge is what Ken AI knows about a workspace: the company, its offer and prices, who it sells to, its proof and competitors, how its people write, and what its calls and website say. Campaigns and agents read it. Every personalization prompt gets the company folder's files and the Instructions; the reply agent and account research cite it; Knowledge prompts add workspace-wide rules to every campaign's qualification, scoring, personalization and replies.
+Knowledge is what Kenso knows about a workspace: the company, its offer and prices, who it sells to, its proof and competitors, how its people write, and what its calls and website say. Campaigns and agents read it. Every personalization prompt gets the company folder's files and the Instructions; the reply agent and account research cite it; Knowledge prompts add workspace-wide rules to every campaign's qualification, scoring, personalization and replies.
 
 This skill fills Knowledge in and keeps it true. It also holds the four playbooks it replaced, which work with or without Knowledge.
 
@@ -31,7 +31,7 @@ Each playbook reads on its own and names its own references, which load the same
 - **Edit sections, keep files.** `section={"heading": "Pricing", "body": "..."}` changes one heading and leaves the rest. A restructure is a new version of the same file, never a delete and a new file; History keeps every version.
 - **Propose what you may not change.** `canEdit` false, or a 403 on a write: `knowledge(operation="suggestion-create", ...)` (the Review playbook), and say it waits in Review.
 - **Webhook URLs and email-in addresses are passwords.** Give one only to the person who asked, here, and never write it into a file, a ticket or a shared channel.
-- **Vendor names never reach clients.** Ken's model and data providers stay out of Knowledge and out of what you tell a client.
+- **Vendor names never reach clients.** Kenso's model and data providers stay out of Knowledge and out of what you tell a client.
 - This skill never sends, launches, or changes a campaign's schedule or volume. A person approves every send and launch.
 
 ## Step 0: Check Knowledge is on
@@ -44,7 +44,7 @@ When the call is refused or answers 404, Knowledge is off for this workspace. Sa
 
 1. `knowledge_review(operation="tree-get")`: every folder and file with its name, level, status and version. Add `include_bodies=true` only for a small tree.
 2. `workspace(operation="get", workspace_id=...)`: `website` and `companyContext`, the short company summary campaign prompts read. The workspace id comes from `workspace(operation="list")`.
-3. `knowledge(operation="website-pages-list")`: the pages Ken watches and each one's status.
+3. `knowledge(operation="website-pages-list")`: the pages Kenso watches and each one's status.
 4. `knowledge_review(operation="sources-list")`: connected mailboxes, CRM and recorders.
 5. `knowledge_review(operation="settings-get")` and `knowledge_review(operation="suggestion-counts")`: the review mode and what already waits.
 
@@ -52,7 +52,7 @@ Tell the person in a few lines what is there, what is missing and what you would
 
 ## Step 2: Company files
 
-The company folder holds the company-wide files. Ken seeds none, except a `Company overview` moved from Settings when the workspace had a company context. Aim for:
+The company folder holds the company-wide files. Kenso seeds none, except a `Company overview` moved from Settings when the workspace had a company context. Aim for:
 
 | File | Holds |
 |---|---|
@@ -70,7 +70,7 @@ Your writes, made with the person's yes, go live at once and can be undone from 
 
 ## Step 3: Website pages
 
-Ken watches up to 15 pages of the workspace's website and turns new and changed text into facts.
+Kenso watches up to 15 pages of the workspace's website and turns new and changed text into facts.
 
 - No website: `website` is null and a refresh answers `no_website`. On a yes, set it: `workspace(operation="update", workspace_id=..., website="https://...")`.
 - Pick the pages: home, product or service pages, pricing, customers or case studies, about. Skip blog posts, careers and legal pages.
@@ -90,7 +90,7 @@ A one-off read of a site for research is the website-scraping playbook, not this
 - **One call:** `knowledge(operation="transcripts-create", text="...", title="Kickoff with Acme", occurred_at="2026-10-14T15:00:00Z", account_id=...)`. Up to 5 MB; `Name: words` lines keep the speaker. Facts arrive in Review. Without an account the transcript stays the person's own.
 - **Every call:** `knowledge(operation="transcripts-create-webhook")` returns a URL a recorder, Zapier or Make posts to; `knowledge(operation="transcripts-create-email-address")` returns an address to forward recaps to. Each is shown once, replaces the person's previous one, and is a password (Rules).
 - **Mailbox and CRM:** `knowledge_review(operation="sources-list")` shows them. Turn reading on or off, or share one with the workspace, on the owner's yes: `knowledge_review(operation="sources-update", source_id=..., ingest_enabled=true, share_with_workspace=false)`. HubSpot: `knowledge(operation="hubspot-create-connect-session")` returns an authorize link for a workspace admin, who finishes the connection signed in to the app.
-- **Documents:** upload a PDF, Word file, deck or spreadsheet the person gives you, on their yes: `knowledge_library(operation="upload-create", file_content_base64=..., file_name="Pricing deck.pdf", folder_id=<company folder id>)`. Up to 50 MB, into the company folder or a folder in it. The new file reads `reading` until Ken has parsed it. Read an uploaded file's text with `knowledge_review(operation="upload-content", file_id=...)`.
+- **Documents:** upload a PDF, Word file, deck or spreadsheet the person gives you, on their yes: `knowledge_library(operation="upload-create", file_content_base64=..., file_name="Pricing deck.pdf", folder_id=<company folder id>)`. Up to 50 MB, into the company folder or a folder in it. The new file reads `reading` until Kenso has parsed it. Read an uploaded file's text with `knowledge_review(operation="upload-content", file_id=...)`.
 
 ## Step 6: Review mode
 
@@ -116,7 +116,7 @@ A rule that holds for every campaign (who never qualifies, what replies never sa
 
 ## What this skill cannot do yet
 
-- Give a file a system key. A file you create is a plain file, so update the `Company overview` Ken moved from Settings rather than making a second one.
+- Give a file a system key. A file you create is a plain file, so update the `Company overview` Kenso moved from Settings rather than making a second one.
 - Read a website on a customer connection: `web` is not on those, so ask the person to paste the page text (the website-scraping playbook).
 
 ## Errors
@@ -132,6 +132,6 @@ A rule that holds for every campaign (who never qualifies, what replies never sa
 | 409 `upload_folder_not_supported` | Upload into the company folder or a folder in it |
 | 400 on a field | Fix the named field and retry once |
 
-## No Ken account yet
+## No Kenso account yet
 
-These steps run on the Ken MCP server, which signs in with a Ken account. If the user has none, send them to https://app.ken.so/get-started to create one, then sign in when the agent asks.
+These steps run on the Kenso MCP server, which signs in with a Kenso account. If the user has none, send them to https://app.ken.so/get-started to create one, then sign in when the agent asks.

@@ -5,13 +5,13 @@ description: Import customer-owned sending domains onto platform-managed Cloudfl
 
 # Connect domains
 
-Import domains the user already owns onto Ken AI. Ken AI creates the Cloudflare zone and returns **Ken AI Cloudflare nameservers**. The user changes nameservers at their registrar. Ken AI owns the zone. Customer Cloudflare API tokens are not supported.
+Import domains the user already owns onto Kenso. Kenso creates the Cloudflare zone and returns **Kenso Cloudflare nameservers**. The user changes nameservers at their registrar. Kenso owns the zone. Customer Cloudflare API tokens are not supported.
 
 Use the import operations and billing reads below. Buying new domains (search, checkout) belongs to `domain-selection`.
 
 Every step except capacity needs the **admin** role on the workspace (backend FullAccess). Confirm the cart with the user before the create call.
 
-Imported domains get Ken AI inboxes, so import is paid like any Ken AI inbox. Credit plans pay in credits: 200 credits ($4) per Google / Outlook inbox a month and 2,500 credits ($50) per Azure domain a month (up to 50 inboxes). There is no registration charge. Exempt workspaces (VIP) have mailboxes on the plan.
+Imported domains get Kenso inboxes, so import is paid like any Kenso inbox. Credit plans pay in credits: 200 credits ($4) per Google / Outlook inbox a month and 2,500 credits ($50) per Azure domain a month (up to 50 inboxes). There is no registration charge. Exempt workspaces (VIP) have mailboxes on the plan.
 
 ## 1. Capacity
 
@@ -62,7 +62,7 @@ If `platformAllowed` is false (Google needs Google Workspace availability, Outlo
 
 `requiresConfirm` is a warning, not a hard fail. If a pool falls below packing minimum after drops, go back to step 1 or 2.
 
-Paid-plan errors (`PLAN_FEATURE_NOT_AVAILABLE`, Forbidden, "A paid plan is required") and OverCapacity are hard stops. Import needs Platform (`planType` Platform), Dfy, VIP (`planType` Premium), or a grandfathered Starter / Growth / Core plan, with billing Active or Trialing. Free cannot import onto Ken AI inboxes: it connects its own inboxes in the app, or upgrades to Platform at https://app.ken.so/settings/billing. Relay the envelope `message` and `error.recovery.summary` when present. OverCapacity comes only from a hard cap.
+Paid-plan errors (`PLAN_FEATURE_NOT_AVAILABLE`, Forbidden, "A paid plan is required") and OverCapacity are hard stops. Import needs Platform (`planType` Platform), Dfy, VIP (`planType` Premium), or a grandfathered Starter / Growth / Core plan, with billing Active or Trialing. Free cannot import onto Kenso inboxes: it connects its own inboxes in the app, or upgrades to Platform at https://app.ken.so/settings/billing. Relay the envelope `message` and `error.recovery.summary` when present. OverCapacity comes only from a hard cap.
 
 Done when every remaining name is Eligible, InUseMx, or LiveWebsite, warnings are confirmed or dropped, packing holds, and `canSubmit` is true (or the only failures are names you dropped).
 
@@ -92,7 +92,7 @@ domain_orders(
 )
 ```
 
-Partial success is normal. For each `accepted` row, show the **Ken AI Cloudflare nameservers** from `nameservers` and record `domainId`. Cloudflare NS are per zone: copy them, never invent them. For a rejected row, show `errorCode` and continue.
+Partial success is normal. For each `accepted` row, show the **Kenso Cloudflare nameservers** from `nameservers` and record `domainId`. Cloudflare NS are per zone: copy them, never invent them. For a rejected row, show `errorCode` and continue.
 
 Then `domain_orders(operation="domain-imports-list", client_id=...)`. Rows use `id` (same value as `domainId`), `status` (`setting_up` after import), and `expectedNameservers`.
 
@@ -104,7 +104,7 @@ Tell the user, registrar-agnostic:
 2. Replace the current nameservers with the pair you showed.
 3. Save. DNS can take minutes to hours.
 
-If the domain sits on someone else's Cloudflare account, they still point NS at the Ken AI pair and leave the old account.
+If the domain sits on someone else's Cloudflare account, they still point NS at the Kenso pair and leave the old account.
 
 Done when the user says they updated nameservers, or they want to wait.
 
@@ -112,7 +112,7 @@ Done when the user says they updated nameservers, or they want to wait.
 
 After they confirm, call `domains(operation="check-nameservers", domain_id=..., client_id=...)` once per imported domain still setting up. Show `status`, `zoneStatus`, and `activated`.
 
-Ken AI polls about every 15 minutes. After about 24 hours without an active zone the status becomes action required (still waiting, NS do not expire). After 14 more days the import is abandoned (`failed`).
+Kenso polls about every 15 minutes. After about 24 hours without an active zone the status becomes action required (still waiting, NS do not expire). After 14 more days the import is abandoned (`failed`).
 
 Do not loop the check on a timer. One shot on user request, then `domain-imports-list` if they want a table.
 
@@ -120,9 +120,9 @@ Do not loop the check on a timer. One shot on user request, then `domain-imports
 
 | Signal | What to tell the user |
 |--------|------------------------|
-| Paid-plan / Forbidden / `PLAN_FEATURE_NOT_AVAILABLE` | Free cannot import onto Ken AI inboxes. Connect your own inboxes in the app, or upgrade to Platform at https://app.ken.so/settings/billing. Show `error.recovery.summary` when present |
-| `INSUFFICIENT_CREDITS` | Not enough credits for the first month of the imported inboxes. Show the message (it carries the credits needed and available). Shrink the cart, or buy credits at https://app.ken.so/settings/billing and retry. Dfy: the Ken AI team adds credits. White-label child: ask the parent workspace |
-| `FREE_CREDITS_NOT_ELIGIBLE` | Free and bonus credits can't pay for domains or inboxes, and the bought credits fall short. Show the message (it carries the credits needed, the credits that can pay, and the free part). Buy credits at https://app.ken.so/settings/billing and retry. Dfy: the Ken AI team adds credits. White-label child: ask the parent workspace. |
+| Paid-plan / Forbidden / `PLAN_FEATURE_NOT_AVAILABLE` | Free cannot import onto Kenso inboxes. Connect your own inboxes in the app, or upgrade to Platform at https://app.ken.so/settings/billing. Show `error.recovery.summary` when present |
+| `INSUFFICIENT_CREDITS` | Not enough credits for the first month of the imported inboxes. Show the message (it carries the credits needed and available). Shrink the cart, or buy credits at https://app.ken.so/settings/billing and retry. Dfy: the Kenso team adds credits. White-label child: ask the parent workspace |
+| `FREE_CREDITS_NOT_ELIGIBLE` | Free and bonus credits can't pay for domains or inboxes, and the bought credits fall short. Show the message (it carries the credits needed, the credits that can pay, and the free part). Buy credits at https://app.ken.so/settings/billing and retry. Dfy: the Kenso team adds credits. White-label child: ask the parent workspace. |
 | OverCapacity / remaining too small | Hard cap only. Show remaining daily send. Shrink inbox counts so `existing + cart <= planDaily`. It is not a mailbox-slot limit |
 | "workspace mailbox cap" / "workspace domain cap" | White-label child at its parent's cap. Shrink the cart or ask the parent workspace to raise it |
 | LookupFailed | Cannot import until preview returns Eligible, InUseMx, or LiveWebsite. Retry later |
@@ -135,10 +135,10 @@ Do not loop the check on a timer. One shot on user request, then `domain-imports
 ## Boundaries
 
 - Imports domains the user already owns. Registering new names is `domain-selection`.
-- Ken AI Cloudflare nameservers only. Never ask for a customer Cloudflare token.
+- Kenso Cloudflare nameservers only. Never ask for a customer Cloudflare token.
 - Existing domains (list, get, update) use `domains`, not this cart. Status lives on the domains and inboxes page, https://app.ken.so/delivery?tab=inboxes.
 - Inbox tuning after the domain is active belongs in `inbox-configuration`.
 
-## No Ken account yet
+## No Kenso account yet
 
-These steps run on the Ken MCP server, which signs in with a Ken account. If the user has none, send them to https://app.ken.so/get-started to create one, then sign in when the agent asks.
+These steps run on the Kenso MCP server, which signs in with a Kenso account. If the user has none, send them to https://app.ken.so/get-started to create one, then sign in when the agent asks.

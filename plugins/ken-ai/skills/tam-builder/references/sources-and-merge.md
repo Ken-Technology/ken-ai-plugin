@@ -9,7 +9,7 @@ A worldwide agency TAM built in October 2026 pulled 160,627 candidate domains fr
 | Source | Fits found first |
 |---|---|
 | A company-search keyword grid over 111 countries | 7,775 |
-| Ken Search, six countries | 3,634 |
+| Kenso Search, six countries | 3,634 |
 | Lookalikes of confirmed fits | 2,531 |
 | Directory research (tool and partner directories) | 724 |
 | Web lists and searches | 638 |
@@ -67,4 +67,4 @@ Keep the keyword list to the target phrases of the fit rubric. Keywords shrink a
 - One or two people per fit company, by the rubric's titles, local-language titles included.
 - Only the company's own domain counts for a person's email. A generic inbox (info@, hello@) is a separate, lower list: its copy has no first name.
 - Never privacy, legal, careers, billing or no-reply inboxes.
-- Ken Search covers six countries for people. Fits elsewhere go to a separate list for the user.
+- Kenso Search covers six countries for people. Fits elsewhere go to a separate list for the user.
