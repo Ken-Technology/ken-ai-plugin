@@ -145,9 +145,11 @@ A campaign that is already sending is not a build: copy changes there are a new 
 
 ## Change a segment's filters
 
-To narrow who a campaign targets (only the US, only some titles), change its segment's `filter_criteria`. Nothing else in the build runs again.
+To narrow who a campaign targets (only the US, only some titles), change its manual segment's `filter_criteria`. Nothing else in the build runs again.
 
-1. Read the segment: `segments(operation="get", segment_id=...)`, or `segments(operation="list", campaign_id=...)` to find it. `filterCriteria` is its filter object. `{}` (or no `filterCriteria`) means it has no filters yet: a valid start, not a failed read.
+Only a manual segment (`segmentationType` `manual`) holds filters: `update` refuses `filter_criteria` on an `ai` or `ab_test` segment, and an AI campaign's Default is `ai`. To narrow such a campaign, create a manual segment with the filters, `segments(operation="create", campaign_id=..., name=..., segmentation_type="manual", filter_criteria={...})`, give it an email sequence, then run step 5. The leads it does not match stay in Default and keep sending while Default is active.
+
+1. Read the segment: `segments(operation="get", segment_id=...)`, or `segments(operation="list", campaign_id=...)` to find it. `filterCriteria` is its filter object. On a manual segment, `{}` (or no `filterCriteria`) means it has no filters yet: a valid start, not a failed read.
 2. Send the whole object: `segments(operation="update", segment_id=..., filter_criteria={...})` replaces every filter, so a key you leave out is cleared. Copy every current key, then add or change yours. Keys are camelCase; `describe_tools(["segments.create"])` lists them all.
 3. `titles` keeps a contact whose job title contains any of its values, ignoring case. `profileCountries` (the person's country) and `companyHqCountries` (the company's headquarters) match the stored text exactly, case included: read a few of the campaign's contacts with `contacts(operation="list", campaign_id=...)` and list every spelling their `country` or `headquartersCountry` uses.
 4. Check the count with the same object: `segments(operation="preview", campaign_id=..., segment_id=..., criteria={...})`, then send the update.
