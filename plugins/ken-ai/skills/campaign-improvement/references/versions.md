@@ -38,7 +38,7 @@ Example, changing only step 3's body on a three-step segment:
 ## What the replace can refuse or warn
 
 - `contentWarnings` on the response lists content findings per step and variant (`link_count_exceeded` for more than 2 distinct links in a cold step, `link_host_mismatch` for link text that reads as a web address). The save still succeeds; tell the user each one.
-- 400 `validation_failed` with `subject_required_for_migma`: the campaign sends through a provider that cannot thread a follow-up, so every step needs a subject. Nothing was written.
+- 400 `validation_failed` whose detail code starts with `subject_required`: the campaign sends through a provider that cannot thread a follow-up, so every step needs a subject. Nothing was written.
 - 400 naming a step and variant with a handwritten letter: the letter part takes no links. Move the link after the signature line.
 - `html_steps_disabled`: the workspace cannot send HTML steps. Keep the step `plain`.
 - `html_brand_domain`: the step loads an image from a Kenso host or carries a Kenso tracking link, which the send would refuse. Remove it, or host the image on the workspace's own domain.
