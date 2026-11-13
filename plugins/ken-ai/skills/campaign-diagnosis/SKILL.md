@@ -24,6 +24,7 @@ Every call takes `client_id`, the workspace id. Send it when the user can see mo
 
 1. `campaigns(operation="list", q="Acme")` finds the campaign by name. `campaigns(operation="get", campaign_id=42)` gives its status, schedule and launch date.
 2. Pick the window. The default is the last 30 days. For "why did replies drop", compare two windows of the same length: the last 14 days against the 14 days before.
+3. When the user compares a Kenso number with another tool (a CRM, a spreadsheet, another report) and names neither the dates nor the tool, ask both in one question before you read, such as "Which dates, and which CRM are you comparing with?". Then read both sides for those dates.
 
 If an operation this skill names is not listed for you, or a campaign the user named answers 404, stop and say: "I can't read that campaign's analytics from here. You can see it in Kenso at https://app.ken.so/<workspace id>/campaigns/<id>." A 404 means the campaign is not in this workspace or the read is not on for you. Do not retry it, and do not tell the user the campaign does not exist.
 
