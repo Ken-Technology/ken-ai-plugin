@@ -15,7 +15,10 @@ Every question the build asks has the same shape: `questionId`, `kind` (`single`
 | `approval_mode` | single | `every_touch`: I approve every touch; `batches`: I approve batches; `auto_after_samples`: Auto-send after I approve samples; `agency_split`: I approve ours, clients approve theirs | no |
 | `performance_help` | single | `book_call`: Yes, book a call; `not_now`: Not now | no |
 | `recruiting_role` | single | `careers_page`: Read my careers page; `paste_jd`: I'll paste the job description; `describe`: I'll describe the role | yes |
+| `widen_search` | single | `search_wider`: Search more widely (offered once per build); `name_companies`: I'll name a few companies (the names go in `text`, comma separated); `connect_first`: Set up sending first | no |
 
 `teammate_role` is asked only of a teammate a workspace invited, never in a sign-up.
+
+`widen_search` is asked when a build found no account or wrote no plan. The build waits for the answer: `search_wider` and `name_companies` search again, and `connect_first` ends the build so the person connects their email first. It can be asked again, without `search_wider`, when the second try also finds nobody.
 
 A question leaves `openQuestions` once it is answered or once the stage named in its `expiresWith` finishes. Never answer a question for the person, and never send an email address in `text`.
