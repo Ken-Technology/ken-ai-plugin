@@ -14,7 +14,7 @@ Every call takes `client_id`, the workspace id. Send it when the user can see mo
 ## The rules for numbers
 
 - A reply is a person, not a message: every count here is distinct contacts. Out-of-office is not a reply.
-- Never report opens. Open tracking is off for deliverability, so open numbers mean nothing.
+- Never report opens. Campaign emails never carry an open-tracking pixel, so opens are not tracked (rule 1 of the deliverability rules, in the `deliverability-guard` skill's `rules.md` reference).
 - Put the counts next to every rate: "2.1% reply rate (21 of 1,004 contacted)". With fewer than about 100 contacted, give the counts and leave the rate out.
 - Missing data is N/A, never 0. A metric that did not load is unknown, not zero.
 - Clicks are human clicks. Use `clickCount` and the returned `clickRate`. `botClickCount` counts scanners and never shows interest.
@@ -36,7 +36,7 @@ The interested count is only as good as the classifier behind it, and the classi
 `totalCount` is the people who replied and `interestedCount` the positive ones. `counts` splits them by class (`interested`, `not_interested`, `out_of_office`, `automated`, `unclassified` and others), and each person counts once.
 
 - Replies are `totalCount` minus the `out_of_office` count.
-- Classification is behind when `unclassified` holds a large share of the replies, or when a campaign that had interested replies shows none for several days while replies keep arriving. Spot-check with `threads(operation="list", campaign_id=42, interest="unclassified", limit=20)` and read a few.
+- Classification is behind when `unclassified` holds a large share of the replies, or when a campaign that had interested replies shows none for several days while replies keep arriving. Spot-check with `threads(operation="list", campaign_id=42, interest="unclassified", limit=20)`, which lists the threads whose newest reply is unclassified, and read a few.
 - If classification is behind, stop the diagnosis there. Tell the user the positive-reply numbers for this window are not reliable, give the reply count, and say the Kenso team needs to look at classification. Do not explain a drop the classifier made.
 
 Done when you know whether the interested count can be trusted.

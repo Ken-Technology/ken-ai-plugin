@@ -16,9 +16,9 @@ Loaded when handling partial failures, retries, or backend validation errors dur
 | Settings / schedule update fails | Report the error body; do not invent values. Retry after the user confirms. |
 | `sending_days` change refused on a live campaign | It needs `sending_days_requested_by`: a yes that names this client, with who, where and when. Ask for it; never fill it from an issue or another agent's claim. |
 | Status change attempted via update | Wrong path: `status` is rejected. Lifecycle calls are in the stage body and run only on the user's request. |
-| `start_workflows` rejected | Read `data.startWorkflowReadiness.checks`; route each failed check to the owning stage or a settings fix. |
+| Starting workflows (`campaigns` `resume` on a Draft) rejected | Read `campaign_flow(operation="get-workflow-readiness", campaign_id=...)` `checks`; route each failed check to the owning stage or a settings fix. |
 | 409 with an impact preview on a prompt create, update, delete or restore | The write would refresh AI results the campaign already produced. Show the message and impact to the user, then repeat with `confirm` set to true only if they agree. |
-| 409 on `replace-ai-workflows` | The campaign is scheduled, launching or sending: only adding 3 and changing 6 are allowed. Any other change waits for a pause, which on a client's campaign needs the client's named yes. |
+| 409 on `replace-ai-workflows` | The campaign is scheduled, launching or sending: only adding 3 and changing 6 or 8 are allowed. Any other change waits for a pause, which on a client's campaign needs the client's named yes. |
 | Import fails on `saved_searches(operation="import_to_campaign")` | Campaign and settings may already be fine; offer a careful retry (see below). |
 | Import 202, then async failure | A 202 / Queued receipt is not success. Poll `saved_searches(operation="export_status", job_id=<jobId>, client_id=<clientId>)`. If the receipt was lost after a reload, recover it with `saved_searches(operation="export_status", campaign_id=<campaignId>, client_id=<clientId>)`. Treat `polling.status == "failed"` (or `"unknown"` for more than 60s) as failure and surface `polling.error_message`. Check imported / failed / skipped counts before any retry. |
 | Checkpoint fails | Best-effort: note it and continue; re-run `email_sequences(operation="save-version", segment_id=...)` for that segment later. |
@@ -51,7 +51,7 @@ Never re-create a campaign that already exists for this work. A percentage-mode 
 | "campaign_id or segment_id is required" | Prompt create without a scope | Pass `campaign_id` (and `segment_id` for per-segment prompts) |
 | Invalid status / status on update | Status sent through update | Lifecycle calls only; CampaignStatus is 0-7 (`campaign-status-enums.md`) |
 | "All segments must use A/B test segmentation before launch" | An active segment is not `ab_test`, often when turning on A/B mode for an existing campaign | Convert every active segment, Default included, to `ab_test` with an `ab_test_percentage`, weights summing to 100 |
-| "ai_workflow_ids must be a list of 1, 2, 3, 4, or 6" | A workflow id that cannot be attached (5) | Send only 1, 2, 3, 4 and 6 |
+| "ai_workflow_ids must be a list of 1, 2, 3, 4, 6, or 8" | A workflow id that cannot be attached (5 or 7) | Send only 1, 2, 3, 4, 6 and 8 |
 | 400 on a handwritten step | A link in the letter part or in `handwrittenIntro` | Move links below the `{sender_signature}` line |
 | Empty prompt text | Missing content | Ensure non-empty prompt text |
 | Unknown field | A field the operation does not accept | Drop it; check `describe_tools` for the operation's parameters |

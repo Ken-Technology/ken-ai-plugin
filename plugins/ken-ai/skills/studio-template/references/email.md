@@ -60,3 +60,5 @@ A render also fails past 10,000 loop steps in all, 1,000,000 characters of outpu
 3. Pin it with `email_sequences(operation="replace", ...)`: set `studio_template_version_id` on the step to the published version id. The step becomes `html`, its subject is the template's, and its body is the stored fallback. The sequence read shows `studioPin {versionId, templateId, state}`; `stale` means the version is no longer published or the template was deleted, and the step sends its stored fallback. A later save that leaves `studio_template_version_id` off the step removes the pin, so send it back on every save.
 
 Pinning changes a live campaign's copy. On a client's campaign that is sending, ask first and name the campaign: a sequence change needs that person's yes.
+
+A Studio email always goes out as HTML, even with the campaign's Send as plain text on. The deliverability rules (the `deliverability-guard` skill's `rules.md` reference) give Google recipients plain text in every step (rule 3) and keep a Studio email out of step 1 (rule 4). So pin one to a follow-up of a campaign whose leads are on Microsoft, and tell the user when the campaign has Google recipients.

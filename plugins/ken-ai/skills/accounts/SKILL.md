@@ -64,9 +64,10 @@ To add one account with its fields set:
 
 `accounts(operation="create", domains=["acme.com"], fields={"stage": "researching", "why_now": "Hiring three AEs for EMEA"})`
 
-- Stages: `researching`, `warming`, `engaged`, `meeting_booked`, `nurture`, `lost`, `paused`, `not_a_fit`. Kenso moves an account to `lost` when its deals are all lost, and back to `engaged` when it gets an open opportunity again. Ken plans and drafts no touch for `lost`, `paused` or `not_a_fit` accounts.
+- Stages, in six groups (`stage_group`): to sort (`new`, an import added it), pipeline (`researching`, `warming`, `engaged`, `meeting_booked`, `in_deal`), customers (`onboarding`, `client`, `churned`), later (`nurture`, `paused`, `lost`), network (`network`, with `network_label` `partner`, `investor` or `personal`) and archive (`not_a_fit`, `competitor`, `do_not_contact`). Kenso moves an account to `lost` when its deals are all lost, and back to `engaged` when it gets an open opportunity again. Ken plans and drafts touches only in the pipeline and for `nurture`.
+- `onboarding` and `client` make the account a customer: its domains are blocked and only a workspace admin may move an account into or out of them. `account_type` follows the stage.
 - A field a person set is pinned. Changing it with `accounts(operation="update", account_id=101, changes={"stage": "warming"})` fails with `pinned_by_user`. Send `overwrite_pinned=True` only when the user asked for that exact change.
-- Delete and merge cannot be undone. Use them only when the user asks. To set an account aside, set its stage to `paused` or `not_a_fit`.
+- Delete and merge cannot be undone. Use them only when the user asks. To set an account aside, set its stage to `paused`, `not_a_fit` or `do_not_contact`.
 
 Done when every company the user named maps to one account id, created or found.
 
@@ -117,7 +118,7 @@ Scan an account now: `account_signals(operation="scan", account_id=101)`. It run
 
 - One account's stored signals: `account_signals(operation="list", account_id=101, kind="funding,hiring")`.
 - Every account's new signals since a date: `account_signals(operation="list-workspace", detected_after="2026-10-12T00:00:00Z")`. Each carries `points` and `weightedPoints` (full up to 7 days old, then less).
-- The accounts heating up: `accounts(operation="list", latest_signal_after="2026-10-12T00:00:00Z", fits_icp=True, sort="-score", limit=4)`. `fits_icp=True` leaves out the workspace's own company, `not_a_fit` accounts and accounts research scored below 20, as Today does.
+- The accounts heating up: `accounts(operation="list", latest_signal_after="2026-10-12T00:00:00Z", fits_icp=True, sort="-score", limit=4)`. `fits_icp=True` keeps pipeline and later accounts only, and leaves out the workspace's own company and accounts research scored below 20, as Today does.
 
 **Scanning many accounts** ("scan my accounts", "what changed this week"):
 
@@ -145,6 +146,7 @@ There are two ways to put touches on an account.
 
 - With a body the touch waits for approval. Without one it is `planned`, to write later.
 - Channels: `email`, `linkedin_connect`, `linkedin_message`, `linkedin_follow`, `linkedin_like`, `linkedin_comment`, `call`, `event`, `intro`, `asset`, `task`. Reasons: `cadence`, `signal`, `manual` (the default), `reply`.
+- Instagram channels (`instagram_dm`, `instagram_follow`, `instagram_like`, `instagram_comment`) exist, but Instagram plans, sends and engagement are not available yet.
 - `linkedin_follow`, `linkedin_like` and `linkedin_comment` need the workspace's `linkedin_engagement` and `accounts_writer` flags. Create them with no body and no page link: Kenso puts a follow or a like up for approval as it is, and for a comment it picks the person's recent post and writes the comment first.
 - `rationale` says why this touch, now, with its source. The person approving reads it.
 - Edit with `account_touches(operation="update", touch_id=5001, changes={"body": "Hi Maya, ..."})`. That works from `planned`, `drafted`, `awaiting_approval` and `failed`; another status is `invalid_transition`.

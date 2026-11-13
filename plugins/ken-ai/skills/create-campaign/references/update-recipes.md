@@ -272,7 +272,7 @@ Variables are per segment. Campaign-level variables are only a fallback for a se
 To mark a variable for rewriting later: `prompts(operation="update", prompt_id=<id>, changes={"to_rewrite": 1}, confirm=False)`.
 
 ### Attach the workflows
-Creating a variable does not attach Personalization. Read `campaign_flow(operation="list-ai-workflows", campaign_id=...)`; when 2 is missing, send the full list with 2 added: `campaign_flow(operation="replace-ai-workflows", campaign_id=..., ai_workflow_ids=[<current ids>, 2])`. Add 3 the same way when any variable has `to_rewrite=1` or the segment has a rewriting prompt. While the campaign is scheduled, launching or sending, only adding 3 and changing 6 are allowed.
+Creating a variable does not attach Personalization. Read `campaign_flow(operation="list-ai-workflows", campaign_id=...)`; when 2 is missing, send the full list with 2 and 8 (AI Line Check) added: `campaign_flow(operation="replace-ai-workflows", campaign_id=..., ai_workflow_ids=[<current ids>, 2, 8])`. Add 3 the same way when any variable has `to_rewrite=1` or the segment has a rewriting prompt. While the campaign is scheduled, launching or sending, only adding 3 and changing 6 or 8 are allowed.
 
 ### Side effects
 - A changed prompt refreshes that variable's AI results, which is why the write can answer 409 with the impact first.
@@ -320,7 +320,7 @@ email_sequences(operation="save-version", segment_id=<segment_id>, name="<short 
 ```
 Once per segment, after the replace lands (live has resolved tracking-link ids). Omit `steps` so it snapshots the live sequence. It saves the email sequence only: AI variables and segment fields are not in it. There is no campaign-level version save. A failed checkpoint is not a failed edit: note it, continue, and retry it for that segment later.
 
-The dashboard's version history lists segment versions, which this checkpoint does not write. When the user wants the round to show there, also call `segments(operation="save_new_version", campaign_id=<campaign_id>, segment_id=<segment_id>)` once for that segment. It queues a sequencer refresh, which is not free on a live campaign.
+The dashboard's version history lists segment versions, which this checkpoint does not write. When the user wants the round to show there, also call `segments(operation="save-version", segment_id=<segment_id>)` once for that segment. It queues a sequencer refresh, which is not free on a live campaign.
 
 ### 8b. Find versions
 ```python
@@ -342,7 +342,7 @@ segments(operation="restore-version", segment_id=<sid>, version_id=<vid>, dry_ru
 segments(operation="restore-version", segment_id=<sid>, version_id=<vid>, confirm=False)  # 409 shows the impact; confirm true only after the user agrees
 prompts(operation="restore", segment_id=<sid>, version_id=<vid>, dry_run=True)            # then confirm=False, as above
 ```
-A segment restore cascades to the sequence and prompt versions at or before that segment version. Segment versions come from `save_new_version` (8a), activating or deactivating the segment, and earlier restores, not from `save-version`.
+A segment restore cascades to the sequence and prompt versions at or before that segment version. Segment versions come from `segments` `save-version` (8a), activating or deactivating the segment, and earlier restores, not from `email_sequences` `save-version`.
 
 ### Post-verify (8a-8d)
 List versions again: a new highest version exists, and after a restore the live resource matches the chosen snapshot.

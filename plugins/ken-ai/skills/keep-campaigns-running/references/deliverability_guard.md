@@ -21,7 +21,7 @@ No campaign sends from a sick inbox, and every campaign's placement stays checke
 - Never drop a campaign's last inbox. Say so in your summary instead, so capacity can propose a pause.
 - Restore an inbox a team drop took off this campaign once it is no longer sick.
 - At most one placement test per campaign per day. Run one when the campaign has none, after its copy changed, or when the latest shows mail landing in spam. A placement test cannot be undone.
-- A placement test sends only from an active mailbox Kenso bought for you. A campaign without one cannot run it: skip the placement test there. Kenso refuses one it cannot run and says why; take that as the answer for the campaign, not an error, and do not ask again.
+- A placement test sends from an active inbox on the campaign. Where the workspace's tests do not run on Kenso's seed network yet, it sends only from an active mailbox Kenso bought for you. A campaign without one cannot run it: skip the placement test there. Kenso refuses one it cannot run and says why; take that as the answer for the campaign, not an error, and do not ask again.
 - Autopilot off: the action comes back `proposed`. That is the expected outcome, not an error.
 
 ## Examples

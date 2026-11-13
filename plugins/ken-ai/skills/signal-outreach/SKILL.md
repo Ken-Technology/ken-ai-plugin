@@ -26,8 +26,8 @@ A person launches the campaign. You build it and hand it over.
 
 ## Step 0 - Check what is on
 
-- `triggers` operations are open to every member; creating, changing or pausing a trigger needs full access (admin). A 403 means the user is not an admin: say so in one sentence and stop.
-- Trigger capacity (`trigger-capacity-get`, `trigger-capacity-update`) is for admins only. If they are missing, skip the capacity step and tell the user an admin sets it.
+- `triggers` operations are open to every member; creating, changing or pausing a trigger needs Campaigns edit access (owners, admins and editors by default). A 403 means the user lacks it: say so in one sentence and stop.
+- Trigger capacity (`trigger-capacity-get`, `trigger-capacity-update`) is listed only for connections with the members feature (admins by default). If they are missing, skip the capacity step and tell the user the daily cap is set in the app and needs Campaigns edit and the workspace settings permission (owners, admins and editors by default).
 - Job postings answer 503 `service_unavailable` when the index is off. Tell the user and do not retry in a loop.
 - Signals on target accounts (`account_signals`) need the Accounts and Accounts signals flags. Without them, use the searches below.
 - If the workspace has no campaign to attach a trigger to, build one first (Step 5). If none of the operations here are in your tools, tell the user in one sentence and link `https://app.ken.so/<workspace id>`.
@@ -73,7 +73,7 @@ Then apply the gate, cheapest check first, and keep the count after each one:
 2. **Size and country**: the user's ICP. The people search covers six countries (United States, United Kingdom, Canada, Ireland, Australia, New Zealand): a company elsewhere passes the gate, and Step 3 finds its decision maker by name with the email finder. Say how many.
 3. **Language**: drop postings not written in the campaign's language.
 4. **Duplicates**: one row per company domain. Drop target accounts (`accounts(operation="list", domain="acme.com")` when Accounts is on) and companies already in the campaign.
-5. **Fit** (optional, paid): when the fit_classification flag is on, score the companies that passed against the user's ICP with `models(operation="fit-classifications-create", fit_definition="...", rows=[{"companyId": 123456}, {"domain": "acme.com", "name": "Acme"}])`: up to 100 rows a call, each back with `fit` (yes, no or maybe), a 0-100 `score` and a one-sentence `reason`, at 0.05 credits a classified row (`estimate_only=True` prices it first). Keep the `yes` rows and their reasons. While the flag is off (the call is not found), judge fit from the company data yourself and keep a reason per company.
+5. **Fit** (optional, paid): when the fit_classification flag is on, score the companies that passed against the user's ICP with `models(operation="fit-classifications-create", fit_definition="...", rows=[{"companyId": 123456}, {"domain": "acme.com", "name": "Acme"}])`: up to 100 rows a call, each back with `fit` (yes or no; maybe only from the fallback model), a 0-100 `score` and a `reason`, at 0.05 credits a classified row (`estimate_only=True` prices it first). Keep the `yes` rows. Most rows come back with a `reason` that only names their fit probability, so write each kept company's one-line reason from its own data. While the flag is off (the call is not found), judge fit from the company data yourself and keep a reason per company.
 
 Show the user the funnel before you go on: "212 postings, 141 companies, 46 pass titles, 31 pass size and country, 29 new. Next: 29 companies, up to 29 people imported into a Draft campaign." Price it with `job_postings(operation="triggers-preview", signal_type="open_roles", parameters='{...}')` (the same keys the trigger stores; it runs for `fundraising`, `open_roles` and `company_headcount_growth`, and saves, fires and charges nothing). Show its `steps` (pass counts per gate step) and `estimatedCredits.basis` (an upper bound for the page, charged per lead), say that each imported person is enriched, verified and qualified by the campaign, and get a yes before Step 3.
 
@@ -116,11 +116,11 @@ The import skips people already in the campaign. To carry each company's signal 
 
 **Mode A, always on.** A trigger watches for the signal and adds each new match to a Trigger campaign by itself. Try the filters with the searches in Step 2 first, then:
 
-`triggers(operation="triggers-create", campaign_id=8123, signal_type="fundraising", tier="same_day", parameters='{"raisedWithinDays": 30, "newRoundsOnly": true, "minRaisedUsd": 2000000, "titles": ["VP Sales", "Head of Sales"], "maxContactsPerCompany": 2}')`
+`triggers(operation="triggers-create", campaign_id=8123, signal_type="fundraising", parameters='{"raisedWithinDays": 30, "newRoundsOnly": true, "minRaisedUsd": 2000000, "titles": ["VP Sales", "Head of Sales"], "maxContactsPerCompany": 2}')`
 
 - `parameters` is a JSON string with camelCase keys, as `trigger-schemas-list` gives them. Unknown keys are rejected. Funding-round search keys (`reportedWithinDays`, `amountRaisedUsd`) differ from the trigger's (`raisedWithinDays`, `minRaisedUsd`).
 - The campaign must be in Trigger mode. `switch_campaign_to_trigger=True` switches a Batch campaign in the same call, and a Trigger campaign never goes back to Batch: pass it only when the user agreed to that.
-- `tier` is `minutes`, `hours` or `same_day`: how fast a firing goes out.
+- Leave `tier` out: it is deprecated and has no effect. Every trigger fires at the same speed.
 - People a trigger adds to a Draft campaign are not emailed until a person launches the campaign.
 
 **Capacity.** Read `triggers(operation="trigger-capacity-get", campaign_id=8123)`. A daily cap is volume: set it with `triggers(operation="trigger-capacity-update", campaign_id=8123, daily_cap=25)` only when the user gave the number, and on a client's campaign only with a yes that names that client.
@@ -131,7 +131,7 @@ The import skips people already in the campaign. To carry each company's signal 
 - `triggers(operation="trigger-firings-list", trigger_id=77, status="suppressed")`: why firings were held back (cooldown, frequency cap, do not contact, blocklist, an active conversation, already in a trigger campaign, expired).
 - Too many suppressed or off-target firings: tighten `parameters` with `triggers(operation="triggers-update", trigger_id=77, changes={"parameters": "..."})`. Too few: widen the window or the titles.
 - To check that a saved trigger would fire, test-fire it on a sample signal: `job_postings(operation="triggers-test-fire", trigger_id=77, contact_id=..., payload={...})`. It reports `shouldFire`, `rejectedBy` and each check, and queues, sends and charges nothing. `payload` is the signal's JSON object. Sweep-only signals (`click_dormancy`, `company_icp_timing`, `linkedin_post_engagement`) answer `test_fire_not_supported`.
-- `triggers(operation="pause", trigger_id=77)` and `triggers(operation="resume", trigger_id=77)` stop and restart it. On a client's campaign both need a yes that names that client.
+- `triggers(operation="triggers-update", trigger_id=77, changes={"status": "paused"})` and `changes={"status": "active"}` stop and restart it. On a client's campaign both need a yes that names that client.
 
 Report the signal, the gate funnel, who you picked and why, the campaign and trigger ids, and what the person has to click.
 

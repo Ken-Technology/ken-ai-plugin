@@ -15,8 +15,9 @@ Every call takes `client_id`, the workspace id. Send it when the user can see mo
 - **Read an unclear yes back before you act.** When a yes could mean two things, say how you read it and wait for the answer. Never make the change in the same turn.
 - **Find the cause before the fix.** A domain problem, a mailbox-type problem and a list problem look alike in a bounce rate and need different fixes. Step 4 tells them apart.
 - **Use counts when the numbers are small.** Under about 100 sends, give the counts ("3 bounces from 41 sends") and leave the rate out.
-- **Never report opens.** Open tracking is off for deliverability.
-- **Name no vendors to a client.** Say "your sending domains" and "Google mailboxes", never the providers behind the infrastructure.
+- **The deliverability rules are the source.** `references/rules.md` holds Kenso's six deliverability rules: no open pixel, one click-tracking host per sending domain, format by the recipient's mail provider, the first email to Google recipients, SMTP inboxes, and the mailbox types a client can buy. Every number you quote on those comes from there, as written, and every proposal follows them.
+- **Never report opens.** Campaign emails never carry an open-tracking pixel. Opens are not tracked and are never reported (rule 1). Asked to turn on open tracking, decline and give rule 1 as written.
+- **Name no vendors to a client.** Say "your sending domains" and "Google mailboxes", never the providers behind the infrastructure. Asked which company sends the mail, say Kenso names mailbox types, not the companies behind them, and give rule 6 as written: "Mailbox types a client can buy: Google, Outlook and SMTP." An inbox on a sending-provider account the workspace connected itself keeps the name the workspace gave it.
 
 ## The thresholds
 
@@ -70,6 +71,8 @@ Mark each campaign against the table above, and each domain and inbox by its ver
 | All Microsoft inboxes, or all Google inboxes, over threshold across domains | The mailbox type | Auto-pause reasons such as `tenant_ban`, and `policyBlocked` bounces |
 | One inbox over threshold, its neighbors fine | That inbox | `inboxes(operation="get", inbox_id=301)` and its warmup (Step 6) |
 | Sends dropped, bounces normal | Holds, warmup, limits or leads | Step 1, Step 6, and the campaign's leads left (`analytics(operation="get-weekly-report", campaign_id=42)`, under `next`) |
+| Mail to Google recipients lands in spam, Microsoft is fine | The format | Rules 3 and 4: is the campaign's Send as plain text on, and does step 1 carry anything that forces HTML (bold, an image, a signature logo, a handwritten letter, a Studio email)? |
+| An SMTP inbox sends more than 10 a day, or a domain holds more than 20 SMTP inboxes | The volume | Rule 5: bring each SMTP inbox to 5 to 10 a day |
 
 Say which cause the numbers point to, and the numbers. Mark it as your read when two causes fit.
 
@@ -78,7 +81,7 @@ Say which cause the numbers point to, and the numbers. Mark it as your read when
 - `domains(operation="get-health", domain_id=12)` is the latest snapshot: blocklists, mail DNS, bounces, placement, nameservers and certificate, with `inboxRate`, `spamRate` and `bounceRate`. `spfStatus`, `dkimStatus`, `dmarcStatus` and `mxStatus` are the SPF, DKIM, DMARC and MX verdicts: `pass`, `fail` or `unknown`. They come from the last check, dated by `checkedAt`, and do not change until the next one, so run a fresh check before you call a record broken or fixed.
 - A fresh check: `domains(operation="domain-health-checks-create", domain_ids=[12])` returns a job. Follow it with `jobs(operation="get", job_id="<job id>", job_type="domain_health")`. A 409 means a check is already running: follow the job it names.
 - Blocklists: `free_tools(operation="check_blacklist", input={"target": "acme-mail.com"})` returns each listing, what it means and where to delist.
-- Tracking DNS (the link records, not mail DNS): `domains(operation="get-dns", domain_id=12)`, and `domains(operation="verify-dns", domain_id=12)` to check it again.
+- Tracking DNS (the link records, not mail DNS): `domains(operation="get-dns", domain_id=12)`, and `domains(operation="verify-dns", domain_id=12)` to check it again. Each sending domain has its own click-tracking host, `link.<sending domain>` (rule 2); a domain without a working one is a fix for the Kenso team.
 
 ## Step 6 - Warmup
 
@@ -86,7 +89,17 @@ Say which cause the numbers point to, and the numbers. Mark it as your read when
 
 ## Step 7 - Placement tests
 
-For workspace members, a placement test sends the campaign's copy from one domain or inbox to test mailboxes and reads where it lands. It sends mail, so ask first. Starting one needs Delivery edit (never a client seat), and a workspace gets 2 a day and 8 in 30 days: over that the call answers 429 naming the limit and when it resets, so tell the user and do not retry before then.
+For workspace members, a placement test sends copy from one domain or inbox to test mailboxes and reads where it lands. It sends mail, so ask first. Starting one needs Delivery edit (never a client seat).
+
+Read `domain_setup(operation="placement-tests-availability")` first. Where it answers `enabled: true`, tests run on Kenso's seed network:
+
+- It says whether the plan allows tests (`planAllowed`; paid plans only), which seed providers are live (`providers`; Google Workspace only at launch), whether the copy check is available (`control.available`) and how many tests are left (`testsLeftToday`, `testsLeftThisMonth`).
+- A test needs copy: `campaign_id` sends that campaign's live copy, or `subject` and `body` together test custom copy without a campaign. `approvals(operation="placement-tests-create", campaign_id=42, domain_id=12)` starts one from a domain, `inbox_id=301` instead of `domain_id` from one inbox, and `campaign_id=42` alone from the campaign's senders. `control=True` adds the copy check (a second, neutral message from the same senders) when it is available.
+- A 200 instead of a 201 returns the test already running for that domain, inbox or campaign, whatever its copy: start yours once it completes.
+- Results come in about an hour. Read `verdict.summary` first and show it as is: it names the likely cause.
+- Paid plans get 10 tests a day and 60 in 30 days, a trialing workspace 2 a day and 8 in 30 days, and each sending inbox 3 a day. A 402 means the workspace needs a paid plan. A 429 names the limit and when it resets: tell the user and do not retry before then. A 503 `seed_network_busy` means try again later. A 422 names the copy or sender problem to fix first.
+
+Where `enabled` is false, the workspace keeps the older engine, unless Kenso tests are paused right now: then a create answers 503 `placement_native_paused`, so try again later. On the older engine a workspace gets 2 a day and 8 in 30 days: over that the call answers 429 naming the limit and when it resets, so tell the user and do not retry before then.
 
 - `approvals(operation="placement-tests-create", campaign_id=42, domain_id=12)` (or `inbox_id=301`) starts one. Without `sequence_version_id` it uses the live copy.
 - `approvals(operation="placement-tests-list", campaign_id=42)` lists them, and `analytics(operation="placement-tests-get", test_id=77)` reads one.
@@ -99,11 +112,13 @@ Give each proposal as the exact change, what it does and why, with the numbers:
 |---|---|
 | Pause a campaign | `campaigns(operation="pause", campaign_id=42)` |
 | Resume it after the cause is fixed | `campaigns(operation="resume", campaign_id=42)` |
+| In the in-app support chat (no pause or resume there) | Name the campaign and tell the user to pause or resume it at https://app.ken.so/<workspace id>/campaigns/<campaign id> |
 | Stop one inbox | `inboxes(operation="update", inbox_id=301, changes={"paused": True})` |
 | Lower one inbox's daily limit | `inboxes(operation="update", inbox_id=301, changes={"daily_send_limit": 15})` |
 | Rest every inbox on a domain | `inboxes(operation="bulk-update", ids=[301, 302, 303], changes={"paused": True})` |
 
 - Rotation: rest the burnt domain's inboxes so the campaign sends from its healthy ones, and add fresh inboxes through `delivery-setup` when capacity falls short.
+- A daily limit you propose stays within the rules: an SMTP inbox sends 5 to 10 a day (rule 5).
 - Keep warmup on while an inbox rests.
 - A list problem: clean or rebuild the segment through `create-campaign`. Pausing alone does not fix it.
 

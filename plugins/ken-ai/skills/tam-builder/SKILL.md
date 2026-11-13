@@ -23,7 +23,7 @@ Filter syntax for Kenso Search lives in the `ken-search` skill: load it with `lo
 
 `search` and `web` are open to members with Search access. If `search(operation="search-companies")` is not in your tools, tell the user in one sentence that building lists needs Search access, link `https://app.ken.so/<workspace id>`, and stop.
 
-Optional parts, skipped with one line when missing: saved lists (`saved_lists`, the Saved lists flag), target accounts (`accounts`, the Accounts flag), job postings and funding rounds as sources (Step 3), and technology search (`saved_searches(operation="list-technology-companies")`, Step 3). `web` answers "Web scraping is off right now" or "out of credits" when it cannot read pages: carry on without it.
+Optional parts, skipped with one line when missing: saved lists (`saved_lists`, the Saved lists flag), target accounts (`accounts`, the Accounts flag), lookalike search (the `lookalike` filter on company search and `crm(operation="list-lookalike-seeds")`, the lookalikes flag, Step 3), job postings and funding rounds as sources (Step 3), and technology search (`saved_searches(operation="list-technology-companies")`, Step 3). `web` answers "Web scraping is off right now" or "out of credits" when it cannot read pages: carry on without it.
 
 ## Step 1 - Define fit in plain words
 
@@ -53,7 +53,9 @@ Report the market as companies and people, by segment and country, with what the
 One search misses most of a market. Pull from several, then merge (recipes and measured yields: `references/sources-and-merge.md`):
 
 1. **Kenso Search grid**: one company search per keyword, size band and country. A query that returns thousands is split by size band, then industry, then founding year, until each part is complete.
-2. **Lookalikes**: once you have confirmed fits, open them with `search(operation="get-company", company_id=...)`. A record that carries `similarCompanies` (company ids) points to close matches: read those the same way and classify them.
+2. **Lookalikes**: once you have confirmed fits, search for companies like them with the lookalike filter on company search: `search(operation="search-companies", body={"lookalike": {"seeds": [{"domain": "acme.com"}, {"domain": "northwind.io"}], "mode": "precise", "minGrade": 3}, "countries": ["United States"], "pageSize": 100})`. The seeds are the confirmed fits' domains, up to 100 (the clearest fits first). `precise` keeps companies that sell the same thing, and `minGrade` `3` keeps the list tight (the default `2` is wider; grades run 1-5, 5 best). Companies that looked like fits but were not go in `negatives` (`[{"domain": "..."}]`) to steer away from them. Rows come back most similar first, each with `lookalike` `score` and `grade`, at most 2,000 a search; the other keys (countries, size) still filter, and `lookalikeSeeds.unresolved` names the seeds it could not use. Classify the rows like any other source.
+   Before you have confirmed fits, `crm(operation="list-lookalike-seeds", source="customers")` suggests seeds: the workspace's customers, or with `source="crm"` the companies on its CRM deals (`stage="won"` by default, `"open"` or `"any"`), with `source="interested"` the companies that replied Interested, with `source="replies"` the companies that replied at all, with `source="campaign"` and `campaign_id` the companies of one campaign's leads, or with `source="website_visitors"` the companies that visited the tracked website. `since="YYYY-MM-DD"` keeps only recent replies or visits. An empty list is normal when the CRM, the replies or the visits are thin.
+   Lookalikes need the workspace's lookalikes flag. When the call answers 403 `feature_disabled` or 400 `lookalikes_unavailable`, say so in one line and widen with filter search instead: the fits' industries and keywords, as in source 1.
 3. **People first**: founders and owners by title and headline, traced to their company (`search(operation="search-people", body=...)`, then each person's current company). Finds small shops whose company page is thin.
 4. **The web**: directories, partner pages and "best agencies for X" lists. `web(operation="search", body={"query": "outbound lead generation agencies directory", "limit": 10})`, then `web(operation="scrape", body={"url": "https://example.com/partners", "formats": ["markdown"]})`. For many pages with the same layout, `web(operation="create-extraction", body={"urls": ["https://example.com/partners/*"], "prompt": "Every agency listed: name and website"})` reads them in one job.
 5. **Signals**: companies hiring for the role or recently funded (`job_postings(operation="search", body=...)`, `triggers(operation="funding-rounds-search", body=...)`), when the definition is about a change. See the `signal-outreach` skill.
@@ -66,7 +68,7 @@ One search misses most of a market. Pull from several, then merge (recipes and m
 
 ## Step 4 - Classify fit, with a reason
 
-When the fit_classification flag is on, classify with `models(operation="fit-classifications-create", fit_definition="...", rows=[{"companyId": 123456}, {"domain": "acme.com", "name": "Acme", "description": "..."}])`: up to 100 rows a call, a Kenso Search `companyId` or the row's own domain, name and description. Each row comes back with `fit` (yes, no or maybe), a 0-100 `score` and a one-sentence `reason`, at 0.05 credits a classified row; a failed row costs nothing, send it again. Price a large list with `estimate_only=True` first and show the user the cost. Write the fit definition from Step 1's rubric, naming the core and adjacent segments, and map each `yes` to one of them by its reason. While the flag is off (the call is not found), classify yourself as below.
+When the fit_classification flag is on, classify with `models(operation="fit-classifications-create", fit_definition="...", rows=[{"companyId": 123456}, {"domain": "acme.com", "name": "Acme", "description": "..."}])`: up to 100 rows a call, a Kenso Search `companyId` or the row's own domain, name and description. Each row comes back with `fit` (yes or no; maybe only from the fallback model), a 0-100 `score` and a `reason`, at 0.05 credits a classified row; a failed row costs nothing, send it again. Most rows come back with a `reason` that only names their fit probability ("Fit probability 0.82"), not the facts. Price a large list with `estimate_only=True` first and show the user the cost. Write the fit definition from Step 1's rubric, naming the core and adjacent segments, then map each `yes` to one of them from the company's own data and write its one-line reason yourself. While the flag is off (the call is not found), classify yourself as below.
 
 Without the classifier, classify in batches of about 50 companies from each company's own data (name, industry, description, specialties, size; `search(operation="get-company", company_id=...)` for one). For each company write `class` and `reason`, for example `core - "Runs SDR and appointment-setting programs for SaaS clients"`.
 
@@ -95,7 +97,7 @@ If `email-finds-create` is not in your tools, the email finder is off for this w
 
 Pick the place by what comes next:
 
-- **A saved search** (reusable, refreshes): for the filter-based part, as `ken-search` describes: `saved_searches(operation="create", name="Agency TAM - companies", search_type="account", filters_json={...}, is_shared=True, client_id="2945")`, and one with `search_type="people"` for the people filters.
+- **A saved search** (reusable, refreshes): for the filter-based part, as `ken-search` describes: `saved_searches(operation="create", name="Agency TAM - companies", search_type="account", filters_json={...}, is_shared=True, client_id="2945")`, and one with `search_type="people"` for the people filters. A lookalike search is a snapshot and cannot be saved (400 `lookalike_not_storable`): keep its companies as a saved list and its people by id, as below.
 - **A saved list** (a fixed set, shareable, when Saved lists is on):
   - People: `saved_lists(operation="create", name="Agency TAM - founders", kind="people", description="Fit rubric v1, Oct 27", icp_tags=["agency-tam"])`, then add the saved people search as its source: `saved_lists(operation="create-source", saved_list_id=41, source_type="saved_search", parameters={"savedSearchId": 991})`. Poll `saved_lists(operation="get-source", saved_list_id=41, source_id=7)` until `done`.
   - Companies with their fit class and reason: a list of `kind="companies"`, filled from a CSV with `saved_lists(operation="create-upload", saved_list_id=42, csv_content="company_name,company_domain,fit,reason\n...", column_mappings=[...])`. Map `fit` and `reason` as custom variables.
@@ -116,7 +118,7 @@ Say what the list does not cover (countries, company types without a company pag
 
 ## What this skill cannot do yet
 
-- No lookalike search by a seed domain (only the `similarCompanies` a record carries).
+- No lookalike search where the workspace's lookalikes flag is off: there, widen around the fits with filter search.
 - No people search outside Kenso Search's six countries: there the email finder needs each person's name, from the company's site or the user.
 - No "do we already hold this person" check across every campaign: imports dedupe against their target campaign only.
 

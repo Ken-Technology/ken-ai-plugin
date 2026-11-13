@@ -38,7 +38,7 @@ Each playbook reads on its own and names its own references, which load the same
 
 `knowledge(operation="folders-list")`. It returns the top folders: the company folder named after the workspace (with Competitors and Proof inside), Accounts, You, Skills and Instructions. Keep their ids and `canEdit`.
 
-When the call is refused or answers 404, Knowledge is off for this workspace. Say so in one sentence with the link `https://app.ken.so/<workspace id>/demo/knowledge` and stop; never retry it. The four campaign playbooks above still work without Knowledge, so offer the one the person needs.
+When the call is refused or answers 404, Knowledge is off for this workspace. Say so in one sentence with the link `https://app.ken.so/<workspace id>/knowledge` and stop; never retry it. The four campaign playbooks above still work without Knowledge, so offer the one the person needs.
 
 ## Step 1: Read what is there
 
@@ -111,7 +111,7 @@ A rule that holds for every campaign (who never qualifies, what replies never sa
 ## Step 9: Check and hand off
 
 1. Read it back the way agents will: `knowledge(operation="context", purpose="first cold email to a new prospect")` returns the cited pack. Check that the overview, offer and voice are in `stable` and that nothing there is wrong or stale.
-2. Report in a few lines: each file you wrote with its link `https://app.ken.so/<workspace id>/demo/knowledge/f/<file id>`, the watched pages, the sources connected, the review mode, and `pendingCount` from `knowledge_review(operation="suggestion-counts")` with the Review link `https://app.ken.so/<workspace id>/demo/knowledge/review`. The change log is `https://app.ken.so/<workspace id>/demo/knowledge/review/changes`.
+2. Report in a few lines: each file you wrote with its link `https://app.ken.so/<workspace id>/knowledge/f/<file id>`, the watched pages, the sources connected, the review mode, and `pendingCount` from `knowledge_review(operation="suggestion-counts")` with the Review link `https://app.ken.so/<workspace id>/knowledge/review`. The change log is `https://app.ken.so/<workspace id>/knowledge/review/changes`.
 3. List the open questions you left as gaps: a price you could not confirm, a competitor with no source.
 
 ## What this skill cannot do yet

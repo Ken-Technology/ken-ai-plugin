@@ -38,7 +38,7 @@ This page is the filter metadata for the skill. Do not call `search(operation="g
 - `pastCompanies` - Any past employer in the experience history
 - `previousCompanies` - The immediately prior employer only (people who recently left a company)
 - `excludeCompanies` - Companies to exclude
-- `companyHeadcount` - `{ "min": N, "max": N }` (maps to size buckets internally)
+- `companyHeadcount` - `{ "min": N, "max": N }`, the current company's counted employees (the `employeesCount` each row shows). A company with no count matches only when its whole size band (`companySize`, "2-10 employees") lies inside the range
 - `foundedYear` - `{ "min": N, "max": N }`
 - `companyFundingAmount` - `{ "min": N, "max": N }`, total funding raised by the current company in whole USD (each bound optional, at least 0, min no greater than max)
 - `companyFundedWithinDays` - Integer 1-3650: the current company last raised within this many days
@@ -86,6 +86,7 @@ Supported countries: United Kingdom, United States, Canada, Ireland, New Zealand
 - `includeSimilarPeople` - Boolean; expands results with similar profiles
 - `keywords` - Free text across headline, summary, and skills. Avoid for campaign searches: it shrinks the audience.
 - `booleanSearch` - Advanced field-targeted query (e.g. `title:engineer AND company:"Google"`)
+- `behaviorTags` - String array, any-match: a Kenso-side filter on the workspace's behavior tags (e.g. `cold_responder`, `prefers_linkedin`), applied to the returned page after Search, so pages can be short (`totalResults` counts before it). Needs the `behavior_signals` feature; not a Search index field
 
 ### Pagination and sort
 - `page` - Default 1

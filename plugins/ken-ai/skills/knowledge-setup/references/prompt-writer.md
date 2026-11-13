@@ -1,6 +1,6 @@
 # Prompt Writer Skill
 
-Write the AI personalization prompts (AI variables) for one campaign segment, save them, set optional rewriting steering, and test the outputs on real contacts. The platform runs these prompts per lead at send time. It generates the system prompts (Instructions, Company Context, Rules, Email Sequence) and the default rewriting rules; you write only the **user prompts** (`to_output: true`) and an optional rewriting steering paragraph.
+Write the AI personalization prompts (AI variables) for one campaign segment, save them, set optional rewriting steering, and test the outputs on real contacts. The platform runs these prompts per lead at send time. It generates the system prompts (Instructions, Company Context, Rules, Email Sequence) and the default rewriting rules; you write only the **variable prompts** (`to_output: true`, saved with `prompt_type="system"`, the only type personalization reads) and an optional rewriting steering paragraph.
 
 Never send, test-send, launch, delete, restore, or revert anything, and never start or enable AI workflows. Removing a variable is the one delete this playbook makes, and only after the user asks for it.
 
@@ -83,7 +83,7 @@ Each AI variable is its own prompt. Save them one call at a time; a save never t
 
 **4a. Save each variable.** A variable that is not saved yet:
 ```
-prompts(operation="create", campaign_id=..., segment_id=..., flow="personalization", prompt_type="user",
+prompts(operation="create", campaign_id=..., segment_id=..., flow="personalization", prompt_type="system",
         name="First Line", prompt="<text>", to_output=true, to_rewrite=1, order=2,
         fallback_if_empty="<one plain sentence>", confirm=false)
 ```

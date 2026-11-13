@@ -12,7 +12,7 @@ Every call takes `client_id`, the workspace id. Send it when the user can see mo
 ## The rules
 
 - **Replies are people.** Count distinct contacts, never messages. Out-of-office is not a reply.
-- **Never report opens.** Open tracking is off for deliverability, so open numbers mean nothing.
+- **Never report opens.** Campaign emails never carry an open-tracking pixel, so opens are not tracked (rule 1 of the deliverability rules, in the `deliverability-guard` skill's `rules.md` reference).
 - **Three interested replies, or none.** Quote exactly three, from three different people, or leave the section out. Never pad it with a neutral or out-of-office reply.
 - **N/A, never 0, for anything you could not read.** A 0 says nothing happened; N/A says you do not know. Every N/A that only the reader can fill (meetings held, pipeline, cost per meeting) becomes a question under "Where we need you".
 - **Benchmarks and targets are the workspace's own.** Use the ones Step 0 gives you, or one the user gives you with its source. Write N/A for one you do not have, and never quote an "industry average".
@@ -56,7 +56,7 @@ Use `week.startDate` and `week.endDate` as the window for every other read in th
 
 ## Step 3 - Three interested replies, or none
 
-`threads(operation="list", campaign_id=42, interest="interested", limit=25)`, for each campaign in the report.
+`threads(operation="list", campaign_id=42, interest="interested", limit=25)`, for each campaign in the report. Each row is the prospect's newest reply in that thread, so its time and text are theirs even when you answered since.
 
 Keep threads whose prospect replied inside the window. Pick three different people for the whole report, favoring replies with substance: a question, a referral, a meeting request. For each one give the name, title and company, and a quote of at most 200 characters on one line. Fewer than three in the window: leave the whole section out.
 

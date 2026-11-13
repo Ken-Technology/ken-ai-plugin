@@ -2,13 +2,13 @@
 
 ## Reply forwarding
 
-Forwards replies from a sending mailbox to the client's own external inbox. Off by default when a mailbox is provisioned.
+Forwards replies from a sending mailbox to the client's own external inbox. Off by default when a mailbox is provisioned, unless the workspace has saved a reply forwarding default.
 
-- One inbox: `inboxes(operation="forwarding-set", inbox_id=..., forwarding_type=2, destination="founder@acme.com")`
-- Many inboxes: `inboxes(operation="forwarding-set_bulk", inbox_ids=[...], forwarding_type=2, destination=...)`
-- Turn it off: pass no `forwarding_type`
+- One inbox: `inboxes(operation="update", inbox_id=..., changes={"forwarding_destination": "founder@acme.com"})`
+- Many inboxes: `inboxes(operation="bulk-update", ids=[...], changes={"forwarding_destination": ...})`
+- Turn it off: `changes={"forwarding_destination": null}`
 
-`forwarding_type=2` with an external `destination` is the only accepted mode. Platform-hosted forwarding (`forwarding_type=1`) and destinations on platform-hosted addresses or platform-managed sending domains are rejected. Google, Outlook, and Azure mailboxes all accept it. The provider queues the change, so it can take a few minutes to apply.
+Only an external destination is accepted: a destination on a platform-hosted address or on one of the workspace's managed sending domains is rejected. Google, Outlook, and Azure mailboxes all accept it. The provider queues the change, so it can take a few minutes to apply.
 
 This is reply forwarding, not the domain website redirect. The redirect is a domain setting (`domains` update with `redirect_url_404`), handled in `domain-selection`.
 
@@ -27,4 +27,4 @@ Read one inbox: `inboxes(operation="get-warmup", inbox_id=...)`. Act on `status`
 | `not_started` | No warmup subscription. Enrolling is a staff step, not available from this skill |
 | `completed`, `maintenance`, `degraded` | An older warmup record, shown when no warmup provider tracks the inbox now. Nothing to resume from this skill; if the user wants it warming, it needs the support team |
 
-Pause with `enabled=false`. Pause and resume need the admin role and a yes from the user. `readiness.isHeld` true means the cold-send gate is still holding the inbox (for example `too_young` while it warms); wait it out rather than raising limits.
+Pause with `enabled=false`. Pause and resume need Delivery edit access (owners, admins and editors by default) and a yes from the user. `readiness.isHeld` true means the cold-send gate is still holding the inbox (for example `too_young` while it warms); wait it out rather than raising limits.

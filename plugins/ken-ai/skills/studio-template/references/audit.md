@@ -87,7 +87,6 @@ Credits, in plain words: `scrape.page` is free until the rate card prices it. Th
 - **Too few findings on a thin site.** A one-page site may not give 4 quotable problems; 3 findings fail `data-items` and the page shows `fallback.liquid`. Lower `minItems` if you target small sites.
 - **Two or four rewrites.** `rewrites` is exactly 3 (`data-items`). Say "exactly 3" in the prompt.
 - **A severity outside the enum.** "critical" or "High" fails `data-enum`. The prompt names the three lowercase values and when to use each.
-- **Their phone number in a quote.** A footer or contact line quoted from their site fails `data-third-party-contact`, because only the sender's own contact details may appear. Point the prompt at the headline, buttons, proof and pricing.
 - **Their own dashes.** The rubric fails any rewrite holding an em dash or en dash, and a verbatim `before` copied from a site that uses them keeps them. If your accounts write that way, limit the dash rule to `after` in the rubric.
 - **The grade keeps failing.** After two retries the page goes `needs_review` and gets no link. `studio_pages(operation="run-get", run_id=...)` shows the verdict: it names the rewrite by its `where`, the check, and the words to change. Fix the `rewrites` prompt, push, publish, refill.
 

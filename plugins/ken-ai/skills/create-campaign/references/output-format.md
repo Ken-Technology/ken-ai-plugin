@@ -39,7 +39,7 @@ Use this layout for every verify-campaign run. One row per executed check; SKIP 
 | 55b | Personalization | Subject Line | PASS | toOutput=true, toRewrite=0 on all segments |
 | 57-58 | Scoring | Scoring | SKIP | Not checked: scoring not requested |
 | 56 | Quality | Campaign name | PASS | "Acme - Series A SaaS founders" |
-| 60 | Prelaunch | Launch readiness | INFO | notReady: Draft, workflows still running |
+| 60 | Prelaunch | Launch readiness | INFO | not_ready: Draft, workflows still running |
 | 61-62 | Prelaunch | Domain auth + blocklists | PASS | 3/3 domains SPF, DKIM, DMARC pass; none listed (checked 2026-10-26) |
 | 63 | Prelaunch | Inbox warmup | FAIL | 2 of 9 inboxes have 6 warmup days left |
 | 64 | Prelaunch | Placement test | WARN | No placement test for this campaign yet |
@@ -62,7 +62,7 @@ Use this layout for every verify-campaign run. One row per executed check; SKIP 
 **WARNINGS (recommended fixes):**
 1. Status is Draft (0) - launch from the campaign page when ready; this check does not launch.
 2. Segment "enterprise" description drifts from the campaign plan - update with `segments(operation="update", segment_id=..., description=...)`.
-3. No placement test yet - a member with Delivery edit can start one after your yes with `approvals(operation="placement-tests-create", campaign_id={id}, random_scope=True)`; it sends the live copy to seed inboxes and uses one of the workspace's 2 tests a day (8 in 30 days).
+3. No placement test yet - a member with Delivery edit can start one after your yes. Where `domain_setup(operation="placement-tests-availability")` answers `enabled: true`, `approvals(operation="placement-tests-create", campaign_id={id})` sends the live copy from the campaign's senders to Kenso's seed inboxes, with results in about an hour (paid plans: 10 tests a day, 60 in 30 days). Otherwise `approvals(operation="placement-tests-create", campaign_id={id}, random_scope=True)`; it sends the live copy to seed inboxes and uses one of the workspace's 2 tests a day (8 in 30 days).
 4. No canary plan - agree the first 50-200 leads and how long to watch them before the rest send.
 
 Want me to apply the critical fixes?
