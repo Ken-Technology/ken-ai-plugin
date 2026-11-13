@@ -1,6 +1,6 @@
 # HTML Serializer Reference
 
-Read this before pushing any email sequence, and when reading a live one back. Copy you author is a `plain` step (`body_format` `plain`), but its body is stored as simple HTML: `<p>` paragraphs and `<a href="{{tracking_link:ID}}">` links. The skill converts the approved plain-text copy itself; no tool does it for you. `body_format` `html` is for full HTML emails, needs the workspace's `html_steps` feature, and is never used for copy written here.
+Read this before pushing any email sequence, and when reading a live one back. Copy you author is a `plain` step (`body_format` `plain`), but its body is stored as simple HTML: `<p>` paragraphs and `<a href="{{tracking_link:ID}}">` links. The skill converts the approved plain-text copy itself; no tool does it for you. A `plain` step still goes out with an HTML part unless the campaign's Send as plain text is on, which deliverability rule 3 asks for when the campaign has Google recipients (`campaign-configuration` Step 2a). `body_format` `html` is for full HTML emails, needs the workspace's `html_steps` feature, and is never used for copy written here.
 
 ## Authoring vs stored form
 
@@ -42,7 +42,7 @@ Every URL in the approved copy (the signature company link included) gets a trac
 2. Otherwise create one: `tracking_links(operation="tracking-links-create", campaign_id=..., name="{segment-slug} url_{n}", domain_name="<full destination URL>", text_value="<link text>")`. `domain_name` takes the full URL, path included. `text_value` is the markdown link text: a few plain words, never a host or URL.
 3. Record the mapping `url -> id` for the segment, then replace every link to that URL, in every email and variant, with the wrapped token.
 
-Never share a tracking link across segments. Link text must be plain words (the company name, "the 2-minute demo"), never a bare URL and never text that reads like a web address (`acme.com`): click tracking sends every link through a tracking domain, so the visible host would not match, and the save raises a `link_host_mismatch` finding.
+Never share a tracking link across segments. Link text must be plain words (the company name, "the 2-minute demo"), never a bare URL and never text that reads like a web address (`acme.com`): click tracking sends every link through the sending domain's own click host, `link.<sending domain>` (deliverability rule 2), so the visible host would not match, and the save raises a `link_host_mismatch` finding.
 
 Examples (tracking link id 116 for `https://acme.com`, 117 for `https://acme.com/report`):
 
@@ -99,7 +99,7 @@ Best,
 | `bodyFormat` / `body_format` | `plain` for copy written here; `markdown`; `html` only for full HTML emails with the `html_steps` feature |
 | `waitDays` / `wait_days` | Days before this step sends; Email 1 is 0 |
 | `isActive` | Carry over, so a paused variant stays paused. New steps send `true` |
-| `openTrackingEnabled` | Carry over; omitting it turns open tracking off |
+| `openTrackingEnabled` | Carry over. It is stored for compatibility and changes no send: campaign emails carry no open pixel (deliverability rule 1) |
 | `handwrittenEnabled`, `handwrittenBackground`, `handwrittenIntro` | Carry all three over; omitting them turns the handwritten letter off |
 | `studioTemplateVersionId` | Carry over when set; omitting it unpins the Studio template and the step sends its stored body |
 

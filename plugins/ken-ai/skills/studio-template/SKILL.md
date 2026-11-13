@@ -15,7 +15,7 @@ Every call takes `client_id`, the workspace id. Send it on every call when the u
 
 Studio is in beta behind the workspace's `studio` flag, and its operations are staff exposure until the flag is on for the workspace.
 
-- If `studio_templates` is not in your tool list, or `studio_templates(operation="list")` answers 404, Studio is not on for this workspace. Say so in one sentence and point to https://app.ken.so/<workspace id>/demo/studio. Do not retry, and never read the 404 as "no templates".
+- If `studio_templates` is not in your tool list, or `studio_templates(operation="list")` answers 404, Studio is not on for this workspace. Say so in one sentence and point to https://app.ken.so/<workspace id>/studio. Do not retry, and never read the 404 as "no templates".
 - A 404 on one id while other calls work means the id belongs to another workspace or was deleted. Check `client_id` and the id.
 - Extra flags: `recruiting` for recruiting templates, `studio_email` for the email format, `rd_docs` for Google Drive and OneDrive doc exports. Without one, that part answers 400 `feature_disabled` or is left out of the list: tell the user which part is off and carry on with the rest.
 
@@ -179,7 +179,6 @@ Previews, validation, pushes, hosting and PDFs are free. Publishing is free. Pag
 ## What this skill cannot do yet
 
 - No email template is in the Kenso template library; email templates start blank.
-- `enrich.email` is not available as a recipe tool: its slot always falls back.
 
 ## References
 

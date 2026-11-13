@@ -82,6 +82,7 @@ When the user asks to undo:
 
 - The sequence: `email_sequences(operation="list-versions", segment_id=7)`, then `email_sequences(operation="restore-version", segment_id=7, version_id=55)` with the id of the "Before" version. A restore puts that version live and keeps the history.
 - A prompt: `prompts(operation="prompt-versions-list", segment_id=7)`, then `prompts(operation="restore", segment_id=7, version_id=12, dry_run=True)` to preview it, and `confirm` set to true after the yes.
+- In the in-app support chat `restore-version` is not available, and `save-version` alone only stores a snapshot, it puts nothing live. Roll the sequence back with `email_sequences(operation="get-version", segment_id=7, version_id=55)` for the "Before" version, then `segment-email-sequences-replace` with that version's copy on the live step ids from `segment-email-sequences-get` (the fields `references/versions.md` lists), and checkpoint the result with `save-version`. A prompt or a whole segment cannot be rolled back there: send the user to the segment's version history at https://app.ken.so/<workspace id>/campaigns/<campaign id>.
 
 ## Step 7 - Report
 

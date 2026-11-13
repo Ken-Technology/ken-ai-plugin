@@ -173,12 +173,21 @@ Default to 3 emails. Go beyond 3 only when each extra email carries a distinct, 
 - **Final-email endings (HARD):** the last email never announces itself. Banned: "Last note from me", "Last email", "Just following up", "Following up", "Circling back", "Checking in", "Wanted to follow up", "Bumping this", "One last try". It earns its open with a real idea and closes on the offer CTA.
 
 ### Formatting
-- Plain text; short paragraphs (1-3 sentences) with spacing; never ALL CAPS.
+- Plain prose: short paragraphs (1-3 sentences) with spacing; no bold or other styling; never ALL CAPS.
 - Bullets as simple dashes, numbered items typed as 1, 2, 3. No markdown except links.
 - No calendar link in Email 1.
 
 ### First email
 - Mention the solution, not just the problem; state the problem and offer the solution together. State the UVP clearly. Don't ask if they have the problem.
+
+### First email to Google recipients (deliverability rule 4, HARD)
+A recipient on Google (Google Workspace or gmail.com) gets plain text (rule 3), so write Email 1 by rule 4 of the deliverability rules, in the `deliverability-guard` skill's `rules.md` reference:
+- The one link sits alone on its own line, as a markdown link on two or three plain words. The plain-text send writes it as those words and its URL, so the reader sees the URL. With click tracking on, that URL is on the sending domain's own click host (rule 2).
+- One link only, short, on the sender's own domain.
+- The proof is in the text: one or two specific findings before the link, not only behind it.
+- No bold, HTML signature, logo, image, video, handwritten letter or Studio email in Email 1: each forces the step back to HTML. A sender signature with a logo counts. Put that content on the page the link opens.
+
+Write every Email 1 this way unless the user says the campaign's leads are all on Microsoft (Microsoft 365 or outlook.com), who get the email as written.
 
 ### Pain point testing
 - The first pain you reach for is rarely the winner. Propose several candidates and test them as Email 1 variants; note which pain each variant leads with.

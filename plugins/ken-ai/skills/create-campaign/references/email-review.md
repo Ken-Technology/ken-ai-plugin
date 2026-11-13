@@ -97,7 +97,8 @@ A static opener that fails (a)-(d) is a REJECT. A failing sample is fixed in its
 - [ ] A PS variable sits on its own line after the signature.
 
 #### Formatting
-- [ ] Paragraphs of 1-3 sentences with spacing; no ALL CAPS; plain text; no calendar link in Email 1.
+- [ ] Paragraphs of 1-3 sentences with spacing; no ALL CAPS; no bold or other styling; no calendar link in Email 1.
+- [ ] **Email 1 to Google recipients (deliverability rule 4, in the `deliverability-guard` skill's `rules.md` reference):** the one link alone on its own line, short, on the sender's own domain; the proof in the text, not only behind the link; no bold, HTML signature, logo, image, video, handwritten letter or Studio email. FLAG each miss, unless the user said every lead is on Microsoft.
 
 #### Brevity and punch (HARD - the #1 operator complaint)
 - [ ] **Word bands:** the lint's `static_words` rule checks each email's band and gives its count; report each count. Its over-band REJECT stands except on one value-stack email per sequence (~100 words, numbered lines with real numbers), which you judge. A static PS is outside the count: cap it at ~35 words in at most 1-2 emails.

@@ -49,12 +49,18 @@ The server URL has not changed. Configs that already name the server `ken` keep 
 | `delivery-setup` | Get your sending ready: inboxes, domains, LinkedIn accounts and the link host, one step at a time. |
 | `domain-selection` | Review sending domains or order new ones on a paid workspace. |
 | `event-outbound` | Plan outreach around a conference: build its list, match it to your accounts, find who is likely there, plan touches for Today. |
+| `handoff-to-ae` | Write the handoff to the AE for the call in focus: who, company, pain, what was promised, open questions, next meeting. |
 | `inbox-configuration` | Tune sending inboxes: daily limits, display names, signatures, and reply forwarding. |
 | `infra-planning` | Size sending domains and inboxes against daily send and credits on a paid plan. |
 | `keep-campaigns-running` | Once a week, keep your live campaigns stocked with leads, at the right volume, on healthy inboxes, and propose the rest. |
 | `ken-search` | Build and save people-search filters against the contact database for a campaign. |
+| `kenso-cli` | Bulk lead, CRM and Studio work from files with the Kenso CLI (`npx kenso`): imports, updates and cleanups with dry runs, resumable runs and a results file. Prefer it over the MCP past about 50 records. |
 | `knowledge-setup` | Fill a workspace's Knowledge: company and offer files, website pages, calls, voice, tiers, Review and shared prompts. |
+| `meddic-summary` | Summarize the call in focus as MEDDIC. Anything the call did not cover says Unknown. |
 | `meeting-prep-and-followup` | Prep for a sales call, then follow it up: the brief before, and after it the commitments, deal updates and a follow-up draft you approve. |
+| `next-step-email` | Draft a short email to the main guest on the call in focus with the agreed next steps. It drafts only and never sends. |
+| `objection-log` | List the objections on the call in focus: who raised each, when, how it was answered, and what is still open. |
+| `onboarding-signup` | Sign up from your agent: create the workspace, answer a few choice questions, and open your first account plans in the app. |
 | `pipeline-review` | Review your pipeline: open deals by stage and age, which ones are stuck and why, the next action for each, and a weekly sales update. |
 | `reply-handling` | Go through your replies: sort them by interest, draft answers from your templates and offer real meeting times. You approve every send. |
 | `report` | Write the weekly or monthly results report for a client or your own team, with a short cover email. |

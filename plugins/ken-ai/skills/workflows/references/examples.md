@@ -2,7 +2,7 @@
 
 All three are complete `kenWorkflow: "1"` definitions. Copy the one closest to the goal, change the criteria and limits, and run the loop in the skill body (`SKILL.md`): validate, estimate, test, publish. The format rules are in `definition-format.md`.
 
-## 1. Signals to pipeline (`general`)
+## 1. Email companies that are hiring or just raised (`general`)
 
 This is the definition of the `signals-to-pipeline` template (`workflows(operation="templates-get", client_id=..., template_key="signals-to-pipeline")` reads it). Create it from the template, not by pasting:
 
@@ -14,14 +14,14 @@ Then replace the `<fill in: your ICP in two sentences>` criteria with an update 
 - `qualify` scores the lead's company against the criteria on the cheap tier.
 - `fit` sends a score of 70 or more to `promote`. The else arm ends the run.
 - `promote` turns the company into an account. On a lead trigger it runs before the research and the send.
-- `crm` creates or updates the company in the connected HubSpot or Salesforce by its domain. It has `"onFailure": "continue"`, so a CRM outage does not stop the research and the email. A workspace with no CRM connected sees `app_not_connected` at publish: connect one, or remove the step.
+- `crm` creates or updates the company in the connected CRM by its domain. It has `"onFailure": "continue"`, so a CRM outage does not stop the research and the email. A workspace with no CRM connected sees `app_not_connected` at publish: connect one, or remove the step.
 - `research` writes why now from the signal and its details (`{{trigger.payload}}`, such as the funding round), and an angle ready to paste into the email.
 - `email` drafts a first email to the lead (`to: "record"`) with a body built from `{{research.angle}}`. Because it has a body, the touch waits in Today for approval and never sends on its own. Without a body it would stay planned, out of Today, until Ken's writer or a person writes it.
 
 ```json
 {
   "kenWorkflow": "1",
-  "name": "Signals to pipeline",
+  "name": "Email companies that are hiring or just raised",
   "trigger": {
     "type": "trigger.signal@1",
     "with": { "signals": ["hiring", "funding", "job_change", "icp_timing"], "oncePerRecordDays": 30 }

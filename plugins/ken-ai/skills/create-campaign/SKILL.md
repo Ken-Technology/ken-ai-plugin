@@ -15,8 +15,11 @@ The work runs in stages. Each stage produces one thing, ends at a gate where a p
 - **A client's live campaign needs that client's yes.** Any schedule, volume, pause or sequence change on a client's campaign that is already sending needs a yes that names that client, with its source (who said it, where, when). Pass the source in `sending_days_requested_by` on `campaigns(operation="update", ...)`. Without it, leave the change undone and say what you need.
 - **Never invent.** No prices, times, offers, pay, case studies, metrics or lead magnets that the workspace's own material does not show. Ask, or leave it out.
 - **Replies, not opens.** Goals and results are replies, positive (interested) replies and clicks. Replies are distinct contacts; an out-of-office is not a reply; opens are never a goal or a reported number.
-- **No vendor names to clients.** Never name the email-finding, verification or sending providers behind Kenso.
+- **The deliverability rules decide tracking, format and inboxes.** Kenso's six deliverability rules are in the `deliverability-guard` skill's `rules.md` reference: quote them as written. The format follows the recipient's mail provider (rule 3, set in `campaign-configuration` Step 2a), and step 1 to Google recipients follows rule 4 (`email-copywriting`).
+- **No open tracking.** Asked to turn on open tracking, decline and give rule 1 as written: "Campaign emails never carry an open-tracking pixel. Opens are not tracked and are never reported."
+- **No vendor names to clients.** Never name the email-finding, verification or sending providers behind Kenso. Asked which company sends the mail, say Kenso names mailbox types, not the companies behind them, and give rule 6 as written: "Mailbox types a client can buy: Google, Outlook and SMTP." An inbox on a sending-provider account the workspace connected itself keeps the name the workspace gave it.
 - **A structural copy change is a new version.** On a live campaign, improved copy replaces the live steps and is checkpointed as a version. Never add it as a Variant B: variants are live A/B arms that send.
+- **Pass the user's request with every sequence save.** Each email and LinkedIn sequence replace (`email_sequences(operation="segment-email-sequences-replace", ...)`, `linkedin(operation="segment-linkedin-sequences-replace", ...)` and their campaign-level forms) takes `instruction`: the request that led to the change, in the user's own words when you have them ("make step 2 shorter"). Kenso keeps it with the edit, marked as reported by you. Leave it out when no person asked for the change; never invent one.
 - **A funding round is not a buying event.** Write to the plan the money pays for, never "congrats on the raise".
 
 ## Step 0 - Preflight
@@ -31,8 +34,8 @@ The work runs in stages. Each stage produces one thing, ends at a gate where a p
 | A recruiting campaign for a role | the `recruiting` feature (`roles`) | build a normal campaign or stop |
 | LinkedIn steps | LinkedIn accounts connected | email-only campaign |
 | Assigning inboxes from here | staff only | the user assigns inboxes at https://app.ken.so/<workspace id>/campaigns/<campaign id> |
-| Placement tests | Delivery view to read them, Delivery edit to start one (never a client seat); 2 a day and 8 in 30 days per workspace | the check reports "not checked" |
-| HTML steps | the `html_steps` feature | plain steps (the default) |
+| Placement tests | Delivery view to read them, Delivery edit to start one (never a client seat). On Kenso's seed network paid plans only: 10 a day and 60 in 30 days (2 and 8 while trialing), 3 a day per sending inbox; elsewhere 2 a day and 8 in 30 days per workspace | the check reports "not checked" |
+| HTML steps (never step 1 to Google recipients, deliverability rule 4) | the `html_steps` feature | plain steps (the default) |
 
 4. **New or existing.** If the user names an existing campaign, read it with `campaigns(operation="get", campaign_id=...)`, then `segments(operation="list", campaign_id=...)`, and start at the first stage whose output is missing (see "Picking up a campaign" below).
 5. **Credits.** Imports, enrichment and AI workflows spend credits, and prompt tests spend model usage. Say what a step costs before you run it on more than a handful of contacts. On `plan_limit` or `billing` errors, show `error.message` and `error.recovery.summary` and stop that step; never retry blindly.
@@ -104,7 +107,7 @@ Done when the segment's live sequence matches the approved copy.
 
 ### 6. Review (per segment)
 
-Open `email-review`. It scores the copy 1 to 5 against the rubric (word bands, four first-line checks, the bridge rule, spam-word tiers, merge fields, a prompt for every AI variable) and lists each failure with its fix. Below 4.5, rewrite with stage 5 and review again, at most 3 rounds. Fixes on a live sequence are a full replace of the live steps, then one `email_sequences(operation="save-version", segment_id=..., name=...)` per segment. The app's version history lists segment versions: when the user wants the round to show there, also call `segments(operation="save_new_version", campaign_id=..., segment_id=...)`, which queues a sequencer refresh on a live campaign (the configuration stage's `update-recipes.md`, section 8a).
+Open `email-review`. It scores the copy 1 to 5 against the rubric (word bands, four first-line checks, the bridge rule, spam-word tiers, merge fields, a prompt for every AI variable) and lists each failure with its fix. Below 4.5, rewrite with stage 5 and review again, at most 3 rounds. Fixes on a live sequence are a full replace of the live steps, then one `email_sequences(operation="save-version", segment_id=..., name=...)` per segment. The app's version history lists segment versions: when the user wants the round to show there, also call `segments(operation="save-version", segment_id=...)`, which queues a sequencer refresh on a live campaign (the configuration stage's `update-recipes.md`, section 8a).
 
 Done when the copy scores 4.5 or more and the user approves it.
 
@@ -116,13 +119,13 @@ Done when each variable's samples read well to the user.
 
 ### 8. Configuration
 
-Open `campaign-configuration`. It applies the settings the plan needs (contact limit, schedule, daily cap, AI workflows), runs the search import into the campaign, and checks what can only be set in the app. Inbox assignment from here is staff-only; everyone else assigns inboxes at https://app.ken.so/<workspace id>/campaigns/<campaign id>. Starting the AI workflows (`campaign_flow(operation="start_workflows", ...)`) spends credits: run it only on the user's yes.
+Open `campaign-configuration`. It applies the settings the plan needs (contact limit, schedule, daily cap, AI workflows), runs the search import into the campaign, sets open tracking and plain text by the deliverability rules once the leads' mail providers are known (Step 2a), and checks what can only be set in the app. Inbox assignment from here is staff-only; everyone else assigns inboxes at https://app.ken.so/<workspace id>/campaigns/<campaign id>. Starting the AI workflows (`campaigns(operation="resume", ...)` on the Draft campaign) spends credits: run it only on the user's yes.
 
 Done when every setting matches the plan, or the user has the list of what to change in the app.
 
 ### 9. Verify
 
-Open `verify-campaign`. It is read-only: `campaign_flow(operation="can_launch", campaign_id=...)`, the full checklist (segments, sequences, prompts, workflows, settings, tracking links), the prelaunch gate (domain authentication, warmup, placement, schedule and caps, merge fields render, a 50 to 200 lead canary) and a list audit (duplicates, blocklist, free mail, unverified emails). Each check reports PASS, FAIL or "not checked" with the reason. Fixes go back to the stage that owns them, after a yes.
+Open `verify-campaign`. It is read-only: `campaign_flow(operation="get-launch-readiness", campaign_id=...)`, the full checklist (segments, sequences, prompts, workflows, settings, tracking links), the prelaunch gate (domain authentication, warmup, placement, schedule and caps, merge fields render, a 50 to 200 lead canary) and a list audit (duplicates, blocklist, free mail, unverified emails). Each check reports PASS, FAIL or "not checked" with the reason. Fixes go back to the stage that owns them, after a yes.
 
 Done when the report is in the chat. Hand the user the campaign at https://app.ken.so/<workspace id>/campaigns/<campaign id> to launch it themselves.
 
@@ -140,15 +143,37 @@ Done when the report is in the chat. Hand the user the campaign at https://app.k
 
 A campaign that is already sending is not a build: copy changes there are a new version of the live steps (stage 6 rules), and any schedule, volume or pause change needs the client's named yes.
 
+## Change a segment's filters
+
+To narrow who a campaign targets (only the US, only some titles), change its segment's `filter_criteria`. Nothing else in the build runs again.
+
+1. Read the segment: `segments(operation="get", segment_id=...)`, or `segments(operation="list", campaign_id=...)` to find it. `filterCriteria` is its filter object. `{}` (or no `filterCriteria`) means it has no filters yet: a valid start, not a failed read.
+2. Send the whole object: `segments(operation="update", segment_id=..., filter_criteria={...})` replaces every filter, so a key you leave out is cleared. Copy every current key, then add or change yours. Keys are camelCase; `describe_tools(["segments.create"])` lists them all.
+3. `titles` keeps a contact whose job title contains any of its values, ignoring case. `profileCountries` (the person's country) and `companyHqCountries` (the company's headquarters) match the stored text exactly, case included: read a few of the campaign's contacts with `contacts(operation="list", campaign_id=...)` and list every spelling their `country` or `headquartersCountry` uses.
+4. Check the count with the same object: `segments(operation="preview", campaign_id=..., segment_id=..., criteria={...})`, then send the update.
+5. A manual segment reassigns its leads only after `segments(operation="process_filters", campaign_id=..., segment_id=...)`.
+
+Worked example, CEOs in the United States, on a segment whose `filterCriteria` is `{"companyHeadcount": {"min": 11, "max": 200}}`:
+
+```
+segments(operation="update", segment_id=<id>, filter_criteria={
+  "companyHeadcount": {"min": 11, "max": 200},
+  "titles": ["CEO", "Chief Executive"],
+  "profileCountries": ["United States"]
+})
+```
+
+`"US"` matches nothing where contacts store `United States`. Company headquarters can hold a long and a short spelling in one campaign: copy each into `companyHqCountries` exactly as the contacts show it.
+
 ## Recruiting campaigns
 
 A recruiting campaign fills one role, needs the `recruiting` feature, and is created from the role (`kind` `recruiting` and the `role_id` on the create call). The plan, segments, copy, review, configuration and verify stage references each have a Recruiting campaigns section: follow it at that stage. The offer is the role, the ask is a reply or a short call, LinkedIn goes first unless the user names one channel, and nothing is ever planned, segmented or written on age, gender, race, religion, disability, family status or nationality.
 
 ## What this skill cannot do yet
 
-- Domain authentication is read from the last stored DNS snapshot (`domain_setup(operation="list")`), not checked per message.
+- Domain authentication is read from the last stored DNS snapshot (`domains(operation="get-health", domain_id=...)`, one domain per call), not checked per message.
 - No tool answers "do we already hold these people" for a whole list across the workspace; only one email at a time. Verify reports the overlap as "not checked".
-- A workspace can start 2 placement tests a day and 8 in 30 days, and a client seat cannot start one. Inbox assignment from here is staff-only.
+- On Kenso's seed network a workspace on a paid plan can start 10 placement tests a day and 60 in 30 days (2 and 8 while trialing, 3 a day per sending inbox); elsewhere 2 a day and 8 in 30 days. A client seat cannot start one. Inbox assignment from here is staff-only.
 
 ## Report back
 

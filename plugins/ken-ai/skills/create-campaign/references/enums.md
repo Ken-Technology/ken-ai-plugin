@@ -16,21 +16,21 @@ The values behind campaign settings, prompts, segments, and sequences, with wher
 | `maxEmailsPerDay` | get | Greater than 0; omitted when unset | update `max_emails_per_day` |
 | `status` | get | Collapsed lifecycle string | Lifecycle calls only, never update |
 | `campaignStatuses` | status | CampaignStatus numbers | Lifecycle calls only |
-| `campaignAiWorkflows` | status (also `campaign_flow(operation="list-ai-workflows")`) | Flow ids. `[1, 4]` at create; 2 and 3 are attached by you, 6 by scoring | `campaign_flow(operation="replace-ai-workflows", ai_workflow_ids=[...])`, a full replace |
+| `campaignAiWorkflows` | status (also `campaign_flow(operation="list-ai-workflows")`) | Flow ids. `[1, 4]` at create; 2 and 3 are attached by you, 6 by scoring, 8 (AI Line Check) with 2: keep 8 when you attach 2 with a replace | `campaign_flow(operation="replace-ai-workflows", ai_workflow_ids=[...])`, a full replace |
 | `duplicationScope` | status | DuplicationScope | App setting |
 | `recentlyEmailedDedupDays` | status | 1-3650 or null (off). Suppresses contacts emailed within the window when they are imported. For reactivation / winback | App setting |
 | `segmentationMode` | status | SegmentationMode | App setting (create time or later) |
 | `allowPersonalEmails` | status | bool. Allow gmail / yahoo / etc. | App setting |
 | `campaignDataSources` | status | DataSource. `[17]` for search-sourced campaigns | App setting |
 | `campaignDataEnrichments` | status | DataEnrichment. `[3, 4]` for website scraping (not defaulted on at create) | App setting |
-| `campaignEmailEnrichments` | status | EmailEnrichment. Default `[3, 5, 8]`, applied at create when omitted | App setting |
+| `campaignEmailEnrichments` | status | EmailEnrichment. Default `[3, 8]`, applied at create when omitted | App setting |
 | `campaignEmailVerifications` | status | EmailVerification. Default `[1, 5, 7]`, applied at create when omitted | App setting |
 | `campaignWebsitePageSelections` | status | WebsitePageType per page, when enrichments 3/4 are on | App setting |
 | `aiFlowModelConfigurations` | status | Model overrides per flow; empty unless someone set one | Workspace admins: `models` configuration operations; everyone else: the campaign's AI settings in the app |
 
 ## Email Enrichment (`campaignEmailEnrichments`)
 - 3 = LeadMagicBusiness
-- 5 = Prospeo
+- 5 = Prospeo: no longer a campaign finder (DEV-7563); dropped when saved, and stored 5s run nothing
 - 8 = Findymail
 - Retired, not selectable for new campaigns: 2, 4, 6, 7
 
@@ -69,7 +69,7 @@ These names are wire values for reading settings. Never name these providers to 
 ## Flow (AI workflows and prompts)
 - 1 = Qualification, 2 = Personalization, 3 = Rewriting, 4 = Segmentation, 5 = ToneOfVoice, 6 = Scoring
 
-Prompt calls take the flow as a lowercase name: `qualification`, `personalization`, `rewriting`, `segmentation`, `scoring`. `tone_of_voice` still reads back on old rows, but a new prompt write rejects it, and AI workflow 5 cannot be attached. AI workflow writes take the ids 1, 2, 3, 4 and 6.
+Prompt calls take the flow as a lowercase name: `qualification`, `personalization`, `rewriting`, `segmentation`, `scoring`. `tone_of_voice` still reads back on old rows, but a new prompt write rejects it, and AI workflow 5 cannot be attached. AI workflow writes take the ids 1, 2, 3, 4, 6 and 8.
 
 ## SegmentationType (`segments` `segmentation_type`)
 - **1 = Manual** (membership by filter criteria) - `"manual"`
@@ -114,7 +114,7 @@ Read with `email_sequences(operation="segment-email-sequences-get", segment_id=.
 | `bodyFormat` | string | `plain` for copy you author, even with `<p>` and links; `markdown`; `html` only for full HTML emails (needs the workspace's `html_steps` feature). EmailBodyFormat 1 = Plain, 2 = Markdown, 3 = Html |
 | `waitDays` | int | See Wait days |
 | `isActive` | bool | An inactive variant does not send. Carry from the read so a paused variant stays paused |
-| `openTrackingEnabled` | bool | Per-step open tracking. Carry from the read; omitting it turns open tracking off |
+| `openTrackingEnabled` | bool | Stored for compatibility; it changes no send, and campaign emails carry no open pixel (deliverability rule 1). Carry it from the read |
 | `handwrittenEnabled` | bool | The body above the signature or unsubscribe line goes out as a handwritten letter image (needs the workspace flag `handwritten_letters`). Carry from the read; omitting it turns the letter off |
 | `handwrittenBackground` | string or null | Letter paper: `walnut`, `linen`, `kraft`, `marble`, `deckle` or `notepad` (null is `walnut`); carry from the read |
 | `handwrittenIntro` | string or null | One-line intro above the letter, at most 200 characters, no links; carry from the read |
@@ -133,6 +133,7 @@ Canonical strings, with the LinkedInStepType / LinkedInStepConditionType integer
 | `like_post` | 6 = LikePost | Likes the newest original post from the last 30 days that takes reactions. A body is ignored (never sent). No versions |
 | `endorse_skill` | 7 = EndorseSkill | 1st-degree only: place after the connection request with condition `accepted`. A body is ignored (never sent). No versions |
 | `comment_post` | 8 = CommentPost | Ken writes the comment in the background on the newest original post from the last 30 days. A comment not written within 6 hours skips with `comment_unavailable`; a workspace out of credits skips with `insufficient_credits`. The body is optional guidance, not the comment, max 500 characters. No versions |
+| `voice_note` | 9 = VoiceNote | Ken writes a line per lead and sends it as a LinkedIn voice note in the step's `voice` (provider `deepgram` or `elevenlabs`, `voiceId`, `speed`, `wordsMode` `ken_writes` or `script`, `model` `haiku`, `sonnet` or null). The body is the required fallback text, sent when the voice note cannot go. Needs the workspace's `linkedin_voice_notes` flag |
 
 conditionType: `none` (0), `clicked` (1), `replied_positive` (2), `accepted` (3), `engaged` (4 = Engaged: the prospect read or reacted to one of our LinkedIn messages, so it needs a message step earlier). The four engagement step types and `engaged` need the workspace's `linkedin_engagement` flag; a save that contains them without it is rejected. Turning the flag off also stops saved engagement steps: each skips with `engagement_disabled` and the lane continues. A step with nothing to act on (no recent post, already following, not connected) skips and the lane continues.
 

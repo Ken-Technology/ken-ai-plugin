@@ -69,6 +69,8 @@ Each result is `created`, `duplicate` (already on the event: it fills a blank ti
 
 `find-company-people` and `find-people-going` count each profile they return against the workspace's Search browse quota (429 `quota_exceeded` past it).
 
+A row with source `linkedin_post` is a person whose public LinkedIn post says they take part, added with the post as its proof (`sourceUrl`). No find operation returns those, and they count as confirmed, not likely.
+
 **A LinkedIn event's attendees.** Only when the user asks, and only through their own seat:
 
 1. `outbound_events(operation="linkedin-attendees", event_id=12)` returns `enabled`, the `warning`, the limits and the caller's seats with `canRead`.

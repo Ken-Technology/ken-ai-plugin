@@ -39,7 +39,7 @@ Every call takes `client_id`, the workspace id. Send it on every call when the u
 | Writing style and account knowledge | `knowledge` context | Knowledge on |
 | Email threads | `threads` list, list-messages, replace-draft, create-message | every member who can reply |
 
-When an operation is not listed for you, or answers 404 `not_found` on every id, that part is off for this workspace or this seat. Skip it, tell the user in one sentence which part is not on, and carry on with the rest. Do not retry it. If `meetings` itself is missing, say meeting briefs are not available to this connection and send the user to their calendar in Kenso: `https://app.ken.so/<workspace id>/demo/calendar`.
+When an operation is not listed for you, or answers 404 `not_found` on every id, that part is off for this workspace or this seat. Skip it, tell the user in one sentence which part is not on, and carry on with the rest. Do not retry it. If `meetings` itself is missing, say meeting briefs are not available to this connection and send the user to their calendar in Kenso: `https://app.ken.so/<workspace id>/calendar`.
 
 ## Before the call
 
@@ -140,7 +140,7 @@ In the user's voice, from the writing style in Knowledge when it is on:
 
 Pick the first that applies:
 
-1. **There is an email thread with the contact** (`threads(operation="list", contact_id=5512)`): save the draft on it with `threads(operation="replace-draft", thread_id="thr_...", body="...")`. The person sends it from `https://app.ken.so/<workspace id>/replies`, or approves that text in chat and you send it with `threads(operation="create-message", thread_id="thr_...", body="...", sender_email_id=88, idempotency_key="followup-mtg_812-v1")`.
+1. **There is an email thread with the contact** (`threads(operation="list", contact_id=5512)`): save the draft on it with `threads(operation="replace-draft", thread_id="thr_...", body="...")`. The person sends it from `https://app.ken.so/<workspace id>/inbox`, or approves that text in chat and you send it with `threads(operation="create-message", thread_id="thr_...", body="...", sender_email_id=88, idempotency_key="followup-mtg_812-v1")`.
 2. **The account is in Accounts**: create it as a touch to the attendee's stakeholder (`stakeholderId` on the brief or the participant), which waits for a person's approval in Today: `account_touches(operation="create", account_id=101, stakeholder_id=4401, channel="email", due_at="2026-10-28T09:00:00Z", reason="manual", subject="Next steps from today", body="Hi Maya, ...", rationale="Follow-up to the Oct 27 call")`. A 422 `guardrail_violation` means a Contact limits rule: move `due_at` to the `nextAllowedAt` it names.
 3. **Neither**: show the draft in chat for the person to send from their own mail. Where the workspace's `agent_send` flag is on, every seat that can reply can instead start the thread with the text the person approved, from a shared cold inbox (an `inboxes(operation="list", role="sending", status="active")` entry with no `ownerMemberId`, on a cold sending domain): `replies(operation="threads-create", sender_inbox_id=91, to="maya@acme.com", subject="Next steps from today", body="Hi Maya, ...", idempotency_key="followup-mtg_812-v1")`. A 404 (the flag is off) or a 409 `client_approval_required` means the person sends it.
 

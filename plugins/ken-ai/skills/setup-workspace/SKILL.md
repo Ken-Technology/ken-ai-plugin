@@ -124,7 +124,7 @@ List who is already in with `members(operation="list", client_id=...)` and pendi
 
 Suggest inviting the people who will review campaigns or handle replies. Collect **emails only**; do not ask for roles. Confirm the list, then call `members(operation="invite", email=..., client_id=...)` once per email. The server sends the invitation email.
 
-- Roles are changed later by an admin in the team settings: https://app.ken.so/<workspace id>/settings/users
+- Roles are changed later by an admin in the team settings: https://app.ken.so/<workspace id>/settings/members
 - `code="USER_LIMIT_REACHED"`: relay `error.message` and `error.recovery.summary` as the upgrade path, then continue.
 - If the invite fails because the workspace is not linked to an organization, do **not** invite as a staff user and do not retry. Tell the user Kenso support needs to link the workspace to its owner's organization first (give them the workspace id and the owner's email), then invites will work.
 
@@ -142,10 +142,10 @@ Explain that the blocklist keeps current clients, partners, and anyone they cann
 
 **Integrations:** optional and low pressure. Connect when ready at https://app.ken.so/<workspace id>/settings/integrations:
 
-- CRM sync: https://app.ken.so/<workspace id>/settings/integrations/crm
-- Calendar: https://app.ken.so/<workspace id>/settings/integrations/calendar
-- LinkedIn accounts connect from https://app.ken.so/<workspace id>/delivery?tab=linkedinAccounts
-- API keys, when they need them: https://app.ken.so/<workspace id>/settings/integrations/api-keys
+- CRM sync: https://app.ken.so/<workspace id>/settings/integrations
+- Calendar: https://app.ken.so/<workspace id>/settings/calendar
+- LinkedIn accounts connect from https://app.ken.so/<workspace id>/delivery?tab=linkedin
+- API keys, when they need them: https://app.ken.so/<workspace id>/settings/api-keys
 
 OAuth stays in the browser. Never claim setup connected anything.
 

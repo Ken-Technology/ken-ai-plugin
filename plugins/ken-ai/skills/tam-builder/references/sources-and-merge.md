@@ -21,7 +21,7 @@ A worldwide agency TAM built in October 2026 pulled 160,627 candidate domains fr
 Lessons from that run:
 
 - No single source found more than half the fits. Plan at least three.
-- Lookalikes of confirmed fits were the third-largest source: once you have confirmed fits, widen around them (the `similarCompanies` ids on each fit's company record).
+- Lookalikes of confirmed fits were the third-largest source. That run read the similar companies listed on each fit's company record; today the lookalike filter on company search does it in one call, with up to 100 fits as seeds (SKILL.md Step 3).
 - People first catches freelancers and one-person shops whose company page is thin or missing.
 - The site pass (reading the home, about and team pages) found a founder on about 30% of the sites it could read, and most of those gave a verified email. About a quarter of sites did not answer a script fetch.
 - Only 46% of fits had a verified founder email. Plan the campaign size from emails found, not from fits.

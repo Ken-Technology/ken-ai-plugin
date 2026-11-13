@@ -25,4 +25,4 @@ No invented typos (`jhon`, `jonh`, dropped letters). No role names (`info`, `sal
 
 ## Profile photos
 
-Optional `profile_picture_url` for Google and Outlook mailboxes: a public HTTPS PNG, JPEG, or WebP. Worth setting when one person has several usernames on a domain. Omit it for Azure.
+Optional `profile_picture_url` for Google and Outlook mailboxes: a public HTTPS PNG, JPEG, WebP, or GIF. Worth setting when one person has several usernames on a domain. Omit it for Azure.

@@ -36,7 +36,7 @@ Any state -> Archived (7) on archive
 ```
 
 - New campaigns are always created in `Draft (0)`.
-- `Draft -> Building -> Ready` advances as enrichment and AI workflows finish, after `start_workflows`.
+- `Draft -> Building -> Ready` advances as enrichment and AI workflows finish, after `campaigns(operation="resume")` starts them.
 - The user moves `Ready -> Sending` to start outreach (or an auto-launch preference the user set).
 - `Sending <-> Paused` is the user-controlled toggle while a campaign is live.
 - `Completed` is terminal in the happy path. `Error` stays until a human resets it.
@@ -55,9 +55,9 @@ Show the name and the number: `Draft (0)`, `Sending (3)`. When you read the cano
 
 **Never set `status` through `campaigns(operation="update")`** (it is rejected). Lifecycle changes go through the calls below, and only on the user's explicit request for that action. Launch is the user's decision, after verify-campaign passes. On a client's live campaign, pause and resume also need a yes that names that client, with who said it, where and when. Verification never calls any of them.
 
-- `campaign_flow(operation="start_workflows", campaign_id=...)` - Draft -> Building (spends credits)
+- `campaigns(operation="resume", campaign_id=...)` on a Draft campaign - Draft -> Building (starts enrichment and AI workflows; spends credits)
 - `campaigns(operation="launch", campaign_id=...)` - Ready -> Sending
-- `campaigns(operation="pause", campaign_id=...)` and `campaigns(operation="resume", campaign_id=...)` - while live
+- `campaigns(operation="pause", campaign_id=...)` and `campaigns(operation="resume", campaign_id=...)` - while live (each covers sending, processing and AI workflows together)
 - `campaigns(operation="archive", campaign_id=...)` - Archived (pause sending first; a sending campaign answers 409)
 
 Field-level updates (name, contact limit, schedule) use `campaigns(operation="update", ...)` - see `update-recipes.md` section 1.

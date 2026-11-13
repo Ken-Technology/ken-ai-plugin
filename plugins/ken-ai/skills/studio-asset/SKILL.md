@@ -24,7 +24,7 @@ Every call takes `client_id`, the workspace id. Send it on every call when the u
 
 Studio is in beta behind the workspace's `studio` flag, and its operations are staff exposure until the flag is on for the workspace.
 
-- If `studio_pages` is not in your tool list, or `studio_templates(operation="list")` answers 404, Studio is not on for this workspace. Say so in one sentence and point to https://app.ken.so/<workspace id>/demo/studio. Do not retry, and never read the 404 as "not found".
+- If `studio_pages` is not in your tool list, or `studio_templates(operation="list")` answers 404, Studio is not on for this workspace. Say so in one sentence and point to https://app.ken.so/<workspace id>/studio. Do not retry, and never read the 404 as "not found".
 - A 404 on one id while other calls work means another workspace's id or a deleted one.
 - Recruiting pages need `recruiting`; Google Drive and OneDrive doc exports need `rd_docs`; research refreshes need `accounts_research`. Tell the user which part is off and carry on with the rest.
 
@@ -102,7 +102,7 @@ Read each page with `studio_pages(operation="get", asset_id=901)`: `data`, `slot
 4. Confidentiality: no email address or phone number except the sender's own, no other client's names or data, no vendor or tool names, no "demo".
 5. You read it once through `previewUrl`, on desktop and mobile.
 
-A `needs_review` page failed a grade after its retries or holds data that broke a rule. Refill it once (`studio_pages(operation="refill", asset_id=901)`, charged like a fill), or ask a person to review it on its Customize screen (https://app.ken.so/<workspace id>/demo/studio/pages/901/customize): their save there moves it to `ready`; your own `customize` edit does not.
+A `needs_review` page failed a grade after its retries or holds data that broke a rule. Refill it once (`studio_pages(operation="refill", asset_id=901)`, charged like a fill), or ask a person to review it on its Customize screen (https://app.ken.so/<workspace id>/studio/pages/901/customize): their save there moves it to `ready`; your own `customize` edit does not.
 
 ## Step 6 - Create the links
 
@@ -125,6 +125,7 @@ A `needs_review` page failed a grade after its retries or holds data that broke 
 
 - **Accounts:** put the person's link in the next touch you draft for them (the `accounts` skill), or use "Use in next touch" on the account's Assets tab. The touch waits for a person in Today, and it can be approved only once the page is ready.
 - **Campaigns:** a step carries the merge tag `asset_link`, written in double curly braces, and Kenso builds each company's page one step ahead from the campaign's pinned template; slot fallbacks cover anything not filled yet. Pinning is the `studio-template` skill.
+- **Workflows:** a `studio.page@1` step fills the template for the run's account and returns the person's link as its `url`, for a later `send.email@1` step to carry; a page that needs review gets no link and fails the step. Its inputs and outputs are in the `workflows` skill's `references/definition-format.md`.
 
 ## Step 8 - Read engagement
 
@@ -174,6 +175,7 @@ When a prospect asks to see the work, build them a real sample: their campaign, 
 | Kenso writing `prompt` and `grade` steps (executor `"ken"`, refill, update-version) | model tokens at 2x cost |
 | Your own agent writing them (executor `"agent"`) | no token charge |
 | A `ken.copy` step, on any path | model tokens at 2x cost |
+| An `enrich.email` step (only when Kenso fills the page) | 1 credit per email found on Kenso's key; an email Kenso already holds, or one found on the workspace's own key, is free |
 | Data steps | rate card; today's (`bind`, Kenso Search, `chart.data`, scraping, `webhook`, `dataset`) cost nothing |
 | Previews, hosting, PDFs | free |
 

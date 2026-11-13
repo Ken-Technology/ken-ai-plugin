@@ -75,9 +75,9 @@ Read through `campaign_ops(operation="status")` and set in the campaign settings
 | `sending_timezone` | `"America/New_York"` | Or `"prospect"` for a window local to each lead |
 | `duplication_scope` | 1 (CampaignSegment) | App setting |
 | `campaign_data_sources` | `[17]` | App setting |
-| AI workflows | `[1, 4]` | Plus 2 once AI variables exist, plus 3 when rewriting is used; written with `replace-ai-workflows` |
+| AI workflows | `[1, 4]` | Plus 2 and 8 (AI Line Check) once AI variables exist, plus 3 when rewriting is used; written with `replace-ai-workflows` |
 | `campaign_data_enrichments` | `[3, 4]` | Not defaulted on at create; Home page selection when on. App setting |
-| `campaign_email_enrichments` | `[3, 5, 8]` | Defaulted at create when omitted. App setting |
+| `campaign_email_enrichments` | `[3, 8]` | Defaulted at create when omitted. App setting |
 | `campaign_email_verifications` | `[1, 5, 7]` | Defaulted at create when omitted. App setting |
 | `allow_personal_emails` | `false` | Reject gmail / yahoo / etc. App setting |
 
@@ -85,7 +85,7 @@ Read through `campaign_ops(operation="status")` and set in the campaign settings
 
 ## AI workflows
 
-Read: `campaign_flow(operation="list-ai-workflows", campaign_id=...)`. Write: `campaign_flow(operation="replace-ai-workflows", campaign_id=..., ai_workflow_ids=[...])`, a full replace: read first, then send every id the campaign should run. While the campaign is scheduled, launching or sending, only adding 3 and changing 6 are allowed; anything else answers 409 until it is paused.
+Read: `campaign_flow(operation="list-ai-workflows", campaign_id=...)`. Write: `campaign_flow(operation="replace-ai-workflows", campaign_id=..., ai_workflow_ids=[...])`, a full replace: read first, then send every id the campaign should run. While the campaign is scheduled, launching or sending, only adding 3 and changing 6 or 8 are allowed; anything else answers 409 until it is paused.
 
 | Flow | ID | Purpose | Attached by |
 |------|----|---------|-----------|
@@ -166,7 +166,7 @@ Default import limit in this stage: `5 * contact_limit`. Factor in:
 
 ### 2. Keep the default email finding and verification
 
-The create defaults (finding `[3, 5, 8]`, verification `[1, 5, 7]`) are the cost-effective set. Change them in the app only when the user asks. Never name the providers behind these ids to a client (`enums.md`).
+The create defaults (finding `[3, 8]`, verification `[1, 5, 7]`) are the cost-effective set. Change them in the app only when the user asks. Never name the providers behind these ids to a client (`enums.md`).
 
 ### 3. Prefer Manual segments when filters are enough
 
@@ -185,7 +185,7 @@ Say what a step costs before you run it on more than a handful of contacts. Neve
 | Step | Spends |
 |------|--------|
 | Search import, then enrichment (email finding and verification) | Credits per contact |
-| `campaign_flow(operation="start_workflows")` and the AI workflows it runs | Credits / model usage per contact |
+| `campaigns(operation="resume")` on a Draft campaign and the AI workflows it starts | Credits / model usage per contact |
 | `prompts(operation="test", ...)` | Model usage per sample |
 | `campaigns(operation="run-scoring", ...)` | Model usage per contact |
 
@@ -260,7 +260,7 @@ Check the stored `waitDays` first (`0, 3, 4, 4` for 0/3/7/11). The dashboard gap
 
 - Never set status through `campaigns(operation="update")`
 - Lifecycle calls run only on the user's explicit request; launch is the user's decision after verify passes
-- On a `start_workflows` rejection: `data.startWorkflowReadiness.checks`
+- Before starting workflows, or when a start is rejected: `campaign_flow(operation="get-workflow-readiness", campaign_id=...)` `checks`
 
 Full recovery table: `error-recovery.md`. Status enum: `campaign-status-enums.md`.
 

@@ -83,7 +83,7 @@ Do not repeat any of this in your user prompts.
 
 ## Saving variables (one prompt each)
 
-Each variable is one `prompts` item with `flow="personalization"`, `prompt_type="user"` and `to_output=true`: `prompts(operation="create", ...)` for a new one, `prompts(operation="update", prompt_id=..., changes={...}, confirm=false)` for a saved one. The prompt writer playbook has the exact calls. Fields:
+Each variable is one `prompts` item with `flow="personalization"`, `prompt_type="system"` and `to_output=true`: `prompts(operation="create", ...)` for a new one, `prompts(operation="update", prompt_id=..., changes={...}, confirm=false)` for a saved one. The prompt writer playbook has the exact calls. Fields:
 
 | Field | Required | Notes |
 |-------|----------|-------|
@@ -162,7 +162,7 @@ The Subject Line, First Line and PS Line templates live in the prompt writer pla
 
 A 3-email sequence whose strategy asked for an opener in every email. Each email that needs its own opener gets its own name, because one prompt produces one value per lead and a reused token sends the same sentence again.
 
-Each entry below is one `prompts` create (`flow="personalization"`, `prompt_type="user"`, `to_output=true`, `to_rewrite` 0 for Subject Line and 1 for the rest).
+Each entry below is one `prompts` create (`flow="personalization"`, `prompt_type="system"`, `to_output=true`, `to_rewrite` 0 for Subject Line and 1 for the rest).
 
 ```
 variables = [

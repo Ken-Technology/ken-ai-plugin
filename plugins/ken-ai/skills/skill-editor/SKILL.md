@@ -14,7 +14,7 @@ A skill reaches agents when it is on (`active`), reviewed (`status` `ok`) and ha
 
 ## Rules
 
-- **Admins edit shared skills.** A skill with `visibility` `workspace`, every Kenso skill included, changes only through a workspace admin; a private skill belongs to the person who made it. When `canEdit` is false or a save answers 403, propose the change instead: `knowledge(operation="suggestion-create", kind="change", file_id=..., base_version=..., old_text="...", new_text="...", reason="...")`. It waits in Review at `https://app.ken.so/<workspace id>/demo/knowledge/review`.
+- **Admins edit shared skills.** A skill with `visibility` `workspace`, every Kenso skill included, changes only through a workspace admin; a private skill belongs to the person who made it. When `canEdit` is false or a save answers 403, propose the change instead: `knowledge(operation="suggestion-create", kind="change", file_id=..., base_version=..., old_text="...", new_text="...", reason="...")`. It waits in Review at `https://app.ken.so/<workspace id>/knowledge/review`.
 - **A yes before each save.** Show the change as before and after, in the skill's own words, and save after the person agrees. Pass a `reason`; History shows it.
 - **Read, then write.** `knowledge(operation="get", file_id=...)` returns `version`; pass it as `base_version`. `version_conflict` means someone saved since: read again, merge, show, save.
 - **Keep the approvals.** A skill must never let an agent send, launch, book, spend credits, or change a campaign's schedule or volume without a person's yes. Keep every approval step and "a person approves" line. When a requested edit would remove one, say so and leave that part out.
@@ -26,7 +26,7 @@ A skill reaches agents when it is on (`active`), reviewed (`status` `ok`) and ha
 
 ## Step 0: Check Knowledge is on
 
-`knowledge(operation="list", level="skill")`. When it is refused or answers 404, Knowledge is off for this workspace: say so in one sentence with the link `https://app.ken.so/<workspace id>/demo/knowledge` and stop. Never retry it.
+`knowledge(operation="list", level="skill")`. When it is refused or answers 404, Knowledge is off for this workspace: say so in one sentence with the link `https://app.ken.so/<workspace id>/knowledge` and stop. Never retry it.
 
 ## Step 1: Find the skill
 
@@ -38,7 +38,7 @@ The list gives each skill's `id`, `name`, `cmd`, `active`, `status`, `visibility
 
 ## Step 2: Read it
 
-`knowledge(operation="get", file_id=...)` returns `body`, `version`, `canEdit`, `cmd`, `trigger`, `triggerStatus`, `active`, `status` and `visibility`. Summarize it for the person: what it does, when it runs, its steps, and anything that looks out of date. Link it: `https://app.ken.so/<workspace id>/demo/knowledge/f/<file id>`.
+`knowledge(operation="get", file_id=...)` returns `body`, `version`, `canEdit`, `cmd`, `trigger`, `triggerStatus`, `active`, `status` and `visibility`. Summarize it for the person: what it does, when it runs, its steps, and anything that looks out of date. Link it: `https://app.ken.so/<workspace id>/knowledge/f/<file id>`.
 
 Kenso's own current text of a Kenso skill is the `skill://ken-ai/<name>/SKILL.md` resource. Compare with it to see what the workspace changed.
 
@@ -59,6 +59,7 @@ Kenso's own current text of a Kenso skill is the `skill://ken-ai/<name>/SKILL.md
 - History: `knowledge(operation="versions-list", file_id=...)` lists every version, newest first, with its author, `reason` and `bodyMd`.
 - Restore one on a yes: `knowledge(operation="versions-restore", file_id=..., version=<the one to bring back>, base_version=<the current version>)`. It becomes a new version, so nothing is lost and the restore can itself be undone.
 - Back to Kenso's current text, on a yes: `knowledge_prompts(operation="knowledge-files-reset", file_id=..., base_version=<the current version>)`. It writes Kenso's text as a new version, so the edits stay in History. Only a Kenso skill resets. The reset icon in the Knowledge tab (the file's toolbar, next to History) does the same.
+In the in-app support chat `versions-restore` and `knowledge-files-reset` are not available: send the user to History (restore) or the reset icon in the Knowledge tab at https://app.ken.so/<workspace id>/knowledge.
 
 ## Step 6: When Kenso updates a skill
 

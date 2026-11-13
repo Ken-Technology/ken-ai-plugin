@@ -5,7 +5,7 @@ description: Build, validate, test, publish and run a workflow over MCP, from a 
 
 # Workflows
 
-A workflow is automation in Kenso (Workflows, https://app.ken.so/<workspace id>/demo/workflows). It has one trigger (a signal, a new lead, a webhook, a schedule, or a run on records someone picks), a list of steps (find people, enrich, qualify with AI, branch, promote to Accounts, draft an email, post to Slack) and limits (credits per month and per run, runs per day). A `general` workflow runs on the workspace's accounts, people or leads. A `campaign` workflow belongs to one campaign and runs on its leads. A `system` workflow is Kenso's own and read-only. Kenso keeps one for each Knowledge skill (edit the skill instead), and the ones Kenso seeds for its own jobs are hidden: a 404 for anyone but staff (`references/ops-console.md`).
+A workflow is automation in Kenso (Workflows, https://app.ken.so/<workspace id>/workflows). It has one trigger (a signal, a new lead, a webhook, a schedule, or a run on records someone picks), a list of steps (find people, enrich, qualify with AI, branch, promote to Accounts, draft an email, post to Slack) and limits (credits per month and per run, runs per day). A `general` workflow runs on the workspace's accounts, people or leads. A `campaign` workflow belongs to one campaign and runs on its leads. A `system` workflow is Kenso's own and read-only. Kenso keeps one for each Knowledge skill (edit the skill instead), and the ones Kenso seeds for its own jobs are hidden: a 404 for anyone but staff (`references/ops-console.md`).
 
 You edit a draft, and nothing runs until you publish it. A published workflow is `live`: its trigger starts runs. `draft` means it was never published. `off` means it was unpublished, or the engine paused it at a limit (`pausedReason`). Every run records the version it ran, each step with its attempts, and the credits charged. This skill is the loop from a goal to a live workflow, then running it on records and recovering runs.
 
@@ -13,6 +13,7 @@ Open a reference with `load_skill(name="workflows", reference="references/exampl
 
 | Reference | Open it when |
 |---|---|
+| `references/plain-steps.md` | you write a workflow yourself (the default): plain steps first, then the engine steps, pinning, judgment and secrets |
 | `references/definition-format.md` | you write or fix a definition: keep it open the whole time |
 | `references/examples.md` | you want a complete workflow to copy: three of them, one with a `code.run@1` step |
 | `references/lead-source-workflows.md` | the user wants leads or accounts to come in by themselves (Sales Navigator, forms, website visitors, hiring signals, imports), or picks a template: every template, what it needs, and the template loop with a spend limit |
@@ -22,14 +23,15 @@ Every call takes `client_id`, the workspace id. Send it on every call when the u
 
 ## Step 0 - Check that it can run
 
-Workflows are in beta and staff-only for now. Two flags decide what works for a workspace:
+Workflows are in beta: they open where Kenso turns them on for the workspace. Three flags decide what works:
 
 | Flag | Without it |
 |---|---|
 | `workflows` | the workflow tools are not listed, or every workflows call answers 404 |
+| `workflows_plain` | `workflows(operation="brief")` is not listed: write from `references/definition-format.md` and `step-types-list` instead |
 | `workflows_runtime` | you can build, validate and estimate, but nothing runs: a test answers 404 (step 4) and live runs stay `queued` |
 
-- The tools are not listed, or every call answers 404: Workflows is not on for this workspace yet. Stop, tell the user in one sentence, and link https://app.ken.so/<workspace id>/demo/workflows. Do not retry, and do not read that 404 as "this workflow does not exist".
+- The tools are not listed, or every call answers 404: Workflows is not on for this workspace yet. Stop, tell the user in one sentence, and link https://app.ken.so/<workspace id>/workflows. Do not retry, and do not read that 404 as "this workflow does not exist".
 - A 404 on one id while other calls work: another workspace's id or a deleted workflow.
 - 403: the caller's role lacks Workflows view (reads) or edit (writes). Spend limits also need the billing permission, which an admin has.
 
@@ -39,17 +41,20 @@ List what exists first: `workflows(operation="list", client_id=..., q="funding")
 
 | Start from | Pick it when |
 |---|---|
+| Plain steps, written by you | the default: the user says what should happen and you write it, at no Kenso AI cost |
 | A template | one of the templates below fits the goal |
-| The builder | the user describes the goal in plain words and no template fits |
-| Your own definition | you know the trigger and the steps |
+| The builder | the user wants Kenso to write the whole draft from one goal |
+| Custom JSON or code | the user hands you a definition, a step's config or a `code.run@1` step: send it as written, its plain step pinned |
 
-**Template.** `workflows(operation="templates-list", client_id=...)` lists them with `requires` (`app:slack`, `secret:NAME`, `flag:x`: what the workspace needs before publishing). `references/lead-source-workflows.md` says what each template is for and what it needs. Read one with `workflows(operation="templates-get", client_id=..., template_key="signals-to-pipeline")`, then create a draft from it:
+**Plain steps.** Call `workflows(operation="brief", client_id=...)` first: it returns the authoring guide, the step and trigger types this workspace can use, worked examples and the workspace's campaigns, Slack and secret names. Write the When line and numbered steps with the user, turn each into engine steps yourself, then create the draft below. `references/plain-steps.md` has the loop and the shapes to use (fit filter, segments, adding to a campaign, pinning, judgment).
+
+**Template.** `workflows(operation="templates-list", client_id=...)` lists them with `requires` (`app:slack`, `secret:NAME`, `flag:x`, or `any_flag:x|y` when any one of those flags is enough: what the workspace needs before publishing). `references/lead-source-workflows.md` says what each template is for and what it needs. Read one with `workflows(operation="templates-get", client_id=..., template_key="signals-to-pipeline")`, then create a draft from it:
 
 `workflows(operation="create", client_id=..., template_key="signals-to-pipeline")`
 
 A template has placeholders such as `<fill in: your ICP in two sentences>`. Read the draft with `workflows(operation="get", client_id=..., workflow_id=12)` and replace each one with an update (step 8) before you test.
 
-Replace every `<fill in: ...>` value before you publish; publish refuses them with `placeholder_not_filled`. A CRM field whose value is missing for a record is skipped, not cleared.
+Replace every `<fill in: ...>` value before you publish, and set the `campaignId` an `account.add_to_campaign@1` step leaves at 0; publish refuses them with `placeholder_not_filled`. A CRM field whose value is missing for a record is skipped, not cleared.
 
 **Builder.** Describe the goal in plain words, 10 to 4,000 characters, with the trigger and what should happen:
 
@@ -62,6 +67,8 @@ It returns `workflow` (a new draft, never live), `issues` still to fix, `attempt
 `workflows(operation="create", client_id=..., definition={...})`
 
 A campaign workflow takes `kind="campaign"` and `campaign_id`. A definition that does not parse answers 400 `invalid_definition`, with one `error.details` entry per problem.
+
+An `ai.agent@1` step uses only the read-only tools its `with.tools` names (`references/definition-format.md`, Step types). To review an email someone sent, give it `email_copy_grade`, `email_copy_lint`, `domain_auth_check` and `domain_blocklist_check`: its answer then quotes Kenso's own copy grade, copy rules and the sender domain's DNS and blocklist checks instead of guesses.
 
 Done when the draft exists and you have its `id` and `draftVersion`. `draftVersion` is the draft's revision (its save counter), not the version `number` that `versions-list` shows: send it as `base_version` on the next save.
 
@@ -76,18 +83,18 @@ The result is `valid`, `mode` and `issues`, each with `severity`, `path` (a JSON
 | `code` | Fix |
 |---|---|
 | `limits_required` | Add `limits` with `creditsPerMonth`, `creditsPerRun`, `runsPerDay` and `atLimit`. Publish mode. |
-| `missing_secret` | Ask the user for the value and create it: `workflow_builder(operation="workflow-secrets-create", client_id=..., name="CRM_TOKEN", secret_value=...)`; `workflow-secrets-rotate` replaces the value of one that exists. The value stays in the chat, so a user who would rather not paste it adds it in Kenso under Settings > Integrations > Secrets instead. Never repeat it back. `workflows(operation="workflow-secrets-list", client_id=...)` lists the names that exist. |
+| `missing_secret` | Ask the user to add it in Kenso under Settings > Integrations > Secrets and tell you only its name; the definition references it by that name (`references/plain-steps.md`, Secrets). Never ask for a value or put one in a definition: a value pasted here lands in the chat transcript. `workflows(operation="workflow-secrets-list", client_id=...)` lists the names that exist. |
 | `secret_header_only` | A step other than `code.run@1` names a header-only secret, which only a Run code step can use. Use a plain secret there. A secret stays header-only until the user deletes it and creates it again without the mark. |
 | `secret_host_not_listed` | A `code.run@1` step names a header-only secret whose host its `allowedHosts` does not cover. Add the host `fix` names to `allowedHosts`. |
 | `secret_header_conflict` | Two header-only secrets of one `code.run@1` step set the same header on the same host. Keep one of them in `secrets`. |
 | `too_many_hosts` | A `code.run@1` step's `allowedHosts` plus the hosts its wildcards cover for header-only secrets pass 20. Replace the wildcard with the exact host, or remove a host. |
-| `app_not_connected` | The user connects Slack (for `slack.message@1`) or a CRM, HubSpot or Salesforce (for `crm.*` steps), under Settings > Integrations, or removes the step. `workflows(operation="workflow-slack-connection-get", client_id=...)` checks Slack; the CRM connection is on Settings > Integrations > CRM. |
+| `app_not_connected` | The user connects Slack (for `slack.message@1`) or a CRM (for `crm.*` steps), under Settings > Integrations, or removes the step. `workflows(operation="workflow-slack-connection-get", client_id=...)` checks Slack; the CRM connection is on Settings > Integrations > CRM. |
 | `feature_disabled` | The step needs a flag that is off for this workspace: remove the step, or ask Kenso to turn the flag on. |
 | `unknown_reference` | A reference names a step, root or output field that does not exist. Use the step's `exampleOutput` from `workflows(operation="step-types-get", client_id=..., type="ai.qualify@1")`. |
 | `unknown_record_field` | A warning, so it still publishes, but the reference renders empty: `account`, `person` or `lead` followed by a field the record does not have, such as `account.domain`. Use the field `fix` names (`account.primaryDomain`, `lead.companyDomain`); `references/definition-format.md` lists each record's fields. |
 | `unknown_step_type` | Use the type `fix` suggests, or find one with `workflows(operation="step-types-list", client_id=...)`. |
 | `invalid_formula` | A `when` or formula does not parse or check. The message starts with the formula's own code (`syntax_error`, `unknown_function`, `type_mismatch`). |
-| `approval_required` | Comes only from publish: a send step has `approval` other than `"required"`. Set it to `"required"`. |
+| `approval_required` | Comes only from publish: a send step (`send.email@1`, `send.linkedin@1`, `send.whatsapp@1`) has `approval` other than `"required"` and the workspace does not have the `workflows_auto_send` flag. Set it to `"required"`. |
 | Parser codes: `invalid_json`, `invalid_type`, `missing_property`, `unsupported_format`, `invalid_name`, `missing_trigger`, `invalid_step_type`, `no_steps`, `invalid_id`, `reserved_id`, `invalid_on_failure`, `unknown_property` (a warning) | The definition's shape is wrong at `path`: fix it as `fix` says. `references/definition-format.md` lists every other code. |
 
 Done when `valid` is true in `mode="publish"` and you have read every warning.
@@ -108,6 +115,8 @@ Tell the user both numbers, and the `limits` that cap them (only the `workflow` 
 
 This runs the draft once as a test run on one record. Leave out the record to use the newest record of the trigger's type. For a campaign workflow, that is the newest live lead of its campaign; when the campaign has none, the call answers 400 `record_required` and names the campaign: add a lead to that campaign first.
 
+To let the user pick the record, list candidates with `workflow_builder(operation="test-records", client_id=..., workflow_id=12)`: the records this workflow ran on recently, then the newest of its trigger's type, each with `type`, `id`, `label` and `sublabel`. Pass the picked one's `type` and `id` as `record_type` and `record_id`.
+
 A test run calls real providers, so it needs the workspace's `workflows_runtime` flag like any run. While that flag is off, the call answers 404 `Workflow runs are not enabled for this workspace (workflows_runtime is off).` and starts nothing: stop and tell the user that Kenso has to turn workflow runs on for this workspace. A test run that was already queued when the flag went off fails with the same message on its step. What a step does in a test depends on its type's `test` field (`workflows(operation="step-types-get", ...)`):
 
 | `test` | In a test run |
@@ -117,7 +126,7 @@ A test run calls real providers, so it needs the workspace's `workflows_runtime`
 
 The trigger's output (what steps read as `trigger.<field>`) comes from the record under test, for the fields the trigger declares: a lead gives `leadId`, `campaignId`, `campaignSegmentId` and `createdAt`, an account `accountId` and `stage`, a person `personId` and its first account link. A field the record cannot supply, such as a signal's `signal`, `payload` and `occurredAt`, keeps the trigger type's example value, and the result's `exampleFields` lists those names: steps that read them ran on made-up values.
 
-To force a branch, pin a step's output: `pinned_outputs={"qualify": {"score": 85}}` records that output for `qualify` without running it, so the branch after it takes the qualified arm. Keys are step ids. Pinned steps count as untested: when pins stand in for every action step that ran (branches, filters, formulas, waits and for-each do not count), the run can succeed but records no pass. Pin only what you need to steer the run.
+To force a branch, pin a step's output: `pinned_outputs={"qualify": {"score": 85}}` records that output for `qualify` without running it, so the branch after it takes the qualified arm. A pinned step costs nothing, so pin the steps you already checked and re-run the rest while you fix them. Keys are step ids. Pinned steps count as untested: when pins stand in for every action step that ran (branches, filters, formulas, waits and for-each do not count), the run can succeed but records no pass. Pin only what you need to steer the run.
 
 A test run never waits: `logic.wait@1` goes on at once, and `logic.wait_for_event@1` goes on as if the event arrived (`timedOut` false), with no `event` payload. To test the timeout path, pin the wait step: `pinned_outputs={"reengaged": {"timedOut": true}}`. When a later step reads the event (such as `reengaged.event.reason`), pin one: `{"reengaged": {"timedOut": false, "event": {"reason": "reply"}}}`.
 
@@ -143,7 +152,7 @@ Before you publish, show the user the estimate (step 3) and the workflow's spend
 The gate, in order; the first failure wins:
 
 1. The draft validates in publish mode. Otherwise 400 `invalid_definition`, one `error.details` entry per issue with its code and fix.
-2. Every send step keeps `approval: "required"`. `"auto"` passes the gate only when the workspace has the `workflows_auto_send` flag, and even then every send still waits for approval in Today for now. Otherwise `approval_required`.
+2. Every send step keeps `approval: "required"`, and so does every `browser.run@1` step with `canSubmit: true` (it fills a form with the inbox's name and email). `"auto"` passes the gate only when the workspace has the `workflows_auto_send` flag. Then Ken approves a `send.linkedin@1` or `send.whatsapp@1` touch itself once its text is final and passed review and, for WhatsApp, its number is found and its voice note is ready. `send.email@1` always waits for approval in Today, and so does a browser step that submits: its plan waits for the inbox owner. A read-only browser step never waits. Otherwise `approval_required`.
 3. A test passed on the current draft.
 
 A workflow that is off and has no draft (turned off, or a default workflow Kenso set up off) is turned back on instead: the same call puts its published version live through gates 1 and 2, with no new test and no new version.
@@ -203,7 +212,9 @@ Read one run: `workflow_runs(operation="get", client_id=..., run_id=5531)`. The 
 - **Bulk:** `workflow_runs(operation="bulk", client_id=..., action="restart", workflow_id=12, status="failed")` acts on a filter, or pass `run_ids=[5531, 5532]` instead. `action` is `cancel`, `restart`, `retry` or `skip` (`skip` needs `node_id`, the step to skip in every run). A filter stops at the newest 1,000 runs and says `truncated: true` with a `nextCursor`: call again with the same filter and `cursor=<nextCursor>` until `truncated` is false. Each result has its own `status`.
 - **Where a workflow fails:** `workflow_runs(operation="step-overview", client_id=..., workflow_id=12)` counts each step's statuses over the last 30 days (or `created_after` / `created_before`), with average duration, credits and the last error.
 
-A send step with a body (or LinkedIn `text`) creates a touch that waits for approval in Today. Without one, the touch is created planned and is not in Today until Ken's writer drafts it (workspaces with the `accounts_writer` flag) or a person writes it on the account. The run stays `waiting` meanwhile. Once a person approves it, the Accounts send pass sends it where sending is on for the workspace, and the step succeeds with status `sent` and charges one send credit. A touch a person skips or deletes ends the step with status `skipped` or `deleted` and charges nothing. When the workspace's Contact limits refuse the touch (the same check an agent's `POST /v1/touches` gets: weeks between touches to a person, new people a day, the send window's days, open opportunity), no touch is created: the step succeeds at once with status `skipped`, `reason` `contact_limit`, the `rule`, the guardrail's `message` and `nextAllowedAt`, charges nothing, and the run goes on. Its output then has no `touchId`. A refusal by the send window's day rule alone (`agent_send_window`) is deferred instead, because a workflow has no agent to retry: the touch is created due at the window's start time on its next day (America/New_York; Monday to Friday at 08:00 by default), at most a week out, the output's `deferredUntil` says so, and the step waits with its 14 days counted from then. Refused again on that day (the new-people cap, for example), the step skips as above. The new-people cap, spacing and open opportunity are never deferred, so a skip on a day outside the window can still name `rule` `agent_send_window` when another rule fails at the same time (the verdict names the rule that clears last). A touch the send pass gives up on (status `failed`) stays in Today for a retry, and the step keeps waiting. With no send, the wait times out after 14 days: the step then fails with `wait timed out: touch.sent` and charges nothing.
+Instagram workflow steps are not available yet.
+
+A send step (`send.email@1`, `send.linkedin@1`, `send.whatsapp@1`) with a body (or LinkedIn or WhatsApp `text`) creates a touch that waits for approval in Today, unless it is a LinkedIn or WhatsApp send on `"auto"`, which Ken approves once its text is final and passed review. Without one, the touch is created planned and is not in Today until Ken's writer drafts it (workspaces with the `accounts_writer` flag) or a person writes it on the account. The run stays `waiting` meanwhile. Once a person approves it, the Accounts send pass sends it where sending is on for the workspace, and the step succeeds with status `sent` and charges one send credit. A touch a person skips or deletes ends the step with status `skipped` or `deleted` and charges nothing. When the workspace's Contact limits refuse the touch (the same check an agent's `POST /v1/touches` gets: weeks between touches to a person, new people a day, the send window's days, open opportunity), no touch is created: the step succeeds at once with status `skipped`, `reason` `contact_limit`, the `rule`, the guardrail's `message` and `nextAllowedAt`, charges nothing, and the run goes on. Its output then has no `touchId`. A refusal by the send window's day rule (`agent_send_window`), the new-people cap (`agent_new_people_per_day`) or both, and by no other rule, is deferred instead, because a workflow has no agent to retry and a run fires once per record: the touch is created due at the window's start time (America/New_York; Monday to Friday at 08:00 by default) on the first later day every rule allows, so a weekend run whose Monday is full goes to Tuesday. That is at most a week out, the output's `deferredUntil` says so, the run log names the rules that moved it, and the step waits with its 14 days counted from then. Refused again at that time, the step skips as above. Spacing and open opportunity are never deferred, alone or with the others, so a skip on a day outside the window can still name `rule` `agent_send_window` when spacing fails at the same time (the verdict names the rule that clears last). A touch the send pass gives up on (status `failed`) stays in Today for a retry, and the step keeps waiting. With no send, the wait times out after 14 days: the step then fails with `wait timed out: touch.sent` and charges nothing.
 
 ### Outcome codes
 
@@ -251,11 +262,13 @@ Send `patch` (RFC 6902 operations) or the whole `definition`. A stale `base_vers
 ## Rules
 
 - Show the estimate before every publish and every run on records.
-- Keep every send step at `approval: "required"`. Set anything else only when the user asks for automatic sends and the workspace has the `workflows_auto_send` flag.
+- Keep every send step (`send.email@1`, `send.linkedin@1`, `send.whatsapp@1`, `send.facebook@1`, `send.instagram@1`), and every `browser.run@1` step with `canSubmit: true`, at `approval: "required"`. Set `"auto"` on `send.linkedin@1` or `send.whatsapp@1` only when the user asks for automatic sends and the workspace has the `workflows_auto_send` flag; `send.email@1`, `send.facebook@1` and `send.instagram@1` always wait for a person.
+- `logic.wait_for_event@1` on `reply.received` also resolves on a 1:1 email, LinkedIn or WhatsApp reply from the person in a person run, with `channel` in the event (`"match": {"channel": "whatsapp"}` waits for one channel).
 - One workflow per goal: list first, and change the one that fits instead of creating a duplicate.
 - Set or confirm a spend limit before you publish (step 5), and quote only the credits and dollars the tools return.
 - A campaign workflow on a client's campaign decides who that campaign sends to. Publishing, unpublishing or bulk-cancelling one needs a yes that names that client, with its source (who said it, where and when).
 - Never retry a call that answered 404 on every id (step 0).
+- Never ask for a secret's value or write one into a definition: reference it by name and let the user set it in the app.
 
 ## No Kenso account yet
 

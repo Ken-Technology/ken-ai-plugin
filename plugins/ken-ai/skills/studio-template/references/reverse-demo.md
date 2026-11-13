@@ -86,7 +86,7 @@ The key steps from the starter, prompts shortened:
   "rubric": "... Score quick_read, makes_sense, cta, ps from 0 to 10. Answer easy, would_reply, weird_word yes or no. Automatic fail: an em dash or en dash, the word demo, an email address or phone number, a price, a subject of 6 words or more ..." }
 ```
 
-`"filters": "{{ data.search }}"` is exactly one output tag, so the filter object the `plan` prompt wrote passes through with its type. That is how a prompt steers the search. Search results carry `{name, title, company, linkedin_url}` and never an email or phone number.
+`"filters": "{{ data.search }}"` is exactly one output tag, so the filter object the `plan` prompt wrote passes through with its type. That is how a prompt steers the search. Search results carry `{name, title, company, linkedin_url}` and never an email or phone number. An `enrich.email` step after `leads` adds each person's verified email, at 1 credit per email found on Kenso's key.
 
 `rd-ken-native` replaces the `copy` prompt with a `ken.copy` tool step that writes the email core once (`"kind": "email"`, `"maxWords": 90`) and a `pick` prompt that adds a first line per person. `rd-your-product` starts with your endpoint:
 
@@ -119,7 +119,6 @@ All three ask for a short call: `{% render 'ken/cta', label: 'Book 30 minutes', 
 - **Fewer leads than `minItems`.** Narrow filters return 2 candidates, `copy` writes 2 leads, and `data-items` fails `leads` (minimum 3). `company: "any"` also needs at least one filter. Ask the `plan` prompt for filters that match a few thousand people, keep `limit` at 30, and pick the best 8 to 10.
 - **A label over its limit.** `data-length` on `segments[].label` (24) or `funnel[].label` (28). Put the limit in the prompt in words ("write them short instead of cutting them") as well as in the schema. A chart label over 28 characters that the schema lets through is cut mid-word by `ken/chart`.
 - **One `http://` LinkedIn URL fails the whole list.** `link-scheme` runs on every URL in filled data, and one bad item fails the top-level slot. The starter template also links `linkedin_url` only when it starts with `https://` and contains `linkedin.com/`.
-- **A contact detail in the copy.** `data-third-party-contact` drops the slot when a PS or email body holds an email address or phone number. Only the sender's own pass. Keep the starter's "No email addresses, phone numbers or prices" line in every prompt.
 - **"Demo" on the page.** Prospects should never read "reverse demo". The starter prompts and the grader ban it; also add "reverse demo" and "demo" to the workspace's banned phrases in Knowledge, so `data-banned-phrase` rejects any slot that slips.
 - **The grade keeps failing.** After `retries` rewrites the page goes `needs_review` and `create-link` answers 409 `studio_page_not_ready`. Read the grade's verdict in `run-get` (it names the check and quotes the phrase), tighten the `copy` prompt, push, publish, then refill. Or fill the page yourself with `prepare` and `submit`.
 - **The webhook breaks.** `timeout_s` above 30 fails `recipe-webhook-timeout`; an `http://` URL fails `recipe-webhook-url`. A number sent as a string where the slot says `number` fails `data-type`. When every attempt fails, `metric` and `findings` have no fallback, so the link shows `fallback.liquid`.

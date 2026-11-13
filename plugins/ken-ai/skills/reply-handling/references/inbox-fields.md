@@ -23,7 +23,7 @@ Reference for the reply-handling skill. Ids: threads are `thr_`, messages `msg_`
 
 `interested`, `not_interested`, `negative`, `automated`, `unclassified`, `unsubscribe`, `objection`, `wrong_contact`, `out_of_office`, `referral`.
 
-- `threads(operation="list", interest=...)` filters by it.
+- `threads(operation="list", interest=...)` filters by it. With no tab, or `all`, it reads each thread's newest reply from the contact, so a thread you answered still lists.
 - `threads(operation="update", thread_id="thr_...", changes={"interest": "interested"})` changes it. LinkedIn threads refuse `automated`.
 - A label moves the thread between tabs and into or out of positive-reply counts in reports, so tell the user what you changed.
 - A positive reply is a distinct contact filed `interested`. If replies come in and nothing is ever filed `interested`, the classifier may not be running for this workspace: say that, and do not report a 0% positive rate.
@@ -31,7 +31,7 @@ Reference for the reply-handling skill. Ids: threads are `thr_`, messages `msg_`
 ## Thread fields worth reading
 
 - `direction`: `inbound` (the contact wrote last) or `outbound` (you did).
-- `campaignId`, `contactId`, `inboxId` (the inbox the contact wrote to), `accountId` and `accountName` (when the contact is on a target account).
+- `campaignId`, `contactId`, `inboxId` (email: the workspace inbox the contact wrote to, or that sent our message; LinkedIn: the LinkedIn account), `accountId` and `accountName` (when the contact is on a target account).
 - `tags`, `subject`, `preview`.
 - On `threads(operation="get", ...)`: `scheduledMessages` (replies not sent yet: `scheduled`, `sending` or `awaiting_approval`), and `referral` on a recruiting reply filed `referral`.
 - On `threads(operation="list-messages", ...)`: each message, oldest first. Inbound email messages carry `extractedText` (the contact's words only). Outbound messages carry open counts: never report them. `attachments` list files with an `att_` id you can read with `threads(operation="get-content", attachment_id="att_...")`.
@@ -69,7 +69,7 @@ Reference for the reply-handling skill. Ids: threads are `thr_`, messages `msg_`
 | 409 `reply_not_sent` | the scheduled reply failed or was cancelled | send again with a new key, on the person's word |
 | 404 `not_found` | wrong id, or the thread is not in this workspace | check the id; never retry blind |
 
-A queued reply waits out a short undo delay. `threads(operation="cancel", scheduled_message_id=...)` stops one that has not started sending; one already sending, sent, cancelled or failed is 409 `invalid_state`.
+A queued email reply waits 5 minutes before it sends. `threads(operation="cancel", scheduled_message_id=...)` with the send result's `scheduledMessageId` stops one that has not started sending; one already sending, sent, cancelled or failed is 409 `invalid_state`.
 
 ## Reply templates
 
@@ -79,4 +79,4 @@ A queued reply waits out a short undo delay. `threads(operation="cancel", schedu
 
 ## Reply agent settings
 
-`replies(operation="autonomous-reply-settings-get")` returns `defaultEnabled`, `linkedInEnabled`, `mode` (`draft` or `autonomous`) and `extraInstructions` (up to 4,000 characters). `autonomous` sends AI replies without a person.
+`replies(operation="autonomous-reply-settings-get")` returns `defaultEnabled`, `linkedInEnabled`, `mode` (`draft`, `autonomous` or `approve_risky`) and `extraInstructions` (up to 4,000 characters). `autonomous` sends AI replies without a person. `approve_risky` sends the replies no check flagged without a person and leaves the risky ones, meeting requests and scheduling turns as drafts for a person; only a workspace that has it enabled can choose it.

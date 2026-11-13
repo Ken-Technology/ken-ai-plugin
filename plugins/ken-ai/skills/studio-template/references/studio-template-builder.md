@@ -24,6 +24,8 @@ The build loop, in short:
   assets/            files the page loads from its own host: images, fonts, pdf, csv
   samples/           optional: <name>.json = {account, person, data} for local preview (.json, .csv); never served
   README.md          optional notes for the next editor (a webhook contract, a CSV layout)
+  brief.md           optional: the plan (who it is for, the one ask, sections, variables); the builder's Plan page and Brief step show it, and a Ken library template ships one
+  ideas.md           optional: three ways to adapt the template, shown as idea cards next to brief.md
 ```
 
 Anything else is ignored with a `bundle-unknown-file` warning.
@@ -345,6 +347,7 @@ Supplied at render, never filled by the recipe. Recipes fill only `data.*`.
 | `role` | `title`, `company`, `location`, `remote_policy` (`onsite`, `hybrid`, `remote` or null), `pay_range` (text like "$150k-$180k a year", empty text when the role has no pay), `description` (at most 4000 characters), `highlights` (the must-haves, at most 10), `job_url`, `booking_url` | Recruiting pages only, during the fill and on the page; absent everywhere else. `booking_url` is null during the fill and equals `link.booking_url` on the page |
 | `roles` | A list shaped like `role`: the campaign's primary role first, then its open extra roles, at most 4 | Recruiting pages only, during the fill and on the page |
 | `defaults.<slot>` | One key per slot that has a `fallback` | The slot's fallback as the page would render it; use it in prompts for owner-set details such as an event's name, date and agenda. A Liquid fallback is rendered over the fill's variables; a list, object, number or boolean comes as it is. A fallback renders here with the recipe text rules (output tags and the recipe filters, no `{% %}` tags), not the page's full Liquid; a slot without a fallback, or whose fallback does not render that way, has no key, and the validator refuses an `inputs` or bind `from` that reads it. Recipe only (prompt text, `inputs`, tool `args`, bind `from`, grade `rubric`): a template keeps reading `data.<slot>`, which shows the fallback when no step filled it. No step writes `defaults` |
+| `lead.custom` | One key per custom variable of the lead, as a flat map of text values, such as `lead.custom.ph_url` | Campaign pages for a company only: the custom variables of the company's earliest live lead in that campaign (the page is shared by the company's leads). Only the variables the campaign marks **Use as AI context** (`useAsAiContext`) appear; any other variable never reaches the recipe. Keys are the campaign's variable keys, lowercase snake case (`ph_url`, not `PH URL`), and a blank value has no key. An empty map on account pages, recruiting pages, shared pages and leads with no such variables, so a missing key reads like any missing value: a bind falls back, `requires` skips, and `\| default:` applies in prompt text. Recipe only (prompt text, `inputs`, tool `args`, bind `from`, grade `rubric`), as `lead.custom` or `lead.custom.<key>`; the validator refuses any other `lead.` path. A template does not see `lead`: bind a value into a slot to show it |
 
 `brand.colors.*` and `brand.fonts.*` are null unless the workspace brand kit sets them (and always while its `brand_kit` flag is off), and `sender.title` is null today, so every use needs `| default:`. `fallback.liquid` and Liquid slot fallbacks see the same variables, with empty `data`.
 
@@ -411,6 +414,14 @@ Args: `title` (the iframe title, default "Book a time"), `height` (pixels, 320 t
 - At most 12 fields. Password, card and ID-number names never render.
 - Markup: `<form class="ken-form">`, one `<label class="ken-form-field">` per field (a `<span>` with the label, then the `input`, `textarea` or `select`), `<label class="ken-form-field ken-form-check">` for checkboxes, and `<button class="ken-form-submit">` with inline styles. The form needs a published link: without one (a preview) it renders nothing.
 
+**`ken/video`**: the lead's own video, from `person.video`. Renders nothing for a lead without a video.
+
+```liquid
+{% render 'ken/video', title: 'A 60-second walkthrough' %}
+```
+
+Args: `title` (the iframe title and poster alt text, default "Video"), `color` (accepted and ignored for now). Markup: a 16:9 `<div class="ken-video" data-ken-video="embed">` with the provider's player iframe (Loom, YouTube, Vimeo, Wistia, Vidyard, HeyGen or Sendspark), else `data-ken-video="poster"` (the poster image linking to the watch page), else a dashed placeholder in a builder preview, else nothing. Pages only: kit tags do not render in emails.
+
 ## Tracked sections
 
 - Put `data-section="<id>"` on exactly one element per section (usually a `<section>` or `<header>`).
@@ -423,7 +434,7 @@ Args: `title` (the iframe title, default "Book a time"), `height` (pixels, 320 t
 Every Studio page is served with this Content Security Policy, built from the policy below:
 
 ```
-default-src 'none'; script-src 'self' 'nonce-<per response>' https://cdn.jsdelivr.net/npm/chart.js@4 https://cdn.jsdelivr.net/npm/chart.js@4/ https://cdn.jsdelivr.net/npm/@alpinejs/csp@3/ https://cdn.jsdelivr.net/npm/motion@11 https://cdn.jsdelivr.net/npm/motion@11/ https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https://api.ken.so/media/; connect-src 'self' https://cloudflareinsights.com/cdn-cgi/rum; frame-src https://calendly.com https://cal.com https://app.cal.com https://meetings.hubspot.com https://meetings-eu1.hubspot.com https://*.chilipiper.com https://savvycal.com https://www.loom.com https://www.youtube.com https://www.youtube-nocookie.com https://player.vimeo.com https://fast.wistia.net; form-action 'self'; base-uri 'none'; frame-ancestors 'none'
+default-src 'none'; script-src 'self' 'nonce-<per response>' https://cdn.jsdelivr.net/npm/chart.js@4 https://cdn.jsdelivr.net/npm/chart.js@4/ https://cdn.jsdelivr.net/npm/@alpinejs/csp@3/ https://cdn.jsdelivr.net/npm/motion@11 https://cdn.jsdelivr.net/npm/motion@11/ https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https://api.ken.so/media/; connect-src 'self' https://cloudflareinsights.com/cdn-cgi/rum; frame-src https://calendly.com https://cal.com https://app.cal.com https://meetings.hubspot.com https://meetings-eu1.hubspot.com https://*.chilipiper.com https://savvycal.com https://www.loom.com https://www.youtube.com https://www.youtube-nocookie.com https://player.vimeo.com https://fast.wistia.net https://play.vidyard.com https://app.heygen.com https://sendspark.com https://www.sendspark.com; form-action 'self'; base-uri 'none'; frame-ancestors 'none'
 ```
 
 The policy the validator and the page server share, verbatim:
@@ -448,7 +459,8 @@ The policy the validator and the page server share, verbatim:
     ],
     "video": [
       "https://www.loom.com", "https://www.youtube.com", "https://www.youtube-nocookie.com",
-      "https://player.vimeo.com", "https://fast.wistia.net"
+      "https://player.vimeo.com", "https://fast.wistia.net",
+      "https://play.vidyard.com", "https://app.heygen.com", "https://sendspark.com", "https://www.sendspark.com"
     ]
   },
   "links": {
@@ -458,7 +470,7 @@ The policy the validator and the page server share, verbatim:
       "t2m.io", "tiny.cc", "tinyurl.com", "tr.im", "v.gd", "x.co"
     ]
   },
-  "kit": ["ken/cta", "ken/chart", "ken/booking", "ken/form"],
+  "kit": ["ken/cta", "ken/chart", "ken/booking", "ken/form", "ken/video"],
   "chart": {"types": ["bar", "funnel", "line", "pie"], "maxLabelLength": 28, "maxPoints": 50},
   "forms": {
     "fieldTypes": ["text", "email", "tel", "url", "number", "date", "textarea", "select", "checkbox"],
@@ -507,15 +519,15 @@ The recipe fills `data.*` for one account, in order. Every step is `{"id", "kind
 
 - `id`: unique in the recipe.
 - `to`: `"data.<slot>"` or a list of them; every slot is declared in `slots`.
-- `inputs` and Liquid read only Kenso variables, `knowledge.*`, `defaults.<slot>` (a slot that has a `fallback`, see Kenso variables), or `data.<slot>` that an earlier step fills. Order the steps so writers come before readers.
+- `inputs` and Liquid read only Kenso variables, `knowledge.*`, `defaults.<slot>` (a slot that has a `fallback`, see Kenso variables), `lead.custom` or `lead.custom.<key>` (campaign pages, see Kenso variables), or `data.<slot>` that an earlier step fills. Order the steps so writers come before readers.
 - Recipe text (a prompt's `prompt`, a grade's `rubric`, every string in a tool's `args` and a dataset's `where`) takes output tags only: `{{ account.name }}`, `{{ data.leads[0].name }}`, `{{ data.why_now | default: 'no news' }}`. Filters: `default`, `upcase`, `downcase`, `capitalize`, `strip`, `size`, `join`, `truncate`, `json`. A `{% %}` tag (`if`, `for`, `assign`) fails validation (`recipe-liquid-tag`), because the runner refuses it on every fill and every page would fall back. Put a condition in words instead ("skip the industry line when it is blank"); `template.liquid` and `fallback.liquid` keep the full tag set.
 - `requires` (optional, every kind but `bind`): the `data.<slot>` paths the step cannot work without, each written by an earlier step, such as `["data.candidates"]`. When one is empty (null, blank text, an empty list or object) or its step failed, the step does not run: no model or tool call, no charge, it is recorded `skipped`, and its slots fall back. A step that requires those slots skips in turn. Put it on every prompt that writes from search or tool results, so a failed search never turns into invented people.
 - `person` is null while the recipe runs (pages fill once per account; person fields bind per link). Read `person.*` in the template, not in the recipe. Recruiting pages are the exception: they fill once per candidate, so `person.*`, `role.*` and `roles` are set while the recipe runs, and a `prompt` reads them in `inputs`.
-- Credits: when the platform runs the recipe (executor `ken`), `prompt`, `grade` and `ken.copy` cost tokens at 2x model cost. When your own agent fills the page (executor `agent`, the `studio-asset` skill's `references/studio-fill.md`), there is no token charge. `bind`, Kenso Search, `scrape.page`, `chart.data`, `webhook` and `dataset` are free.
+- Credits: when the platform runs the recipe (executor `ken`), `prompt`, `grade` and `ken.copy` cost tokens at 2x model cost. When your own agent fills the page (executor `agent`, the `studio-asset` skill's `references/studio-fill.md`), there is no token charge. `bind`, Kenso Search, `scrape.page`, `chart.data`, `webhook` and `dataset` are free. `enrich.email` costs 1 credit for each email found on Kenso's key, and runs only when the platform fills the page.
 
 ### bind
 
-Copies one value into one slot. Fields: `from` (starts with `account.`, `person.`, `role.`, `knowledge.` or `defaults.`, including `account.dossier.*` and `account.signals`), `to` (one slot). A missing or empty source is not an error: the slot falls back.
+Copies one value into one slot. Fields: `from` (starts with `account.`, `person.`, `role.`, `knowledge.` or `defaults.`, including `account.dossier.*` and `account.signals`, or is `lead.custom` or `lead.custom.<key>`), `to` (one slot). A missing or empty source is not an error: the slot falls back.
 
 `account.signals` is a list of `{type, title, date, source_url}`, newest first, at most 10. `date` is `YYYY-MM-DD`, and `source_url` is there only when the signal has a web address. On an account page it holds that account's signals; on a campaign page, those of the workspace's account at the company's domain. It is empty on accounts with no signals: fall back to `account.dossier.why_now`. A page template does not see it, so bind it into an array slot to show it.
 
@@ -529,25 +541,34 @@ Fields: `tool`, `args`, `to`. `ken.copy` also takes a step-level `model`. Args a
 
 | Tool | Args | Result |
 |---|---|---|
-| `ken_search.people` | `company`: `"account"` (default, the account's domain), a domain, or `"any"` to search across companies (needs at least one filter). `filters`: a camelCase Kenso Search people filter object (`currentTitles`, `seniorityLevels` from Entry, Individual, Senior, Manager, Director, VP, CLevel, Owner; `industries` as lowercase LinkedIn industries; `companyHeadcount {min, max}`; `countries`, where people exist only in United States, United Kingdom, Canada, Australia, Ireland and New Zealand, so any other country finds no one). `titles`, `seniorities`, `departments`, `locations`: lists that override those filters. `limit` 1 to 30, default 10 | People records (`name`, `title`, `company`, `linkedin_url`, ...), never an email address or phone number |
-| `ken_search.companies` | `filters`: a camelCase Kenso Search account filter object (`industries`, `hiringSurge`, `headcountGrew`, `raisedFundingRecently`, ...). Without `filters` it finds lookalikes of `company` (`"account"` default, or a domain). `mode`: `filters` or `lookalikes`, inferred. `limit` 1 to 50, default 10 | Company records; never the account itself |
+| `ken_search.people` | `company`: `"account"` (default, the account's domain), a domain, or `"any"` to search across companies (needs at least one filter). `filters`: a camelCase Kenso Search people filter object (`currentTitles`, `seniorityLevels` from Entry, Individual, Senior, Manager, Director, VP, CLevel, Owner; `industries` as lowercase LinkedIn industries; `companyHeadcount {min, max}`; `countries`, where people exist only in United States, United Kingdom, Canada, Australia, Ireland and New Zealand, so any other country finds no one). `titles`, `seniorities`, `departments`, `locations`: lists that override those filters. `limit` 1 to 30, default 10 | People records (`name`, `title`, `company`, `website`, `linkedin_url`, ..., and `kenId`, the person's Kenso Search id), never an email address or phone number. Each also carries `hasKenEmail` (true when Kenso holds a verified email for them) and `kenEmailStatus` (`verified`, `risky`, `catch_all` or `none`); `enrich.email` adds the address itself |
+| `ken_search.companies` | `filters`: a camelCase Kenso Search account filter object (`industries`, `hiringSurge`, `headcountGrew`, `raisedFundingRecently`, ...). Without `filters` it finds lookalikes of `company` (`"account"` default, or a domain). With the workspace's lookalikes flag on, `lookalikes` mode runs one company search with the lookalike filter, and `company` may also hold several seed domains separated by commas (up to 100), or `"account"`; with the flag off it returns the companies the seed's record lists as similar. `mode`: `filters` or `lookalikes`, inferred. `limit` 1 to 50, default 10 | Company records (`name`, `domain`, `industry`, `size`, ..., and `kenId`, the company's Kenso Search id). `raisedFundingRecently` and `headcountGrew` are there when Kenso Search knows them, and a lookalike search with the lookalikes flag on adds `lookalike {score, grade}` (score 0 to 100, grade 1 to 5, 5 the closest). Never the account itself |
 | `ken_search.count` | `kind`: `companies` or `people`. `segments`: 1 to 8 `{label, filters}`, `label` at most 28 characters, `filters` the filter object `ken_search.companies` or `ken_search.people` takes (companies also take `employeesCount {min, max}` and `countries`). Every filter key must be known, and each segment must narrow the search | `[{label, value}]` in segment order, `value` the exact Kenso Search total, ready for `ken/chart`. Use for charts of market counts; never invent numbers. The step writes an array slot, and one failed segment fails it |
 | `scrape.page` | `url` (default `https://{{ account.domain }}`; a bare host gets `https://`), `maxChars` 200 to 20,000 (default 12,000), `mode` `markdown` (default) or `metadata` | `{url, source, title, description, markdown, captured_at}`, emails and phone numbers removed. An account with no domain falls back |
 | `ken.copy` | `brief` (required: what to write, for whom, which facts), `kind` `email`, `headline` or `paragraph` (default), `tone`, `maxWords` (default 120, 14 or 80 by kind; at most 400) | A string, or a list of paragraphs when the slot is an array |
 | `chart.data` | `from` (`"data.segments"` or `"{{ data.segments }}"`), `label` and `value` (item fields, default `label` and `value`, dotted paths work), `top` 1 to 50, `sort` `none` (default), `desc` or `asc` | `[{label, value}]` for `ken/chart`, labels cut to 28 characters |
-| `enrich.email` | | Not available yet: its slot always falls back and nothing is charged. Do not build on it |
+| `enrich.email` | `people` (required): the person records an earlier step wrote, passed whole (`"{{ data.candidates }}"`) or as a path (`"data.candidates"`). Each needs a name (`name`, or `first_name` and `last_name`) and the company's domain (`domain` or `website`, which `ken_search.people` writes); `linkedin_url` and `company` help the match. At most 50 people: more fails the step | The same list in the same order, each record with `email_status` (`verified`, `risky`, `catch_all` or `none`) and, only when verified, `email`. A person without a name or a domain is `none`. The slot must be a list whose items declare `email` (and `email_status`), or declare no properties; otherwise the step fails. Only the first `maxItems` people are looked up |
 
 ```json
 {"id": "leads", "kind": "tool", "tool": "ken_search.people", "args": {"company": "any", "filters": "{{ data.search }}", "limit": 30}, "to": "data.candidates"}
 {"id": "market", "kind": "tool", "tool": "ken_search.count", "args": {"kind": "companies", "segments": [{"label": "Software 50-200", "filters": {"industries": ["software development"], "employeesCount": {"min": 50, "max": 200}}}, {"label": "Software 201-1000", "filters": {"industries": ["software development"], "employeesCount": {"min": 201, "max": 1000}}}]}, "to": "data.market"}
+{"id": "emails", "kind": "tool", "tool": "enrich.email", "args": {"people": "{{ data.candidates }}"}, "requires": ["data.candidates"], "to": "data.contacts"}
 ```
+
+`enrich.email`:
+
+- It takes the address Kenso already holds first, which is free (`hasKenEmail: true` on a `ken_search.people` record means Kenso holds one). Then it asks Kenso's email finders, on Kenso's key or the workspace's own, and verifies each answer.
+- Each email found on Kenso's key costs 1 credit once the page shows it, charged once per page and person, so a refill never charges the same person twice. An email Kenso already held, or one found on the workspace's own key, is free. When the platform fills the page, the run estimate counts 50 credits per page for each `enrich.email` step, the most it can charge.
+- With no credits left, or past the member's monthly credit limit, it runs nothing, charges nothing and its slot falls back.
+- It runs only when the platform fills the page (a run, a refill, a campaign page). While your own agent prepares a page, it fails and its slot falls back.
+- 50 people can take a few minutes. The step stops after 3 minutes, and the people it did not reach are `none`.
 
 ### prompt
 
 A model writes one or more slots. Fields:
 
 - `prompt`: recipe text (output tags only) over Kenso variables and `data.*`.
-- `inputs`: the paths the model reads (Kenso variables, `knowledge.*`, earlier slots).
+- `inputs`: the paths the model reads (Kenso variables, `knowledge.*`, `lead.custom`, earlier slots).
 - `to`: the slots it writes. The model answers JSON with exactly those slot names as keys, and each value is checked against its slot schema. A bad answer is retried with the reason.
 - `model`: `cheap` (default) or an allow-listed model name. An unknown name fails the step, and the error lists the valid names.
 
@@ -614,7 +635,7 @@ Picks rows from a CSV uploaded to the template. Fields: `dataset` (its name), `w
 Whatever fills `data.*` (the recipe, your agent through `submit`, a person's Customize edit) is checked against the slot schema and these rules. A value that breaks one fails that slot, and the slot shows its fallback:
 
 - No unresolved `{{`, `{%`, `[[` or `${` in any string (`data-unresolved`).
-- No email address or phone number except the sender's own (`data-third-party-contact`). Figures with a decimal digit, dates, years, counts and prices are fine.
+- Email addresses and phone numbers are allowed, so a page can list people with their contact details. Only `enrich.email` puts a verified address in the data; tell prompts never to write one.
 - None of the workspace's banned phrases from Knowledge, case-insensitive, whole words (`data-banned-phrase`).
 - HTML values are formatting only: `p`, `br`, `hr`, `span`, `div`, inline text tags, headings, `blockquote`, `pre`, `code`, lists, tables, `a`, `img`, `picture`, `source`, `figure`. No `on*` handlers and no Alpine attributes (`x-*`, `@*`, `:*`) (`data-active-content`). A value counts as HTML as soon as `<` is followed by a letter or `/`.
 - Every URL and HTML string passes the link rules, and `img` sources pass the image rule.
@@ -629,7 +650,7 @@ Whatever fills `data.*` (the recipe, your agent through `submit`, a person's Cus
    "message": "An external script from 'https://unpkg.com/alpinejs@3/dist/cdn.min.js' is blocked by the page's Content Security Policy.",
    "fix": "Load scripts only from the Studio CDN list (Chart.js 4, the Alpine CSP build 3, Motion 11)."},
   {"file": "template.liquid", "line": 40, "column": 12, "rule": "liquid-unknown-variable", "severity": "warning",
-   "message": "'company' is not a Ken variable or a variable the template assigns; it renders empty.", "fix": "Use account.name."}
+   "message": "'company' is not a Kenso variable or a variable the template assigns; it renders empty.", "fix": "Use account.name."}
 ]}
 ```
 
@@ -682,8 +703,8 @@ The loop:
 | `recipe-field-missing` | error | Add the kind's required fields: bind `from`, `to`; tool `tool`, `to`; prompt `prompt`, `to`; grade `rubric`, `on`; webhook `url`, `to`; dataset `dataset`, `to` |
 | `recipe-field-unknown` | warning | Remove the field; for a tool step, tool arguments go inside `args` |
 | `recipe-to` | error | Point `to` at `data.<slot>` and declare that slot |
-| `recipe-input` | error | List only Kenso variables (`role` and `roles` too on a recruiting page), `knowledge.*`, `defaults.<slot>` of a slot whose `fallback` renders as recipe text (no `{% %}` tags or other filters), or slots an earlier step fills; move the writing step earlier |
-| `recipe-bind-from` | error | Start `from` with `account.`, `person.`, `role.`, `knowledge.` or `defaults.` (a slot whose `fallback` renders as recipe text); a template reads `data.*` slots directly, no bind needed |
+| `recipe-input` | error | List only Kenso variables (`role` and `roles` too on a recruiting page), `knowledge.*`, `defaults.<slot>` of a slot whose `fallback` renders as recipe text (no `{% %}` tags or other filters), `lead.custom` or `lead.custom.<key>` with a lowercase snake case key, or slots an earlier step fills; move the writing step earlier |
+| `recipe-bind-from` | error | Start `from` with `account.`, `person.`, `role.`, `knowledge.` or `defaults.` (a slot whose `fallback` renders as recipe text), or read `lead.custom` or `lead.custom.<key>` (nothing else under `lead.`); a template reads `data.*` slots directly, no bind needed |
 | `recipe-tool` | error | Use `ken_search.people`, `ken_search.companies`, `ken_search.count`, `enrich.email`, `scrape.page`, `ken.copy` or `chart.data` |
 | `recipe-webhook-url` | error | Use an absolute https URL |
 | `recipe-webhook-timeout` | error | Set `timeout_s` above 0 and at most 30 |
@@ -698,7 +719,7 @@ The loop:
 | `section-mismatch` | error | Make the template's `data-section` values equal `sections[].id`, both ways; `fallback.liquid` uses only declared ids |
 | **Liquid** | | |
 | `liquid-parse` | error | Fix the Liquid at `file:line`: close every block, use only the supported tags, nest under 250 deep |
-| `liquid-unknown-render` | error | Render only `ken/cta`, `ken/chart`, `ken/booking`, `ken/form`; write other markup inline (no `include`) |
+| `liquid-unknown-render` | error | Render only `ken/cta`, `ken/chart`, `ken/booking`, `ken/form`, `ken/video`; write other markup inline (no `include`) |
 | `liquid-render-syntax` | error | `{% render 'ken/x', key: value %}`: a quoted snippet name, values that are quoted strings, numbers or variables, no trailing comma |
 | `liquid-render-arg` | error / warning | Error: chart `type` outside `bar`, `funnel`, `line`, `pie`. Warning: drop an argument the snippet does not read; use `href` instead of a cta `kind` other than `booking` |
 | `liquid-unknown-variable` | warning | Use a root variable (`account`, `person`, `sender`, `brand`, `link`, `data`, `asset_url`) or `assign` it first; as written it renders empty |
@@ -730,7 +751,6 @@ The loop:
 | `data-uri` | error | Write an absolute https URL |
 | `data-unknown-slot` | warning | Drop the key, or declare the slot; it is ignored |
 | `data-unresolved` | error | Resolve or remove `{{`, `{%`, `[[` and `${` |
-| `data-third-party-contact` | error | Remove email addresses and phone numbers other than the sender's own |
 | `data-banned-phrase` | error | Rewrite without the banned phrase |
 | `data-active-content` | error | Keep HTML values to formatting elements; no scripts, styles, forms, frames, media, SVG, handlers or Alpine attributes |
 
@@ -763,7 +783,7 @@ Set LiquidJS up the way the page renderer runs it, or a local render hides error
 
 - `strictFilters: true`, `strictVariables: false`, `ownPropertyOnly: true`, and every output escaped. Only HTML slots and escaped prose (`| escape | newline_to_br | strip_newlines | raw`) use `| raw`.
 - The scope is one sample file: `{account, person, sender, brand, data}`, plus `role` and `roles` on a recruiting page.
-- The kit snippets (`ken/cta`, `ken/chart`, `ken/booking`, `ken/form`) render inside Studio only, and `ken/form` needs a published link. Register placeholder partials with those names so the page renders.
+- The kit snippets (`ken/cta`, `ken/chart`, `ken/booking`, `ken/form`, `ken/video`) render inside Studio only, and `ken/form` needs a published link. Register placeholder partials with those names so the page renders.
 
 A local render does not apply the fallback precedence for you. To preview the partial variant, merge each missing slot's `fallback` into `data` first (render Liquid fallbacks over the sample's Kenso variables). When a required slot has no fallback and the bundle ships `fallback.liquid`, render that file instead. Open each result at 375 px and 1280 px wide.
 

@@ -59,12 +59,14 @@ Writable here with `campaigns(operation="update", ...)`:
 | `sending_timezone` | `America/New_York` for a fixed zone, or `"prospect"` for a window local to each lead |
 | `ramp_up_days` | 0-30 scheduled sending days; only when the user asks for a ramp |
 | `excluded_countries` | The plan's excluded countries as ISO codes or names (`["DE", "Austria"]`); `[]` (default) blocks none. Imports drop a lead from a listed country and the sequencer skips one already on the campaign. Each call replaces the whole list |
+| `track_opens` | Off, its default, always (deliverability rule 1, Step 2a) |
+| `send_as_plain_text` | On when the campaign has Google recipients (deliverability rule 3, Step 2a) |
 
 A campaign created without a schedule gets the house window (Mon-Fri 10:00-18:00 ET). Gap-fill picks up a schedule or daily-cap change on its next pass, about every 10 minutes.
 
 AI workflows are writable with `campaign_flow(operation="replace-ai-workflows", ...)` (Step 3).
 
-**Set in the campaign settings in the app** (not writable through these tools): data sources (`[17]` KenSearch), website enrichments (`[3, 4]`, Home page; not defaulted on at create), email enrichments (`[3, 5, 8]`) and verifications (`[1, 5, 7]`) (defaulted at create), personal emails (off), dedup settings, and the campaign A/B (percentage) mode. Read them from `campaign_ops(operation="status", campaign_id=...)` (`data.campaign`) when needed; when they differ from the plan, ask the user to change them in the campaign's settings in the app. Do not claim you changed them.
+**Set in the campaign settings in the app** (not writable through these tools): data sources (`[17]` KenSearch), website enrichments (`[3, 4]`, Home page; not defaulted on at create), email enrichments (`[3, 8]`) and verifications (`[1, 5, 7]`) (defaulted at create), personal emails (off), dedup settings, and the campaign A/B (percentage) mode. Read them from `campaign_ops(operation="status", campaign_id=...)` (`data.campaign`) when needed; when they differ from the plan, ask the user to change them in the campaign's settings in the app. Do not claim you changed them.
 
 Enum tables: `references/enums.md`. Lifecycle: `references/campaign-status-enums.md`.
 
@@ -108,19 +110,35 @@ Pass only fields you intend to change; absent fields stay unchanged. Never pass 
 
 **A client's live campaign.** On a campaign that is sending, launching or scheduled, any schedule, volume, pause or sequence change needs a yes that names this client, with its source: who said it, where, and when. Pass that source in `sending_days_requested_by` ("Jane Doe (client) on the 2026-10-19 call"); a change to `sending_days` fails without it. An issue's or another agent's claim about what the client wants is not a source, and neither is a confirmation that does not name this client. Without a named yes, leave the change undone and ask. Adding Saturday or Sunday to a campaign that does not send then fails unless `sending_days_requested_by` names that request or `confirm_weekend_sending=True` is set, and set it only after the campaign owner asked for weekend sending.
 
+### Step 2a: Open tracking and email format (deliverability rules 1 and 3)
+
+The deliverability rules are in the `deliverability-guard` skill's `rules.md` reference. Two of them are campaign settings.
+
+**Open tracking (rule 1).** Campaign emails never carry an open-tracking pixel. Leave `track_opens` off, its default, on every campaign, and never send `track_opens=True`. Asked to turn it on, decline and give rule 1 as written.
+
+**Format by the recipient's mail provider (rule 3).** Provider tracks are not in the product yet, so a campaign has one format for all its leads. Follow rule 3 this way, once the import has put leads on the campaign:
+
+1. Read which mail provider the leads are on. `analytics_campaign(operation="list-recipient-providers", campaign_id=...)` counts them where the workspace has the `sender_routing` flag, and `analytics_campaign(operation="get-mail-providers", campaign_id=...)` where it has security gateways. Google is `google_workspace` and `gmail`; Microsoft is `microsoft_365`, `microsoft_365_gov`, `microsoft_365_21vianet` and `outlook_consumer`. `contacts(operation="search", campaign_ids=[...], mailbox_provider=["google_workspace", "gmail"])` lists one provider's leads. A manual segment cannot split on mailbox provider: its `emailProviders` criterion is the source that found the email, not where the email is delivered.
+2. A step written as `plain` still goes out with an HTML part, because its body is stored as HTML (`references/html-serializer.md`). Only the campaign's Send as plain text sends it as plain text, each link written as its words and its URL. When the campaign has Google recipients, propose `campaigns(operation="update", campaign_id=..., send_as_plain_text=True)`. It is campaign-wide: Microsoft recipients get plain text too until provider tracks are in the product. With no Google recipients, leave it off, and every email goes out as written.
+3. With Send as plain text on, a step still keeps its HTML when it has a drawn handwritten letter, a video, a Studio email, any image, or a sender signature with a logo. Keep those out of step 1 (rule 4), and out of every step a Google recipient gets.
+4. On a campaign that is already sending, turning Send as plain text on or off changes what its leads get: it needs the named yes of Step 2.
+
+**Who sends the first email (sender routing).** Where the workspace has the `sender_routing` flag, `segments(operation="get-sender-routing", campaign_id=...)` reads a campaign's routing, and `segments(operation="replace-sender-routing", campaign_id=..., rules=[{"provider": "google_workspace", "domains": ["acme-mail.com"], "inbox_ids": [101]}])` sends one provider's recipients their first email only from that rule's domains and inboxes (one rule per provider, a full replace, `[]` clears them). It chooses the sender, never the format: rule 3 still comes from Send as plain text. Use it when the user wants a provider's recipients to hear from particular inboxes, and only after their yes.
+
 ### Step 2b: Sending inboxes (staff only)
 
 An empty inbox assignment fails closed. Assigning inboxes from here is staff-only: when `campaign_ops` does not offer these operations, tell the user to assign inboxes in the campaign's settings in the app and move on. Staff list with `campaign_ops(operation="available", campaign_id=...)` (no provider filter), pick the family this campaign should send from (do not default to Google), then `campaign_ops(operation="assign_all_active", campaign_id=..., provider=<chosen family>)`. An empty list is not assignable yet.
 
 ### Step 3: AI workflows and rewriting readiness
 
-Read the attached workflows with `campaign_flow(operation="list-ai-workflows", campaign_id=...)` (ids: 1 qualification, 2 personalization, 3 rewriting, 4 segmentation, 6 scoring). The baseline is `[1, 4]`, plus:
+Read the attached workflows with `campaign_flow(operation="list-ai-workflows", campaign_id=...)` (ids: 1 qualification, 2 personalization, 3 rewriting, 4 segmentation, 6 scoring, 8 line check). The baseline is `[1, 4]`, plus:
 
 - **2 Personalization** whenever any segment has AI variables. Creating a variable does not attach it.
 - **3 Rewriting** when any segment has a rewriting prompt or variables marked `to_rewrite=1`. Set `to_rewrite=1` on every rewritten variable except Subject Line: `prompts(operation="update", prompt_id=..., changes={"to_rewrite": 1}, confirm=False)`. If rewriting is unused, leave 3 off.
 - **4 Segmentation** off for Manual segments (Step 8b).
+- **8 Line check** with 2. A new campaign with personalization gets it by default: it grades each AI line before it is saved and holds a contact whose lines fail until someone approves or regenerates it. Keep it unless the user asked to turn it off.
 
-To change them, read first, then send the full list the campaign should run: `campaign_flow(operation="replace-ai-workflows", campaign_id=..., ai_workflow_ids=[1, 2, 3, 4])`. It is a full replace: an id you leave out is detached. While the campaign is scheduled, launching or sending, only adding 3 and changing 6 are allowed; any other change answers 409 until the campaign is paused, and pausing a client's campaign needs the client's yes (Step 2).
+To change them, read first, then send the full list the campaign should run: `campaign_flow(operation="replace-ai-workflows", campaign_id=..., ai_workflow_ids=[1, 2, 3, 4, 8])`. It is a full replace: an id you leave out is detached, 8 included. While the campaign is scheduled, launching or sending, only adding 3 and changing 6 or 8 are allowed; any other change answers 409 until the campaign is paused, and pausing a client's campaign needs the client's yes (Step 2).
 
 ### Step 4: Completeness and push order
 
@@ -228,13 +246,13 @@ Never change status through `campaigns(operation="update")`. Run a lifecycle cal
 
 | Goal | Call |
 |------|------|
-| Check launch readiness (read-only) | `campaign_flow(operation="can_launch", campaign_id=...)` |
-| Start enrichment / AI processing (Draft -> Building; spends credits) | `campaign_flow(operation="start_workflows", campaign_id=...)` |
+| Check launch readiness (read-only) | `campaign_flow(operation="get-launch-readiness", campaign_id=...)` |
+| Start enrichment / AI processing (Draft -> Building; spends credits) | `campaigns(operation="resume", campaign_id=...)` on the Draft campaign |
 | Start sending when Ready | `campaigns(operation="launch", campaign_id=...)` |
-| Pause / resume sending | `campaigns(operation="pause", campaign_id=...)` / `campaigns(operation="resume", campaign_id=...)` |
+| Pause / resume (sending, processing and AI workflows together) | `campaigns(operation="pause", campaign_id=...)` / `campaigns(operation="resume", campaign_id=...)` |
 | Archive (pause sending first) | `campaigns(operation="archive", campaign_id=...)` |
 
-On a `start_workflows` rejection, read `data.startWorkflowReadiness.checks` and route each failed check (often missing sequences, the Subject Line variable, workflows, or the import).
+Before starting, and when a start is rejected, read `campaign_flow(operation="get-workflow-readiness", campaign_id=...)` and route each failed check in `checks` (often missing sequences, the Subject Line variable, workflows, or the import).
 
 ## Related calls
 

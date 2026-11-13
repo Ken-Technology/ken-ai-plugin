@@ -58,6 +58,8 @@ More keys (names, job-change signals, education, sort), the full function and in
 
 ## Workflow
 
+These steps build a campaign's audience. A one-off search the person spelled out (named titles, industries, sizes, places) is one call with those values, `search(operation="search-people", body={...})` or `search(operation="search-companies", body={...})`, with no expand or facets first. Which exact values a filter accepts (industry taxonomy names, with counts) is `search(operation="get-people-facets", body={...})`, not expand.
+
 1. **Target** - segments x contacts per segment = desired contacts (default ~1,000-2,000 per segment unless the plan or caller sets a target). The campaign's contact limit wins when present.
 2. **People-first or account-first** - Default is people-first (role + company attributes). Account-first when research names target accounts or the plan says ABM: resolve names with `search(operation="search-companies", body={"name": "..."})`, then `search(operation="people_in_accounts", account_ids=[...], current_titles=[...])` (flat arguments).
 3. **Expand** - `search(operation="expand", kind="titles", titles=[...])` and `search(operation="expand", kind="industries", industries=[...])`; merge the variants. If expand errors, keep the values you have.

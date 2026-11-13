@@ -41,6 +41,7 @@ Example, changing only step 3's body on a three-step segment:
 - 400 `validation_failed` with `subject_required_for_migma`: the campaign sends through a provider that cannot thread a follow-up, so every step needs a subject. Nothing was written.
 - 400 naming a step and variant with a handwritten letter: the letter part takes no links. Move the link after the signature line.
 - `html_steps_disabled`: the workspace cannot send HTML steps. Keep the step `plain`.
+- `html_brand_domain`: the step loads an image from a Kenso host or carries a Kenso tracking link, which the send would refuse. Remove it, or host the image on the workspace's own domain.
 
 ## Checkpoints
 
@@ -52,7 +53,7 @@ Example, changing only step 3's body on a three-step segment:
 
 The version history a person opens on a segment in the app lists segment versions, not sequence versions. To make a change show there, save a segment version after the second checkpoint:
 
-`segments(operation="save_new_version", campaign_id=42, segment_id=7)`
+`segments(operation="save-version", segment_id=7)`
 
 It runs a real segment update, so it is not free on a live campaign. On an active segment of an A/B campaign that is scheduled, sending or paused, it fails when the segments' percentages do not add up to 100, and it refuses a non-manual segment that has saved filter criteria. Tell the user before you run it on a live campaign, and skip it when they do not need the change in the app's history: the sequence versions are enough to roll back.
 
@@ -61,5 +62,6 @@ It runs a real segment update, so it is not free on a live campaign. On an activ
 - Sequence: `email_sequences(operation="list-versions", segment_id=7)` lists the versions newest first, and `email_sequences(operation="get-version", segment_id=7, version_id=55)` shows one. `email_sequences(operation="restore-version", segment_id=7, version_id=55)` puts it live. The history stays.
 - Segment, with its sequence and prompts: `segments(operation="list-versions", segment_id=7)`, then `segments(operation="restore-version", segment_id=7, version_id=31, dry_run=True)` to preview what it restores. A restore that would clear AI output the campaign already wrote answers 409 with the impact: show it to the user, and repeat with `confirm` set to true only after their yes.
 - Prompt: `prompts(operation="prompt-versions-list", segment_id=7)`, then `prompts(operation="restore", segment_id=7, version_id=12, dry_run=True)`, and `confirm` set to true after the yes.
+- Where `restore-version` is not available (the in-app support chat), the sequence rolls back by hand: read the version with `get-version`, read the live sequence with `segment-email-sequences-get`, and send `segment-email-sequences-replace` with the version's subject, body and wait days on each live step's `id` and the other fields as read. `save-version` alone stores a snapshot and puts nothing live. A segment or prompt restore is not available there: the user restores it from the segment's version history in the app.
 
 After any restore, read the live sequence again and tell the user what is live now.
