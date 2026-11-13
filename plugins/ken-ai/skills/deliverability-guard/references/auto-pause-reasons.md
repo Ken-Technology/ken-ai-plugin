@@ -15,7 +15,7 @@ What each `reason` from `analytics(operation="auto-pauses-list")` means, and wha
 | `tenant_ban` | inbox | The mailbox's Microsoft 365 tenant refuses to send | The mailbox host. Other inboxes on the same tenant will fail too |
 | `mailbox_sender_ndr_rate` | inbox | Too many of the inbox's sends came back as non-delivery reports | The inbox's settings and its sending host |
 | `workspace_breaker` | workspace | A send hold on the whole workspace | Only support releases it. Tell the user to contact support |
-| `send_failures` | inbox or campaign | Repeated send failures | The inbox's connection and the failure message on its sends |
+| `send_failures` | campaign | Repeated hard send failures paused the campaign. Kenso does not pause for these today, so this row is rare: a campaign whose sends keep failing stays sending and shows its `sendingError` | The campaign's `sendingError`, then the connection of each inbox it names |
 
 Rules for reading the list:
 
