@@ -61,7 +61,7 @@ Ask once how much cold email they have run, and match your pace to the answer:
 Resolve the workspace before any other call:
 
 1. If the runtime already pins the workspace, or the user named a workspace or `client_id`, use that `client_id` on every call.
-2. Otherwise call `workspace(operation="list")` without `client_id`. When the session works in one workspace (one membership, or a connection pinned with `?workspace=<id>`) the server fills it in; confirm the name and id with the user. A customer connection that belongs to several workspaces and names none is refused with the workspace ids in the error: show them, ask which workspace to set up, and tell the user to reconnect with `https://mcp.ken.so/mcp?workspace=<id>`. Staff pass the `client_id` they pick from then on.
+2. Otherwise call `workspace(operation="list")` without `client_id`: it returns the workspaces this user can access, with ids and names. With one, confirm its name and id with the user. With several, show them, ask which workspace to set up, and pass its id as `client_id` on every call from then on (one connection covers all of them). A connection pinned with `?workspace=<id>` works only there, and an API key that can use several workspaces is refused until its connection names one: show the ids from the error and tell the user to reconnect with `https://mcp.ken.so/mcp?workspace=<id>`. Staff pass the `client_id` they pick from then on.
 3. Never retry a multi-workspace call without an explicit `client_id`.
 
 Then preflight the plan with `billing(operation="subscription-get", client_id=...)`. Record:
