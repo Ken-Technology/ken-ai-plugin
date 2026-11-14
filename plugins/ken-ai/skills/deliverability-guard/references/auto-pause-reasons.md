@@ -11,7 +11,6 @@ What each `reason` from `analytics(operation="auto-pauses-list")` means, and wha
 | `domain_placement_spam` | domain | A placement test found the domain's mail in spam | The test result, then domain health and blocklists |
 | `reply_ingest_dead` | inbox | Replies stopped arriving from the inbox, so its replies would be missed | The inbox's connection: it may need to be reconnected |
 | `uri_blocklist_listed` | domain | A link host in the copy is on a blocklist | The links in the campaign's copy, and the link host |
-| `domain_dns_unresolvable` | domain | The domain's DNS does not resolve | `domains(operation="get-dns")` and the nameservers at the registrar |
 | `tenant_ban` | inbox | The mailbox's Microsoft 365 tenant refuses to send | The mailbox host. Other inboxes on the same tenant will fail too |
 | `mailbox_sender_ndr_rate` | inbox | Too many of the inbox's sends came back as non-delivery reports | The inbox's settings and its sending host |
 | `workspace_breaker` | workspace | A send hold on the whole workspace | Only support releases it. Tell the user to contact support |
