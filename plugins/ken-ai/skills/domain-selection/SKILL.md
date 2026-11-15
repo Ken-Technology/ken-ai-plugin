@@ -55,12 +55,12 @@ Needs a paid plan, Delivery edit access (owners, admins and editors by default),
 
 `domain_orders(operation="domain-orders-search", client_id=..., keyword=..., tlds=[...], limit=...)`, or `domain=` for an exact FQDN.
 
-Each hit has `price` and a registrar quote, both money objects in minor units: each `amount` is US cents (`1200` is $12.00). Quote dollars as `amount` / 100, never the amount itself. Copy the registrar quote, in dollars, into checkout `registrar_price_usd`, or its `amount` as is into the plan's `quote_usd_cents`. Never send `price` as the registrar quote: the markup would apply twice. Banned names are omitted. Premium is allowed if they pay it.
+Each hit has `price` and a registrar quote, both money objects in minor units: each `amount` is US cents (`1200` is $12.00). Quote dollars as `amount` / 100, never the amount itself. Copy the registrar quote, in dollars, into checkout `registrar_price_usd`, or its `amount` as is into the plan's `quote_usd_cents`. Never send `price` as the registrar quote, or the name is priced too high. Banned names are omitted. Premium is allowed if they pay it.
 
 What the user pays for the first year:
 
-- Credit plans, when the hit has `priceMillicredits`: that many millicredits ((ceil(registrar quote x 1.03) + 1) x 50 credits, first year, in whole dollars at 50 credits per dollar: a $10.40 quote is $12, 600 credits). `renewalPriceMillicredits`, when present, is the yearly renewal.
-- Exempt workspaces, or a hit without `priceMillicredits`: `price` at Stripe checkout, in dollars (`price.amount` / 100). It already includes Kenso's markup, so add nothing to it.
+- Credit plans, when the hit has `priceMillicredits`: that many millicredits for the first year (1,000 millicredits is 1 credit). `renewalPriceMillicredits`, when present, is the yearly renewal.
+- Exempt workspaces, or a hit without `priceMillicredits`: `price` at Stripe checkout, in dollars (`price.amount` / 100). It is the full price, so add nothing to it.
 
 Show name, the first-year price, and Google/Microsoft availability flags. Do not put Google inboxes on a name that is not Google-available.
 

@@ -86,7 +86,7 @@ The key steps from the starter, prompt shortened:
 
 The CSV, uploaded as the dataset `case-studies` (`create-upload-url`, PUT the bytes to `url` with exactly the returned `headers`, then `studio_templates(operation="datasets-create", template_id=41, name="case-studies", upload_id="...")`): one row per story with `customer`, `industry`, `size_band`, `problem`, `approach`, `result_metric`, `result_value`, `timeframe`, `quote`, `quote_author_title`. Only customers who agreed to be named. Quotes word for word, or empty. `result_value` under 20 characters, because it prints large. No email addresses, phone numbers, em dashes or en dashes in any cell.
 
-Credits, in plain words: both `dataset` steps are free. The prompt costs its tokens at 2x model cost when Studio runs it (`executor="ken"`) and nothing when your agent fills the page. The page costs 1 credit when its first link is published.
+Credits, in plain words: both `dataset` steps are free. The prompt costs credits for its AI work when Studio runs it (`executor="ken"`) and nothing when your agent fills the page. The page costs 1 credit when its first link is published.
 
 ## The CTA
 

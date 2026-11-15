@@ -73,7 +73,7 @@ Then check what the fill guide says the fields read, before you spend anything:
 
 | `executor` | Who writes the `prompt` and `grade` steps | Cost | Use it for |
 |---|---|---|---|
-| `"ken"` (default) | Kenso | model tokens at 2x cost, plus data steps | many accounts, unattended |
+| `"ken"` (default) | Kenso | its AI work, plus data steps | many accounts, unattended |
 | `"agent"` | you, with your own model | no token charge for the steps you write; data steps at rate card; a `ken.copy` step still runs on Kenso | a few accounts, on your own subscription |
 
 With `"ken"`, estimate first and show the user the number: `studio_pages(operation="run-estimate", template_id=41, account_count=25, executor="ken")` returns `credits` and a per-account `breakdown`. Run only after a yes:
@@ -172,9 +172,9 @@ When a prospect asks to see the work, build them a real sample: their campaign, 
 | A page, on its first link (shared or person) | 1 credit |
 | More links on the same page | free |
 | Republishing a retired page | 1 credit |
-| Kenso writing `prompt` and `grade` steps (executor `"ken"`, refill, update-version) | model tokens at 2x cost |
+| Kenso writing `prompt` and `grade` steps (executor `"ken"`, refill, update-version) | its AI work, in credits |
 | Your own agent writing them (executor `"agent"`) | no token charge |
-| A `ken.copy` step, on any path | model tokens at 2x cost |
+| A `ken.copy` step, on any path | its AI work, in credits |
 | An `enrich.email` step (only when Kenso fills the page) | 1 credit per email found on Kenso's key; an email Kenso already holds, or one found on the workspace's own key, is free |
 | Data steps | rate card; today's (`bind`, Kenso Search, `chart.data`, scraping, `webhook`, `dataset`) cost nothing |
 | Previews, hosting, PDFs | free |

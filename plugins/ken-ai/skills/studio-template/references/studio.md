@@ -160,7 +160,7 @@ This publishes the draft (or `version_id=`). New pages use it, and pages that ha
 | `"all"` | Every live page is refilled on the new version, as a run (`updateRunId`). URLs and links stay. |
 | `[812, 813]` | Only these live pages are refilled. |
 
-Refilling live pages runs Kenso's executor: only the slots the new version added or changed are refilled, and tokens are charged at 2x model cost. The page credit is not charged again. Ask the user before sending `"all"` or a list.
+Refilling live pages runs Kenso's executor: only the slots the new version added or changed are refilled, and their AI work is charged in credits. The page credit is not charged again. Ask the user before sending `"all"` or a list.
 
 The response has `version`, `followedCount` (pages that moved with it), `liveCount` (live pages still on an older version) and `updateRunId`.
 
@@ -180,7 +180,7 @@ Pick who writes the `prompt` and `grade` steps:
 
 | `executor` | Who writes | Cost | Use it for |
 |---|---|---|---|
-| `"ken"` (default) | The platform's executor | model tokens at 2x cost, plus data steps | many accounts, unattended |
+| `"ken"` (default) | The platform's executor | its AI work, plus data steps | many accounts, unattended |
 | `"agent"` | you, with your own model | no token charge for the steps you write; data steps still at rate card, and a `ken.copy` tool step still runs on the platform's model | a few accounts, on your own subscription |
 
 When the user wants the fill to cost no tokens, build the template without `ken.copy`: write that copy in a `prompt` step, which your own model then writes.
@@ -275,9 +275,9 @@ A recruiting page is for one candidate, not for an account. It needs the workspa
 | A Studio page, on its first link (shared or person) | 1 credit |
 | More person links on the same page | free |
 | Republishing a retired page | 1 credit |
-| The platform writing the `prompt` and `grade` steps (executor `"ken"`, refill, `update_live`) | model tokens at 2x cost |
+| The platform writing the `prompt` and `grade` steps (executor `"ken"`, refill, `update_live`) | its AI work, in credits |
 | Your own agent writing the `prompt` and `grade` steps over MCP (executor `"agent"`) | no token charge |
-| A `ken.copy` tool step, on any path | model tokens at 2x cost |
+| A `ken.copy` tool step, on any path | its AI work, in credits |
 | Data steps the platform runs | rate card: email found 1 credit, qualification 0.05, personalization 0.3. Today's data steps (`bind`, Kenso Search, `chart.data`) cost nothing |
 | Scraping | free until the rate card prices it |
 | `webhook` and `dataset` steps, PDF, hosting, previews | free |

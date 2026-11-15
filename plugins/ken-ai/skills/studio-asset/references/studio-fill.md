@@ -113,7 +113,7 @@ Link the page as the `studio-asset` skill describes: `studio_pages(operation="cr
 ## Costs
 
 - No token charge for the `prompt` and `grade` steps: your own model wrote and graded the copy.
-- Data steps the platform ran during prepare are charged at rate card: email found 1 credit, qualification 0.05, personalization 0.3. Today's data steps (`bind`, Kenso Search, `chart.data`) cost nothing, scraping is free until the rate card prices it, and `webhook` and `dataset` steps are free. A `ken.copy` tool step is a model call the platform runs, so it costs tokens at 2x model cost on this path too.
+- Data steps the platform ran during prepare are charged at rate card: email found 1 credit, qualification 0.05, personalization 0.3. Today's data steps (`bind`, Kenso Search, `chart.data`) cost nothing, scraping is free until the rate card prices it, and `webhook` and `dataset` steps are free. A `ken.copy` tool step is a model call the platform runs, so it costs credits for its AI work on this path too.
 - Prepare needs the Ask permission. Before it runs a paid step, it checks the balance (402), your monthly credit limit (402 `member_credit_limit_reached`) and takes one unit of the daily page quota (429). On any of these, stop and tell the user; calling prepare again does not help.
 - The page credit comes with its first link, as on every path.
 
