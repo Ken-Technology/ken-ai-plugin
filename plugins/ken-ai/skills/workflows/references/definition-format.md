@@ -163,7 +163,8 @@ The path must exist in that type's output (`unknown_reference`): read `exampleOu
 
 - Operators: `== != > >= < <= + - * / %`, `and`, `or`, `not` (lowercase), parentheses.
 - Literals: numbers, `'text'` or `"text"`, `true`, `false`, `null`.
-- Functions (case-sensitive): `lower`, `upper`, `trim`, `contains`, `startsWith`, `endsWith`, `split`, `len`, `now`, `daysSince`, `addDays`, `count`, `first`, `any`, `all`, `in`, `coalesce`, `if`, `round`, `number`, `text`.
+- Functions (case-sensitive): `lower`, `upper`, `trim`, `contains`, `startsWith`, `endsWith`, `split`, `len`, `now`, `daysSince`, `addDays`, `addBusinessDays`, `count`, `first`, `any`, `all`, `in`, `coalesce`, `if`, `round`, `number`, `text`.
+- `addBusinessDays(date, days, timeZone)` counts Monday to Friday (no holidays) on the calendar of an IANA time zone, keeps the time of day and returns ISO 8601 UTC text, for example a `logic.wait_for_event@1` `timeoutUntil` computed in a `logic.formula@1` step: `addBusinessDays(now(), 3, 'America/New_York')`. The zone is optional; blank or unknown counts in UTC. `days` is whole, at most 3,650 either way.
 - At most 4,000 characters and 256 nesting levels. A string or list a formula builds is capped at 64 KB (`formula_too_large`).
 - A condition must give a boolean (`condition_not_boolean`): `{{qualify.score}} >= 70`, `contains(lower({{account.industry}}), 'software')`.
 
