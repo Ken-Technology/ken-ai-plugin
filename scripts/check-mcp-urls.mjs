@@ -29,19 +29,25 @@ import { join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 // The configs that actually wire up the MCP server. Both use the documented
-// `mcpServers` envelope - a bare `{"ken-ai": {...}}` map registers no server at
+// `mcpServers` envelope - a bare `{"kenso": {...}}` map registers no server at
 // all, which is how this plugin shipped a Claude Code config that could never
 // have worked regardless of the URL in it.
+//
+// The server is named `kenso`, as every Kenso guide names it (DEV-11123). The
+// old `ken-ai` key is still read until ken-backend's plugin sync renames it in
+// .mcp.json; drop the fallback after that.
+const serverUrl = (json) => (json?.mcpServers?.kenso ?? json?.mcpServers?.['ken-ai'])?.url;
+
 const CONFIG_FILES = [
   {
     path: 'plugins/ken-ai/.mcp.json',
     runtime: 'Claude Code',
-    read: (json) => json?.mcpServers?.['ken-ai']?.url
+    read: serverUrl
   },
   {
     path: 'plugins/ken-ai/.codex-plugin/mcp.json',
     runtime: 'Codex',
-    read: (json) => json?.mcpServers?.['ken-ai']?.url
+    read: serverUrl
   }
 ];
 
@@ -118,7 +124,7 @@ export async function readConfiguredUrls(rootDir) {
     }
     const url = config.read(parsed);
     if (typeof url !== 'string' || url.trim() === '') {
-      entries.push({ ...config, url: null, error: 'no ken-ai server url declared' });
+      entries.push({ ...config, url: null, error: 'no kenso server url declared' });
       continue;
     }
     entries.push({ ...config, url: url.trim(), error: null });
