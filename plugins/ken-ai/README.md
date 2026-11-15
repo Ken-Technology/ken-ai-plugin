@@ -68,6 +68,7 @@ The server URL has not changed. Configs that already name the server `ken` keep 
 | `setup-workspace` | Set up a workspace: company profile, logo, invites, blocklist and integrations links, then your first campaign. |
 | `signal-outreach` | Email companies when a signal fires (hiring, funding, new leaders), gated for free first, with copy about the plan behind it. |
 | `skill-editor` | View, edit, switch on or off and restore the skills in Knowledge > Skills, Kenso's defaults included. |
+| `social-data` | Find someone's social profiles, read their recent posts and job openings, and look up companies on Crunchbase, with the cost shown first. |
 | `studio-asset` | Fill a Studio template for an account or candidate, check the page, then create each person's link to use in a touch. |
 | `studio-template` | Build or edit a Studio template: write the bundle, validate it, preview it on real accounts, publish it and manage its versions. |
 | `tam-builder` | Size a market and build the list: every company that fits, why it fits, who to write to, saved with its stats. |
