@@ -15,7 +15,7 @@ The work runs in stages. Each stage produces one thing, ends at a gate where a p
 - **A client's live campaign needs that client's yes.** Any schedule, volume, pause or sequence change on a client's campaign that is already sending needs a yes that names that client, with its source (who said it, where, when). Pass the source in `sending_days_requested_by` on `campaigns(operation="update", ...)`. Without it, leave the change undone and say what you need.
 - **Never invent.** No prices, times, offers, pay, case studies, metrics or lead magnets that the workspace's own material does not show. Ask, or leave it out.
 - **Replies, not opens.** Goals and results are replies, positive (interested) replies and clicks. Replies are distinct contacts; an out-of-office is not a reply; opens are never a goal or a reported number.
-- **The deliverability rules decide tracking, format and inboxes.** Kenso's six deliverability rules are in the `deliverability-guard` skill's `rules.md` reference: quote them as written. The format follows the recipient's mail provider (rule 3, set in `campaign-configuration` Step 2a), and step 1 to Google recipients follows rule 4 (`email-copywriting`).
+- **The deliverability rules decide tracking, format and inboxes.** Kenso's six deliverability rules are in the `deliverability-guard` skill's `rules.md` reference: quote them as written. The format follows the recipient's mail provider (rule 3, set in `campaign-configuration` Step 2a), and step 1 to Google recipients follows rule 4 (`email-copywriting`). Amendment A1 wins where it differs: a plain text email never carries a click-tracking link, so copy for a campaign that sends as plain text types each address as text (`www.linkedin.com/in/cristian-frunze/`).
 - **No open tracking.** Asked to turn on open tracking, decline and give rule 1 as written: "Campaign emails never carry an open-tracking pixel. Opens are not tracked and are never reported."
 - **No vendor names to clients.** Never name the email-finding, verification or sending providers behind Kenso. Asked which company sends the mail, say Kenso names mailbox types, not the companies behind them, and give rule 6 as written: "Mailbox types a client can buy: Google, Outlook and SMTP." An inbox on a sending-provider account the workspace connected itself keeps the name the workspace gave it.
 - **A structural copy change is a new version.** On a live campaign, improved copy replaces the live steps and is checkpointed as a version. Never add it as a Variant B: variants are live A/B arms that send.
@@ -101,7 +101,7 @@ Done when the user approves the strategy for that segment.
 
 ### 5. Copy (per segment)
 
-Open `email-copywriting`. Draft in the chat, against its lint contract and its supporting references (gold standard, spam words, sound human). After the yes, it creates the tracking links and writes the live sequence with `email_sequences(operation="segment-email-sequences-replace", segment_id=..., steps=[...])`.
+Open `email-copywriting`. Draft in the chat, against its lint contract and its supporting references (gold standard, spam words, sound human). After the yes, it creates the tracking links (none for an address typed as text in a plain text campaign) and writes the live sequence with `email_sequences(operation="segment-email-sequences-replace", segment_id=..., steps=[...])`.
 
 Done when the segment's live sequence matches the approved copy.
 
@@ -119,7 +119,7 @@ Done when each variable's samples read well to the user.
 
 ### 8. Configuration
 
-Open `campaign-configuration`. It applies the settings the plan needs (contact limit, schedule, daily cap, AI workflows), runs the search import into the campaign, sets open tracking and plain text by the deliverability rules once the leads' mail providers are known (Step 2a), and checks what can only be set in the app. Inbox assignment from here is staff-only; everyone else assigns inboxes at https://app.ken.so/<workspace id>/campaigns/<campaign id>. Starting the AI workflows (`campaigns(operation="resume", ...)` on the Draft campaign) spends credits: run it only on the user's yes.
+Open `campaign-configuration`. It applies the settings the plan needs (contact limit, schedule, daily cap, AI workflows), runs the search import into the campaign, keeps open tracking off and sets plain text by the deliverability rules once the leads' mail providers are known (Step 2a), and checks what can only be set in the app. Inbox assignment from here is staff-only; everyone else assigns inboxes at https://app.ken.so/<workspace id>/campaigns/<campaign id>. Starting the AI workflows (`campaigns(operation="resume", ...)` on the Draft campaign) spends credits: run it only on the user's yes.
 
 Done when every setting matches the plan, or the user has the list of what to change in the app.
 

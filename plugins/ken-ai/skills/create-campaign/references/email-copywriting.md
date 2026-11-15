@@ -36,7 +36,7 @@ Code runs this deterministic lint on every email before it is saved. A failing e
 3. **No em-dashes** (and no en-dashes) anywhere in subject or body. Use the simple keyboard dash `-`.
 4. **Subject is 1-60 characters** on every step, follow-ups included.
 5. **Body is 40-180 words**, counted on the whole body (greeting through signature and PS). The editorial bands below (Email 1 50-80 static words, follow-ups 30-60) are stricter at the top; at the bottom, count the whole body: the greeting and the two-line signature add about 9 words, so a close under about 32 static words with no PS fails.
-6. **At most 1 link per email**, counting raw URLs, markdown links and the signature company link.
+6. **At most 1 link per email**, counting raw URLs, markdown links, an address typed as text and the signature company link.
 7. **No unresolved placeholders:** no square-bracket stand-ins (`[Company]`, `[Name]`, `[First Line]`), no `TODO` / `TBD`, and no double-brace token other than a declared `{{Title Case}}` AI variable or an existing `{{tracking_link:ID}}` in a live body. Never hand-write a new tracking token - the push inserts it.
 
 ## Variables
@@ -46,10 +46,11 @@ Code runs this deterministic lint on every email before it is saved. A failing e
 | Lead variable | `{camelCase}` single braces, from the list above | `{firstName}`, `{company}`, `{title}` |
 | AI variable | `{{Title Case}}` double braces | `{{Subject Line}}`, `{{First Line}}`, `{{PS Line}}`, `{{Final PS Line}}` |
 | Sender | `{sender_first_name}` / `{sender_last_name}` | required in the signature |
-| Link | markdown link on plain words, `https` only | converted to a tracking link on push |
+| Link | markdown link on plain words, `https` only; in a campaign that sends as plain text, the address typed as text (`www.acme.com/pilot`) | a markdown link is converted to a tracking link on push; an address typed as text gets none |
 
 - **AI variables** use Title Case names (max 30 characters), uppercase-first, exactly as declared. No square brackets, no lowercase or snake_case spellings, no alternate spellings (`{{Subject line}}`). This is the form the app stores and renders.
-- **Links** are markdown links on a few plain words (`[Acme](https://acme.com)`, `[grab a spot](https://acme.com/pilot)`), never a bare URL and never link text that reads like a web address: click tracking sends every link through a tracking domain, and the save flags a visible host that does not match it.
+- **Links** depend on how the campaign sends. A plain text email never carries a click-tracking link (amendment A1 of the deliverability rules, in the `deliverability-guard` skill's `rules.md` reference). Unless the user says the leads are all on Microsoft, the campaign sends as plain text (rule 3, `campaign-configuration` Step 2a): type each address as text, without `https://`, starting at the host as written (`www.linkedin.com/in/cristian-frunze/`, `acme.com/pilot`). It is the real destination, never a click host, and the email counts no clicks. Rule 4 still holds: the address alone on its own line, one only, short. The lint and the save do not count an address typed without `https://` as a link, so keep to one yourself. When configuration leaves Send as plain text off, rewrite each address as a markdown link as below before the sequence is saved again (`campaign-configuration` Step 2a).
+- In a campaign that sends as HTML (every lead on Microsoft), links are markdown links on a few plain words (`[Acme](https://acme.com)`, `[grab a spot](https://acme.com/pilot)`), never a bare URL and never link text that reads like a web address: click tracking sends every link through a tracking domain, and the save flags a visible host that does not match it.
 - **One AI variable = one value per LEAD, not per email.** The platform generates one value per prompt per lead; the same token in Emails 1-3 sends the identical sentence three times. An email that needs its own opener gets its own name (`{{First Line}}`, `{{Bump First Line}}`, `{{Nudge First Line}}`). Reuse is intentional only for `{{Subject Line}}` on every step.
 - **Default AI-variable layout:** Email 1 carries `{{First Line}}` and `{{PS Line}}`; the last email may carry `{{Final PS Line}}`; middle emails carry no AI-variable lines unless the strategy asks. Never an opener and a PS on every email - over-personalization is the top operator complaint.
 - **Every AI variable in the copy needs a matching prompt** on the platform (knowledge-setup's `prompt-writer` playbook writes them, one per variable). `{{Subject Line}}` needs one too.
@@ -154,7 +155,7 @@ Outreach dies when every sentence starts with "I". "I wanted to", "I think" and 
   ```
   Signoff by reader: `Best regards,` for enterprise, finance and legal; `Best,` or `Cheers,` for SaaS and technical buyers; `Cheers,` for startups and creative teams (`Regards,` also works). The title, company name and URL are literal client values from context. `{sender_first_name}` / `{sender_last_name}` resolve to the sending mailbox at launch.
 - `{sender_signature}` is deprecated: the lint accepts it, but never write it in new copy.
-- **Company name as a link (default):** link the client company to its root domain (deep link when it fits better). That link is the email's one link. In an email whose CTA needs a link, write the company name plain so the email still has exactly one link.
+- **Company name as a link (default):** link the client company to its root domain (deep link when it fits better). That link is the email's one link. In an email whose CTA needs a link, write the company name plain so the email still has exactly one link. In a campaign that sends as plain text, write the company name plain and, when this is the email's one link, its address as text on the next line (`client-site.example`), as **Links** says.
 - Placement: after the CTA. A PS variable goes on its own line after the signature. No taglines, phone numbers, proof lines, or extra sender variables.
 - **Handwritten steps:** when a step sends as a handwritten letter, the typed sign-off is part of the letter, and the letter takes no links: write the company name plain and keep the step free of links (a link there fails the save).
 
@@ -182,7 +183,7 @@ Default to 3 emails. Go beyond 3 only when each extra email carries a distinct, 
 
 ### First email to Google recipients (deliverability rule 4, HARD)
 A recipient on Google (Google Workspace or gmail.com) gets plain text (rule 3), so write Email 1 by rule 4 of the deliverability rules, in the `deliverability-guard` skill's `rules.md` reference:
-- The one link sits alone on its own line, as a markdown link on two or three plain words. The plain-text send writes it as those words and its URL, so the reader sees the URL. With click tracking on, that URL is on the sending domain's own click host (rule 2).
+- The one link is its address typed as text, alone on its own line, without `https://` and starting at the host as written: `acme.com/report`. A plain text email never carries a click-tracking link (amendment A1): the reader sees the real destination, never a click host, and the email counts no clicks.
 - One link only, short, on the sender's own domain.
 - The proof is in the text: one or two specific findings before the link, not only behind it.
 - No bold, HTML signature, logo, image, video, handwritten letter or Studio email in Email 1: each forces the step back to HTML. A sender signature with a logo counts. Put that content on the page the link opens.
@@ -197,7 +198,7 @@ Write every Email 1 this way unless the user says the campaign's leads are all o
 - **Diagnostic questions are not CTAs:** "Do you have a system for X?", "Where do your clients come from?", "Is it worth a look?", "a quick look", "Curious if...?", "Worth exploring...?".
 - Direct and specific: "Want me to walk you through how it works?", "Open to a quick walkthrough?". For SaaS calls, a "strategy call".
 - Yes/no or either/or only. No time commitments ("15 min") in the CTA line; when the length matters, say it in the body before the CTA. Never "Should I close the loop?"; use "Reply if you'd like me to stop emailing".
-- Preferred pattern: a short question with the link on its own line, on a short phrase ("Do you want to apply?" then `[Apply here](https://...)`). That link is the email's one link.
+- Preferred pattern: a short question with the link on its own line, on a short phrase ("Do you want to apply?" then `[Apply here](https://...)`). That link is the email's one link. In an email sent as plain text, the line under the question is the address typed as text (`acme.com/apply`).
 
 ### Rhetorical questions
 Answer a rhetorical question in the very next sentence. Never leave the prospect hanging.
@@ -220,9 +221,9 @@ Match proof to the prospect's vertical (no consumer brands for B2B SaaS). If no 
 
 Platform writes go through MCP tools only. Never hand-rolled HTTP or pasted keys.
 
-**(a) Tracking links.** `tracking_links(operation="tracking-links-list", campaign_id=...)` lists existing links. For each unique URL in the approved copy (including the signature company link), reuse a link whose name starts with `{segment-slug} url_` and points to the same destination; otherwise create one:
+**(a) Tracking links.** `tracking_links(operation="tracking-links-list", campaign_id=...)` lists existing links. For each unique markdown link URL in the approved copy (including the signature company link), reuse a link whose name starts with `{segment-slug} url_` and points to the same destination; otherwise create one:
 `tracking_links(operation="tracking-links-create", campaign_id=..., name="{segment-slug} url_{n}", domain_name="<full destination URL>", text_value="<link text>")`.
-Slug: lowercase segment name, non-alphanumerics to `-`; the Default segment is `default`. Never share links across segments; the name prefix is the segment scope.
+Slug: lowercase segment name, non-alphanumerics to `-`; the Default segment is `default`. Never share links across segments; the name prefix is the segment scope. An address typed as text in a plain text campaign gets no tracking link: it stays text.
 
 **(b) Serialize.** Convert each body to the stored HTML per [`references/html-serializer.md`](references/html-serializer.md): each tracked URL becomes `<a href="{{tracking_link:<id>}}">link text</a>`; `{leadVars}` and `{{AI Vars}}` stay verbatim; `body_format` `plain`.
 

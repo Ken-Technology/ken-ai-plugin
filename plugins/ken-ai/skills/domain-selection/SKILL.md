@@ -98,7 +98,7 @@ Mailboxes on credit plans: 200 credits ($4) per Google/Microsoft inbox a month; 
 
 ## 8. Mutations on existing domains
 
-Never call `domains(operation="update")` or `delete` until the user confirmed the exact domain_id and fields here. Site redirect: `changes={"redirect_url_404": "https://..."}`; leave MX/SPF/DKIM/DMARC alone. Turning on `click_rate_tracking_enabled` does not publish the click host; that provisioning is a staff step. Every sending domain gets its own click-tracking host, `link.<sending domain>` (deliverability rule 2): on Kenso's nameservers it is set up on its own, and for any other domain the Kenso team sets it up.
+Never call `domains(operation="update")` or `delete` until the user confirmed the exact domain_id and fields here. Site redirect: `changes={"redirect_url_404": "https://..."}`; leave MX/SPF/DKIM/DMARC alone. Turning on `click_rate_tracking_enabled` does not publish the click host; that provisioning is a staff step. Every sending domain gets its own click-tracking host, `link.<sending domain>` (deliverability rule 2): on Kenso's nameservers it is set up on its own, and for any other domain the Kenso team sets it up. Minting each link on its own domain's host is not switched on yet, and a plain text email carries no click-tracking link (amendment A1, in the `deliverability-guard` skill's `rules.md` reference).
 
 ## 9. Refusal handling
 

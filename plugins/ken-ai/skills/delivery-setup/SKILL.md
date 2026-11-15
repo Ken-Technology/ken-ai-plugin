@@ -119,7 +119,7 @@ The link host (for example `go.acme.com`) serves Studio pages from the workspace
 2. To set one: `domains(operation="hosting-hostname-set", subdomain="go")`. Workspace admins only.
 3. The user adds the DNS record it returns at their DNS host. Then `domains(operation="hosting-hostname-verify")` until the status is ready.
 
-Click tracking is separate: every sending domain gets its own click-tracking host, `link.<sending domain>` (deliverability rule 2), and `domain-selection` says how it is set up.
+Click tracking is separate: every sending domain gets its own click-tracking host, `link.<sending domain>` (deliverability rule 2), and `domain-selection` says how it is set up. Minting each link on its own domain's host is not switched on yet (`rules.md`, What the product does today), and a plain text email carries no click-tracking link at all (amendment A1).
 
 ## Step 8 - LinkedIn accounts
 

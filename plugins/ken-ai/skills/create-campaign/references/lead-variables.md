@@ -9,7 +9,7 @@ Lead variables are filled from contact data when emails are sent. Use them direc
 | Lead variable | `{variableName}` (single braces, camelCase), optional fallback after a bar (Fallbacks below) | `{firstName}`, `{company}` | Contact data |
 | Sender variable | `{sender_snake_case}` (single braces) | `{sender_first_name}` | Sending inbox |
 | AI variable | `{{Variable Name}}` (double braces, Title Case, max 30 characters) | `{{First Line}}`, `{{PS Line}}` | AI personalization prompts |
-| Tracking link | inserted by the push, never hand-written | - | Tracking links |
+| Tracking link | inserted by the push for a markdown link, never hand-written; a plain text email carries none (amendment A1) | - | Tracking links |
 
 ## Safe to use in copy
 

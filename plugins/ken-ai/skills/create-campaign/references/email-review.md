@@ -116,7 +116,8 @@ A static opener that fails (a)-(d) is a REJECT. A failing sample is fixed in its
 - [ ] REJECT diagnostic questions used as the CTA ("Do you have a system for X?", "Where do your clients come from?", "Is it worth a look?", "a quick look", "Curious if...?", "Worth exploring...?").
 - [ ] No "Should I close the loop?", no complex rhetorical CTA, no time commitment in the CTA line, no keyword-trigger CTA ("Reply 'X' and I'll send Y").
 - [ ] A short question with the link on its own line, on a short phrase, is PREFERRED; flag only a weak question or a buried link.
-- [ ] REJECT a bare URL, link text that reads like a web address (`acme.com`), or a non-`https` link: click tracking routes every link through a tracking domain and the save flags the mismatch.
+- [ ] In a campaign that sends as plain text, the link is its address typed as text without `https://` (`acme.com/report`), alone on its line: a plain text email never carries a click-tracking link (amendment A1 of the deliverability rules). REJECT a click-tracking URL typed in the copy.
+- [ ] In a campaign that sends as HTML, REJECT a bare URL, link text that reads like a web address (`acme.com`), or a non-`https` link: click tracking routes every link through a tracking domain and the save flags the mismatch.
 
 #### Rhetorical questions, offer, proof
 - [ ] A rhetorical question is answered in the next sentence.
