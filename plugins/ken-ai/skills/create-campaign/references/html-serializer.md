@@ -1,13 +1,13 @@
 # HTML Serializer Reference
 
-Read this before pushing any email sequence, and when reading a live one back. Copy you author is a `plain` step (`body_format` `plain`), but its body is stored as simple HTML: `<p>` paragraphs and `<a href="{{tracking_link:ID}}">` links. The skill converts the approved plain-text copy itself; no tool does it for you. A `plain` step still goes out with an HTML part unless the campaign's Send as plain text is on, which deliverability rule 3 asks for when the campaign has Google recipients (`campaign-configuration` Step 2a). `body_format` `html` is for full HTML emails, needs the workspace's `html_steps` feature, and is never used for copy written here.
+Read this before pushing any email sequence, and when reading a live one back. Copy you author is a `plain` step (`body_format` `plain`), but its body is stored as simple HTML: `<p>` paragraphs and `<a href="{{tracking_link:ID}}">` links. The skill converts the approved plain-text copy itself; no tool does it for you. A `plain` step still goes out with an HTML part unless the campaign's Send as plain text is on, which deliverability rule 3 asks for when the campaign has Google recipients (`campaign-configuration` Step 2a). A plain text email never carries a click-tracking link (amendment A1 of the deliverability rules): each link shows its real address without `https://`, so copy for such a campaign types each address as text and gets no tracking link. `body_format` `html` is for full HTML emails, needs the workspace's `html_steps` feature, and is never used for copy written here.
 
 ## Authoring vs stored form
 
 | Stage | Lead variables | AI variables | Links |
 |-------|---------------|--------------|-------|
-| **Authoring** (the copy you draft and show) | `{firstName}`, `{company}` single braces | `{{First Line}}`, `{{PS Line}}` double braces, Title Case | Markdown links on plain words, `https` |
-| **Stored** (sequence push) | unchanged | unchanged | `<a href="{{tracking_link:ID}}">link text</a>` |
+| **Authoring** (the copy you draft and show) | `{firstName}`, `{company}` single braces | `{{First Line}}`, `{{PS Line}}` double braces, Title Case | Markdown links on plain words, `https`; in a plain text campaign, the address typed as text (`acme.com/report`) |
+| **Stored** (sequence push) | unchanged | unchanged | `<a href="{{tracking_link:ID}}">link text</a>`; an address typed as text stays text |
 
 Rules:
 - Write AI variables in their final double-brace form while drafting. Never use square brackets; the lint rejects `[First Line]` as an unresolved placeholder.
@@ -27,22 +27,23 @@ Rules:
 | Numbered list | `<ol><li>item</li></ol>` (no inner `<p>`) |
 | Dash list (`- item`) | `<p>- item one<br />- item two</p>` - dash paragraphs, not `<ul>`, for email-client compatibility |
 | `[text](url)`, tracked | `<a href="{{tracking_link:ID}}">text</a>` |
+| An address typed as text without `https://` (a plain text campaign, `www.acme.com/report`) | Unchanged text inside its `<p>`: no `<a>` and no tracking link |
 | Raw URL (should not be in approved copy) | Turn it into a link on a short phrase first (`[see the setup](https://acme.com/setup)`), then serialize as above |
 | Untracked link (fallback only) | `<a href="url">text</a>` on the same plain-word text |
 
 - Keep `{...}`, `{{...}}` and `{{tracking_link:ID}}` tokens verbatim, and leave underscores inside identifiers alone.
 - Links are `https` only (an `http` link is blocked on cold outreach); `mailto` and `tel` are allowed but rarely belong in cold email. Allowed inline tags: `strong`, `em`, `del`, `a`.
-- Write full `https://` URLs; a bare `www.` address stays plain text. No underline, inline code, tables or task lists.
+- Write full `https://` URLs in a link; an address written without `https://` stays plain text, which is the form a plain text campaign uses (amendment A1). No underline, inline code, tables or task lists.
 
 ## Tracking links
 
-Every URL in the approved copy (the signature company link included) gets a tracking link, scoped to one segment:
+Every markdown link in the approved copy (the signature company link included) gets a tracking link, scoped to one segment. An address typed as text in a plain text campaign gets none: a plain text email never carries a click-tracking link (amendment A1).
 
 1. `tracking_links(operation="tracking-links-list", campaign_id=...)` lists existing links. Reuse one whose name starts with `{segment-slug} url_` and points to the same destination.
 2. Otherwise create one: `tracking_links(operation="tracking-links-create", campaign_id=..., name="{segment-slug} url_{n}", domain_name="<full destination URL>", text_value="<link text>")`. `domain_name` takes the full URL, path included. `text_value` is the markdown link text: a few plain words, never a host or URL.
 3. Record the mapping `url -> id` for the segment, then replace every link to that URL, in every email and variant, with the wrapped token.
 
-Never share a tracking link across segments. Link text must be plain words (the company name, "the 2-minute demo"), never a bare URL and never text that reads like a web address (`acme.com`): click tracking sends every link through the sending domain's own click host, `link.<sending domain>` (deliverability rule 2), so the visible host would not match, and the save raises a `link_host_mismatch` finding.
+Never share a tracking link across segments. Link text must be plain words (the company name, "the 2-minute demo"), never a bare URL and never text that reads like a web address (`acme.com`): click tracking sends every link through a click-tracking host (rule 2 puts it on the sending domain's own host, `link.<sending domain>`), so the visible host would not match, and the save raises a `link_host_mismatch` finding.
 
 Examples (tracking link id 116 for `https://acme.com`, 117 for `https://acme.com/report`):
 
@@ -109,7 +110,7 @@ A handwritten step sends everything above a `{sender_signature}` line or the uns
 
 ## Retrofitting tracking links to a live sequence
 
-When a sequence was pushed with plain-text URLs (no `<a>` wrapper):
+Never retrofit a campaign with Send as plain text on: its email carries no click-tracking link (amendment A1), so its addresses stay as text. When a sequence that sends as HTML was pushed with plain-text URLs (no `<a>` wrapper):
 
 1. Read it: `email_sequences(operation="segment-email-sequences-get", segment_id=...)`.
 2. Find raw URLs in each body (regex `https?://[^\s<)"']+` on the text inside `<p>` tags).

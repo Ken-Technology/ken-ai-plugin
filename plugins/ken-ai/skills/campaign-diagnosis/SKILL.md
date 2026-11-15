@@ -17,7 +17,7 @@ Every call takes `client_id`, the workspace id. Send it when the user can see mo
 - Never report opens. Campaign emails never carry an open-tracking pixel, so opens are not tracked (rule 1 of the deliverability rules, in the `deliverability-guard` skill's `rules.md` reference).
 - Put the counts next to every rate: "2.1% reply rate (21 of 1,004 contacted)". With fewer than about 100 contacted, give the counts and leave the rate out.
 - Missing data is N/A, never 0. A metric that did not load is unknown, not zero.
-- Clicks are human clicks. Use `clickCount` and the returned `clickRate`. `botClickCount` counts scanners and never shows interest.
+- Clicks are human clicks. Use `clickCount` and the returned `clickRate`. `botClickCount` counts scanners and never shows interest. An email sent as plain text counts no clicks (amendment A1 of the deliverability rules).
 - Say what the numbers show first. Then say what you think caused it, and mark that part as your read.
 
 ## Step 0 - Find the campaign and the window
@@ -60,7 +60,7 @@ The same performance read carries `bounceCount`, `bounceRate` and `bounceBreakdo
 
 ## Step 4 - Human clicks
 
-Clicks show that people read past the first lines. Many clicks with few replies points at the call to action or the page behind the link. No clicks on a campaign with links points at the opening or at tracking. Step rows carry raw click volume but no unique clickers, so compare clicks between steps only as volume.
+Clicks show that people read past the first lines. Many clicks with few replies points at the call to action or the page behind the link. No clicks on a campaign with links points at the opening or at tracking, except on a campaign that sends as plain text: a plain text email carries no click-tracking link and counts no clicks (amendment A1 of the deliverability rules, in the `deliverability-guard` skill's `rules.md` reference, live since 15 Nov 2026), so its clicks from that date are N/A, not a finding. Step rows carry raw click volume but no unique clickers, so compare clicks between steps only as volume.
 
 ## Step 5 - Steps and segments
 

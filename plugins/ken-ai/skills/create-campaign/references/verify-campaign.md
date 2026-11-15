@@ -248,7 +248,7 @@ The deliverability rules are in the `deliverability-guard` skill's `rules.md` re
 |---|-------|---------------|-----------|---------|
 | 75 | No open pixel | `trackOpens` is false (rule 1) | FAIL | "Open tracking is on. Campaign emails never carry an open-tracking pixel: turn it off." |
 | 76 | Format by mail provider | When the campaign has Google recipients (`google_workspace` or `gmail` in its `list-recipient-providers` or `get-mail-providers` counts), `sendAsPlainText` is true (rule 3, `campaign-configuration` Step 2a). SKIP when neither count is readable, with the reason | WARN | "{n} of {total} leads are on Google and the campaign sends HTML. Turn on Send as plain text." |
-| 77 | Email 1 to Google recipients | Each segment's Email 1 follows rule 4: one link, alone on its line, on the sender's own domain; the proof in the text; no bold, image, video, handwritten letter, Studio email or sender signature logo | WARN | "Segment '{name}' Email 1: {what forces HTML or breaks the link rule}." |
+| 77 | Email 1 to Google recipients | Each segment's Email 1 follows rule 4: one link, alone on its line, on the sender's own domain; the proof in the text; no bold, image, video, handwritten letter, Studio email or sender signature logo. With Send as plain text on, the link is the real destination, never a click-tracking URL typed in the copy (amendment A1) | WARN | "Segment '{name}' Email 1: {what forces HTML or breaks the link rule}." |
 
 ### List Audit
 

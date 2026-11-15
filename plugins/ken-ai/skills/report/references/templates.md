@@ -39,7 +39,7 @@ Next:
 
 - Leave "What people said" out when you do not have exactly three interested replies from three different people.
 - The weekly report has no benchmark or target line: the meetings ones are per month, and the monthly review compares them.
-- Leave out the clicks line when no campaign has tracked links.
+- Leave out the clicks line when no campaign has tracked links, or when every campaign sends as plain text (a plain text email counts no clicks).
 - Leave out "What changed" when nothing changed. Never fill it with routine sending.
 - A week with no sends: say what is being prepared ("The <campaign> leads are being verified; sending starts Monday") only if a tool or the user told you.
 
