@@ -40,6 +40,10 @@ kenso work release <claimId>   # give back work you will not finish
 
 By hand in a chat: run `kenso work pull`, then give each work file to its own subagent with only its path ("Read this work file and write its answers file as its rules say"), then run pull's `next`. More: `kenso docs work`.
 
+## Setup
+
+`kenso` missing: `npm i -g kenso` (Node 22 or newer), or run a command as `npx -y kenso@latest <command>`. Then `kenso auth login` (the person approves in the browser) and `kenso doctor`. `kenso agent setup -y` installs this skill and the Kenso MCP server (`https://mcp.ken.so/mcp`) for the agent; the person signs in to the MCP once in the agent.
+
 ## No Kenso account yet
 
 The CLI signs in with a Kenso API key. If the user has no Kenso account, send them to https://app.ken.so/get-started to create one, then create a key in Kenso at Settings > Integrations > API keys.
