@@ -44,7 +44,7 @@ Use `week.startDate` and `week.endDate` as the window for every other read in th
 
 **Workspace totals:** the same performance call without `campaign_id`. Its `meetingsBooked` counts meetings booked from campaigns. Meetings held are not tracked yet, so that row is N/A.
 
-**Clicks:** use the human `clickCount` and the returned `clickRate`. Never add `botClickCount`. A 0 on a campaign that sent volume with links in it can mean tracking is not recording: when you cannot confirm it, write N/A. A campaign that sends as plain text counts no clicks from 15 Nov 2026 on, because a plain text email carries no click-tracking link (amendment A1 of the deliverability rules, in the `deliverability-guard` skill's `rules.md` reference): write N/A for its clicks, never 0.
+**Clicks:** use the human `clickCount` and the returned `clickRate`. Never add `botClickCount`. A 0 on a campaign that sent volume with links in it can mean tracking is not recording: when you cannot confirm it, write N/A. A campaign that sends as plain text counts no clicks from 15 Nov 2026 on, because a plain text email carries no click-tracking link (amendment A1 of the deliverability rules, in the `deliverability-guard` skill's `rules.md` reference), and the performance read says so with `clicksTracked` `false`: write N/A (not tracked) for its clicks, never 0 or a rate. A non-zero count there is only partial (steps kept as HTML, or clicks before 15 Nov 2026).
 
 ## Step 2 - Replies
 
