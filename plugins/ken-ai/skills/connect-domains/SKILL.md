@@ -96,7 +96,7 @@ domain_orders(
 )
 ```
 
-Partial success is normal. For each `accepted` row, show the **Kenso Cloudflare nameservers** from `nameservers` and record `domainId`. Cloudflare NS are per zone: copy them, never invent them. For a rejected row, show `errorCode` and continue.
+Partial success is normal. For each `accepted` row, show the **Kenso Cloudflare nameservers** from `nameservers` and record `domainId`. Cloudflare NS are per zone: copy them, never invent them. For a rejected row, show `errorReason` and continue.
 
 Then `domain_orders(operation="domain-imports-list", client_id=...)`. Rows use `id` (same value as `domainId`), `status` (`setting_up` after import), and `expectedNameservers`.
 
