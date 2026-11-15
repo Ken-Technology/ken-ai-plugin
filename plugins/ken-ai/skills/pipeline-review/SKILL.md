@@ -106,18 +106,16 @@ There is no deal delete. A deal that should not exist goes to a lost stage with 
 Write it in this order. `references/weekly-update.md` has the layout.
 
 1. **Pipeline now**: open deals, total and weighted amount, by stage (from `stages-list`). Amounts in the workspace currency.
-2. **This week**: deals opened (`createdAt` in the week), moved (`stageChangedAt` in the week), won and lost (`closedAt` in the week, with amounts and lost reasons).
+2. **This week**: deals opened (`createdAt` in the week), moved, won and lost (`closedAt` in the week, with amounts and lost reasons). For moves, read `opportunities(operation="get-stage-history", opportunity_id=77)` for each deal whose `stageChangedAt` is in the week and count its entries whose `enteredAt` is in the week and whose `kind` is not `created` (opened already counts new deals), so a deal that moved twice shows both moves. A history with `isComplete` false is missing moves Kenso never recorded (a deal created or moved before it recorded every move, or moved by a data fix): say so in the update's notes rather than reading its entries as every move.
 3. **Stuck**: the stale deals, with their signals and next actions.
 4. **Next actions**: the list from Step 3, by owner.
 5. **Top of funnel** (optional): when you can see it, `analytics_campaign(operation="query", metrics=["contacted", "replies", "interested", "meetings"], window={"preset": "last_7_days"}, compare_to="previous_period")`. Replies and interested are distinct contacts. Treat `meetings` as booked, never as held. When you cannot see this tool, write N/A for these lines.
-
-There is no stage history yet. "Moved this week" counts only a deal's latest stage change, so a deal that moved twice shows once: say so in the update.
 
 If replies came in but `interested` is 0, the replies may not be classified yet. Say that, and do not report a 0% positive rate.
 
 ## What this skill cannot do yet
 
-- No stage history and no stale-deal or forecast report: Step 2 rebuilds staleness from activity each time.
+- No stale-deal or forecast report: Step 2 rebuilds staleness from activity each time.
 - No deal delete, and no stage edits beyond win probabilities.
 - No "sync now" for the CRM: `sync-get` is status only.
 - Held meetings are not tracked yet.
