@@ -3,10 +3,10 @@ name: kenso-cli
 description: The Kenso CLI (kenso) for work from a file (of any size, even a few ids) or over about 50 records - import, update, remove (delete), pause, tag or export leads, import CRM accounts and people, edit Studio templates as local files and fill them, run an API operation per file row, resume an interrupted run, write the Kenso AI work a workspace gave to its own coding agent (My agent, with kenso work run, or work pull and submit with subagents), sign in with a key from a variable (pipe it to kenso auth login --with-key, no check first). For records listed in the message (under about 50), one record or a question, use the Kenso MCP.
 ---
 
-1. Every write runs first with `--dry-run`; apply with the plan's `next`. `--yes` at once only to continue an interrupted run or apply what the person confirmed. A command with no dry run refuses `--dry-run` (exit 2, nothing ran): read its `--help`, then run it without.
+1. Every write runs first with `--dry-run`; apply with the plan's `next` (a delete, archive or remove applies with `--yes`). `--yes` at once only to continue an interrupted run or apply what the person confirmed. A command with no dry run refuses `--dry-run` (exit 2, nothing ran): read its `--help`, then run it without.
 2. Many rows: one command on the file as it is (`--file`, `--ids`, `--each`). Run kenso only: no python, awk or shell tests, not even on a file or variable.
 3. Any output's `next` is the command to run; errors are JSON on stderr. `--force` only with the person's OK.
-4. Ids are flags: `--campaign 812` on contacts import, update, export; `--campaign-id 812` on API commands. `--workspace <id>`; by name `kenso workspace list --q acme`. Other commands: `kenso --help`; `kenso api <METHOD> <path>` only when none fits.
+4. Ids are flags: `--campaign-id 812` (or `--campaign 812`, the same flag). `--workspace <id>`; by name `kenso workspace list --search acme`. `--json` is `-o json`; `--query` takes JMESPath (there is no `--jq`). Other commands: `kenso --help`; `kenso api <METHOD> <path>` only when none fits.
 
 ```bash
 kenso contacts import --campaign 812 --file leads.csv --dry-run   # skips leads already in; --map '{"Pain": "customVariables.pain_point", "Notes": null}'; over 200 MB --server-import
