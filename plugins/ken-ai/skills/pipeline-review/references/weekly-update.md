@@ -33,7 +33,7 @@ Top of funnel (last 7 days vs the 7 before)
   Meetings booked: <n> (<prev>)
 
 Notes
-  <data caveats: CRM sync behind, no stage history, thresholds used>
+  <data caveats: CRM sync behind, gaps in a deal's stage history, thresholds used>
 ```
 
 ## Definitions

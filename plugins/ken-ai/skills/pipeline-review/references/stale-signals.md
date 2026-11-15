@@ -4,7 +4,8 @@ Reference for the pipeline-review skill, Step 2. The thresholds below are starti
 
 ## Days in stage
 
-Measured from `stageChangedAt` to today. Without stage history, this is the time since the deal's latest stage change.
+Measured from `stageChangedAt` to today: the time since the deal's latest stage change.
+`opportunities(operation="get-stage-history", opportunity_id=77)` shows how long the deal sat in each stage before (`durationSeconds` per entry), which tells a deal that keeps sliding back from one that is new to its stage.
 
 | Stage (default keys) | Flag after |
 |---|---|
