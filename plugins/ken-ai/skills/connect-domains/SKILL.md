@@ -9,7 +9,7 @@ Connect domains the user already owns to Kenso. Connecting means changing the do
 
 Use the import operations and billing reads below. Buying new domains (search, checkout) belongs to `domain-selection`.
 
-Preview and import need Delivery edit access (owners, admins and editors by default). Capacity and import-list reads need Delivery view. Confirm the cart with the user before the create call.
+Preview and import need Delivery edit access (owners, admins and editors by default). The plan, capacity and import-list reads need Delivery view. Confirm the cart with the user before the create call.
 
 Imported domains get Kenso inboxes, so import is paid like any Kenso inbox. Credit plans pay in credits: 200 credits ($4) per Google / Outlook inbox a month and 2,500 credits ($50) per Azure domain a month (up to 50 inboxes). There is no registration charge. Exempt workspaces (VIP) have mailboxes on the plan.
 
@@ -19,14 +19,14 @@ Import onto the mailbox types of deliverability rule 6, in the `deliverability-g
 
 Size the import with the sending plan, as `infra-planning` says: `inboxes(operation="sending-plans-create", emails_per_day=500, domains=[{"name": "acme.io", "provider": "google", "kind": "import"}], senders=[...])`. Quote its numbers, and use its `importCart` as the import body in step 5. `cost.dueOnConnect` is the first month of the imported inboxes: nothing is charged at import, but the import is refused unless the credits cover it, and it is charged as each domain is set up. `balance.shortfallCredits` is the credits to buy before the import. With `balance.creditsExempt` true the inboxes are on the plan: quote no credits and ask for no packs. Read `domain_setup(operation="delivery-defaults-get")` first for the senders, forwarding URL and website answer. New payers are limited to 3 domains and 10 inboxes (Azure inboxes count) until 14 days of paid history: the plan shows what fits.
 
-Call `domain_orders(operation="domain_import-capacity", client_id=...)`. Then `billing(operation="billing_subscription", client_id=...)`: if `managedByWorkspace` is set (white-label child), record `caps.mailboxes` and `caps.domains`; its credits are run by the parent workspace. Then `billing(operation="credits-get", client_id=...)`: record `exempt` and `display.available`.
+The plan carries the capacity: make no separate capacity read. From it read `emailsPerDay.existing` (emails a day the workspace's inboxes send now, at the planning rate), `emailsPerDay.toAdd` (what the goal still needs) and `limits.planDailyEnforced`. The plan does not check the daily send left on a hard cap: with `limits.planDailyEnforced` true, or missing, read `remaining` from `triggers(operation="sending-capacity-get", client_id=...)`, also a read. Then `billing(operation="billing_subscription", client_id=...)`: if `managedByWorkspace` is set (white-label child), record `caps.mailboxes` and `caps.domains`; its credits are run by the parent workspace. Then `billing(operation="credits-get", client_id=...)`: record `exempt` and `display.available`.
 
-Done when you have `remaining` daily send, `planDailyEnforced`, existing Google / Microsoft / Azure counts, available credits, and the white-label caps when they apply.
+Done when you have the plan's `emailsPerDay` and `limits.planDailyEnforced`, `remaining` daily send on a hard cap, available credits, and the white-label caps when they apply.
 
 Daily-send math:
 
-- `planDaily` is emails/day. Do not compute `emailLimit / 30`.
-- `planDailyEnforced` true, or the field is missing: `planDaily` is a hard cap. `planDailyEnforced` false (credit plans): `planDaily` is a planning figure, and credits are the limit.
+- Daily send is emails a day. Do not compute `emailLimit / 30`.
+- `limits.planDailyEnforced` true, or the field is missing: daily send is a hard cap, and `remaining` is what is left of it. `limits.planDailyEnforced` false (credit plans): daily send is a planning figure, and credits are the limit.
 - Planning rate, which the plan sizes with: Google and Outlook (MICROSOFT) = 25/day each, Azure = 5/day. A mailbox's own sending ceiling is higher (50 for Google and Outlook, 30 for Azure and SMTP): see `infra-planning`.
 - Daily send is the plan limit: `kenMailboxSlots` does not cap mailbox count, so never clamp to it.
 
@@ -34,7 +34,7 @@ The plan, not you, turns the goal into inboxes and domains per provider (`lines`
 
 White-label child only: the parent's caps count every inbox and domain in the workspace, connected ones included (count with `inboxes(operation="list", client_id=...)` and `domains(operation="list", client_id=...)`; follow `cursor` while `pagination.hasMore` is true), so `current + cart` must stay within `caps.mailboxes` and `caps.domains`. Preview counts only one mailbox of daily per domain, so a cart that previews clean can still fail OverCapacity on import.
 
-On a hard cap or a white-label child: if the cart would exceed `remaining` daily send or a white-label cap, shrink the goal and plan again before preview. Shrink on either overflow. Do not submit an over-capacity cart. On a hard cap, remaining daily send is the plan cap, not a domain-count allowance. Capacity does not paid-gate; preview and import do.
+On a hard cap: with `remaining` 0, import nothing; if `emailsPerDay.toAdd` is above `remaining`, plan again with `emails_per_day` at `emailsPerDay.existing` plus `remaining`. On a white-label child: if the cart would exceed a white-label cap, shrink the goal and plan again before preview. Do not submit an over-capacity cart. On a hard cap, remaining daily send is the plan cap, not a domain-count allowance. The plan and the capacity read do not paid-gate; preview and import do.
 
 ## 2. Paste names
 
@@ -118,13 +118,15 @@ Done when the user says they updated nameservers, or they want to wait.
 
 ## 7. Check nameservers
 
-After they confirm, call `domains(operation="check-nameservers", domain_id=..., client_id=...)` once per imported domain still setting up. Show `status`, `zoneStatus`, and `activated`.
+After they confirm, call `domains(operation="check-nameservers", domain_id=..., client_id=...)` once per imported domain still setting up. Show `status`, `zoneStatus`, `activated` and `waitingForCredits`.
 
 Kenso checks the nameservers every 15 minutes on its own. After 24 hours without an active zone the status becomes action required (still waiting: nameservers do not expire, so fix them at the registrar and it clears). After 14 more days the import is given up (`failed`).
 
 Do not loop the check on a timer. One shot on user request, then `domain-imports-list` if they want a table.
 
 `check-nameservers` re-checks one domain right away. A domain read (`domains(operation="get", domain_id=...)`) shows its `nameservers` (`expected`, `current` and `status`: `active`, `action_required` or `pending`) and the registrar as `registrarInfo`.
+
+`waitingForCredits` true, on the check or in `nameservers`: the nameservers already point at Kenso, but setup waits until the balance pays the first month of the domain's inboxes. Show `requiredMillicredits` and `availableMillicredits` as credits (1 credit = 1,000 millicredits) and send them to buy credits at https://app.ken.so/<workspace id>/settings/billing; setup continues on the next check.
 
 ## Errors
 
@@ -133,7 +135,7 @@ Do not loop the check on a timer. One shot on user request, then `domain-imports
 | Paid-plan / Forbidden / `PLAN_FEATURE_NOT_AVAILABLE` | Free cannot import onto Kenso inboxes. Connect your own inboxes in the app, or upgrade to Platform at https://app.ken.so/<workspace id>/settings/billing. Show `error.recovery.summary` when present |
 | `INSUFFICIENT_CREDITS` | Not enough credits for the first month of the imported inboxes. Show the message (it carries the credits needed and available). Shrink the cart, or buy credits at https://app.ken.so/<workspace id>/settings/billing and retry. Dfy: the Kenso team adds credits. White-label child: ask the parent workspace |
 | `FREE_CREDITS_NOT_ELIGIBLE` | Free and bonus credits can't pay for domains or inboxes, and the bought credits fall short. Show the message (it carries the credits needed, the credits that can pay, and the free part). Buy credits at https://app.ken.so/<workspace id>/settings/billing and retry. Dfy: the Kenso team adds credits. White-label child: ask the parent workspace. |
-| OverCapacity / remaining too small | Hard cap only. Show remaining daily send. Shrink inbox counts so `existing + cart <= planDaily`. It is not a mailbox-slot limit |
+| OverCapacity / remaining too small | Hard cap only. Show `remaining` from `triggers(operation="sending-capacity-get", client_id=...)`, plan again with `emails_per_day` at `emailsPerDay.existing` plus `remaining`, and import from the new `importCart`. It is not a mailbox-slot limit |
 | "workspace mailbox cap" / "workspace domain cap" | White-label child at its parent's cap. Shrink the cart or ask the parent workspace to raise it |
 | LookupFailed | Cannot import until preview returns Eligible, InUseMx, or LiveWebsite. Retry later |
 | DomainPendingElsewhere | Another workspace's import still holds the name and has not moved its nameservers. Show `claim.recordName` and `claim.recordValue`: the user adds that TXT record at the domain's own DNS (where they edit its records today), waits for DNS to update (it can take minutes, sometimes longer), then you retry the import. The same record comes from `domain_orders(operation="claim", domain=..., client_id=...)`. Only a workspace that controls the DNS can add it |
