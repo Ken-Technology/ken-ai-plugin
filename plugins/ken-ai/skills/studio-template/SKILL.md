@@ -131,7 +131,7 @@ New pages use the published version, and pages with no link yet move to it. Live
 | `"all"` | Every live page is refilled on the new version as a run (`updateRunId`). URLs and links stay |
 | `[812, 813]` | Only these live pages are refilled |
 
-Refilling live pages runs Kenso's executor on the slots the new version changed, at 2x model cost. Ask the user before you send `"all"` or a list, and say what it costs.
+Refilling live pages runs Kenso's executor on the slots the new version changed, charged for its AI work. Ask the user before you send `"all"` or a list, and say what it costs.
 
 Publish refuses with 409 `invalid_state` on validation errors (each detail names `file:line` and the rule), a flagged link (`link-domain-blocked`, `link-domain-new`), `already_published` (push a change first) or `no_draft`. 50 publishes a day per workspace; a 503 changed nothing, so retry in a minute.
 
@@ -174,7 +174,7 @@ Pinning, unpinning or pinning an email template to a sequence step changes what 
 
 ## Credits
 
-Previews, validation, pushes, hosting and PDFs are free. Publishing is free. Pages cost 1 credit on their first link, and fills cost model tokens at 2x model cost when Kenso writes them: the `studio-asset` skill has the full table.
+Previews, validation, pushes, hosting and PDFs are free. Publishing is free. Pages cost 1 credit on their first link, and fills cost credits for their AI work when Kenso writes them: the `studio-asset` skill has the full table.
 
 ## What this skill cannot do yet
 

@@ -61,7 +61,7 @@ The prompt step, shortened:
   "prompt": "... The reader can change every number, so your job is a fair starting point, not a sales pitch. ... reps: integer from 1 to 50. ... If the inputs name a sales team size or open sales roles, start from that. Otherwise use size_band: 1-10 gives 1, 11-50 gives 3, 51-200 gives 6 ... basis: one plain line each ... When no input supports a number, write \"A typical figure for a team this size.\" ... Clamp every number to its range. Return integers, not strings. ..." }
 ```
 
-Credits, in plain words: the binds and `scrape.page` are free. The prompt costs its tokens at 2x model cost when Studio runs it (`executor="ken"`) and nothing when your agent fills the page. The page costs 1 credit when its first link is published.
+Credits, in plain words: the binds and `scrape.page` are free. The prompt costs credits for its AI work when Studio runs it (`executor="ken"`) and nothing when your agent fills the page. The page costs 1 credit when its first link is published.
 
 ## Alpine under the CSP
 

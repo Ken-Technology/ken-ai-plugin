@@ -7,10 +7,10 @@ The cost of each step in the Accounts loop, and what to do when a call fails. Th
 | What | Cost |
 |---|---|
 | Adding accounts | free; with research on, each new account starts a research run |
-| A research run | its model tokens at 2x model cost, plus each web page or search at 2x its cost |
-| A committee mapping run | its model tokens at 2x model cost |
-| A touch plan | the step titles, at 2x model cost |
-| Drafting or rewriting a touch (`draft`, `rewrite`) | its model tokens at 2x model cost |
+| A research run | its AI work, plus each web page or search it reads |
+| A committee mapping run | its AI work |
+| A touch plan | the AI work of the step titles |
+| Drafting or rewriting a touch (`draft`, `rewrite`) | its AI work |
 | Grading a touch (`feedback`) | free |
 | A signals scan | free; the news source is billed like any web search |
 | An email find | 1 credit per email found |

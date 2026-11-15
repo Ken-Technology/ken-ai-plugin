@@ -102,7 +102,7 @@ Credits, in plain words:
 
 - 1 credit per page, charged when its first link is published. More person links on that page are free.
 - `bind`, `scrape.page`, `ken_search.people`, `webhook` and `dataset` cost nothing today.
-- `prompt`, `grade` and the `ken.copy` tool are model calls. When Studio runs them (`executor="ken"`), they cost their tokens at 2x model cost, and a prompt answer that breaks a slot schema is retried with the reason, so each retry costs tokens too. When your own agent fills the page (`executor="agent"`, then prepare and submit), its prompt and grade steps cost nothing. `ken.copy` is a tool step, so Studio runs and charges it on both paths.
+- `prompt`, `grade` and the `ken.copy` tool are model calls. When Studio runs them (`executor="ken"`), they cost credits for their AI work, and a prompt answer that breaks a slot schema is retried with the reason, so each retry costs tokens too. When your own agent fills the page (`executor="agent"`, then prepare and submit), its prompt and grade steps cost nothing. `ken.copy` is a tool step, so Studio runs and charges it on both paths.
 
 Estimate before a run and show the user the number: `studio_pages(operation="run-estimate", template_id=41, account_count=25, executor="ken")`, then `studio_pages(operation="run-create", template_id=41, account_ids=[...], executor="ken")`.
 

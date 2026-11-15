@@ -79,10 +79,10 @@ Credit prices, for reference only (the plan already applies them; 50 credits per
 |------|---------|
 | Google / Outlook inbox | 200 credits ($4) per inbox a month |
 | Azure domain already in the workspace (up to 50 inboxes; not offered for new orders) | 2,500 credits ($50) per domain a month |
-| Domain registration | (ceil(registrar quote x 1.03) + 1) x 50 credits, first year upfront (a $10.40 quote is $12, 600 credits) |
+| Domain registration | each name's first-year price in credits, as the domain search shows it, upfront |
 | Credit pack | 1,000 credits for $20; at most 10 packs per checkout (fewer while the new-payer checkout cap applies, see section 5) |
 
-Exempt workspaces skip credits: they pay each domain's price as the domain search shows it (it already includes Kenso's markup) for one year at Stripe checkout, and mailboxes are on the plan.
+Exempt workspaces skip credits: they pay each domain's price as the domain search shows it (the full price) for one year at Stripe checkout, and mailboxes are on the plan.
 The plan marks them with `balance.creditsExempt` true. For them quote only what the order charges today, the registrations (`cost.registration`, or `cartCost.registration` once domains are chosen). Never quote the inboxes' monthly credits (`cost.monthly`, `cost.dueOnConnect`) and never ask them to buy credit packs: `balance.shortfallCredits` is always 0 for them.
 
 ## 5. Limits for new payers
