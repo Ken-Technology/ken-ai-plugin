@@ -29,7 +29,7 @@ If an operation is not listed for you, or a write answers 403, the caller cannot
 
 `analytics(operation="get-campaign-performance", from_time="2026-09-27T00:00:00Z", to_time="2026-10-27T23:59:59Z", campaign_id=42, group_by="step")`
 
-Each row is one step: `sentCount`, `replyCount`, `interestedCount`, clicks and `meetingsBooked`. Put the counts next to every rate. A gap of one or two replies is not a finding: say the step needs more sends before it can be judged.
+Each row is one step: `sentCount`, `replyCount`, `interestedCount`, clicks and `meetingsBooked`. Where `clicksTracked` is `false` (a plain text campaign), clicks are not tracked: judge the steps without them. Put the counts next to every rate. A gap of one or two replies is not a finding: say the step needs more sends before it can be judged.
 
 - The user named a step: read its numbers anyway, and say whether they agree.
 - Per variant (optional): when `analytics_campaign(operation="query")` is listed for you (staff, or the workspace's `generative_ui` flag), `analytics_campaign(operation="query", metrics=["sent", "replies", "interested"], group_by=["step", "variant"], filters={"campaignId": [42]}, window={"preset": "last_30_days"})`.
