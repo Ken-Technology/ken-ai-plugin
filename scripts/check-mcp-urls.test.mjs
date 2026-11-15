@@ -50,10 +50,13 @@ async function makeRepo(files) {
 }
 
 const claudeConfig = (url) =>
-  JSON.stringify({ mcpServers: { 'ken-ai': { type: 'http', url } } });
+  JSON.stringify({ mcpServers: { kenso: { type: 'http', url } } });
 const codexConfig = claudeConfig;
 // The shape that shipped: no `mcpServers` envelope, so no server registers.
-const bareMapConfig = (url) => JSON.stringify({ 'ken-ai': { type: 'http', url } });
+const bareMapConfig = (url) => JSON.stringify({ kenso: { type: 'http', url } });
+// The name the server had before DEV-11123, still read until the sync renames it.
+const legacyConfig = (url) =>
+  JSON.stringify({ mcpServers: { 'ken-ai': { type: 'http', url } } });
 
 const goodRepo = () => ({
   'plugins/ken-ai/.mcp.json': claudeConfig(RESOURCE),
@@ -173,7 +176,7 @@ test('readConfiguredUrls rejects a config missing the mcpServers envelope', asyn
   try {
     const problems = findConfigDisagreements(await readConfiguredUrls(dir));
     assert.equal(problems.length, 1);
-    assert.match(problems[0], /no ken-ai server url declared/);
+    assert.match(problems[0], /no kenso server url declared/);
     assert.equal(await main(dir), 1);
   } finally {
     await rm(dir, { recursive: true, force: true });
@@ -300,6 +303,18 @@ test('main fails when the Claude Code config is missing entirely', async () => {
   });
   try {
     assert.equal(await main(dir), 1);
+  } finally {
+    await rm(dir, { recursive: true, force: true });
+  }
+});
+
+test('readConfiguredUrls still reads a server named ken-ai until the sync renames it', async () => {
+  const dir = await makeRepo({
+    'plugins/ken-ai/.mcp.json': legacyConfig(RESOURCE),
+    'plugins/ken-ai/.codex-plugin/mcp.json': codexConfig(RESOURCE)
+  });
+  try {
+    assert.deepEqual(findConfigDisagreements(await readConfiguredUrls(dir)), []);
   } finally {
     await rm(dir, { recursive: true, force: true });
   }
