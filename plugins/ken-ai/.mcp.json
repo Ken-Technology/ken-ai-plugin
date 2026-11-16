@@ -1,6 +1,6 @@
 {
   "mcpServers": {
-    "ken-ai": {
+    "kenso": {
       "type": "http",
       "url": "https://mcp.ken.so/mcp"
     }
