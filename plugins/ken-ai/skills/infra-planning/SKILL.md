@@ -42,7 +42,7 @@ White-label child only (`managedByWorkspace` set): the parent's caps count every
 Which rate is which:
 
 - **Planning rate, for sizing:** 25 emails a day per Google or Outlook inbox and 5 a day per Azure inbox. The plan turns the goal into inboxes with these.
-- **Sending ceiling, for caps:** the most one inbox may send in a day is 50 for Google and Outlook and 30 for Azure and SMTP. Set an inbox's daily limit up to its ceiling and no higher; never size from a ceiling. An SMTP inbox, Azure included, still sends 5 to 10 a day by rule 5.
+- **Sending ceiling, for caps:** the most one inbox may send in a day is 50 for Google and Outlook and 30 for Azure and SMTP. Set an inbox's daily limit up to its ceiling and no higher; never size from a ceiling. An SMTP inbox, Azure included, sends at the daily limit the product sets for it: never raise it. The one exception, once rule 5's price per email is switched on: an SMTP inbox a client buys billed per email follows rule 5 (25 a day, up to 50), above the 30.
 
 Defaults the plan uses without `mix`: below 2,000 new emails a day, Google and Outlook 2:1 and no Azure; at 2,000 or more, 40% Azure, 40% Google, 20% Outlook, which is why you pass `mix` there. Google and Outlook domains take 3 inboxes (1-5 allowed) and every Azure domain is filled to 50 (1-50 allowed, Azure is priced per domain). Checkout `platform` is `GOOGLE` | `MICROSOFT` | `AZURE` and the plan's `cart` carries it.
 
