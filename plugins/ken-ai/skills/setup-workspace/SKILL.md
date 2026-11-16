@@ -35,7 +35,7 @@ Use only these calls. Everything else in this flow is a link to a page in the ap
 | Current company profile | `workspace(operation="get", workspace_id=<client_id>)` | read |
 | Plan, usage, sending status | `billing(operation="subscription-get", client_id=<client_id>)` | read |
 | Save name / website / LinkedIn / company context | `workspace(operation="update", workspace_id=<client_id>, ...)` | write |
-| Set the logo | `workspace(operation="set_logo_from_url", client_id=<client_id>, logo_url="https://...")` | write |
+| Set the logo | `workspace(operation="set-logo-from-url", client_id=<client_id>, logo_url="https://...")` | write |
 | Current members | `members(operation="list", client_id=<client_id>)` | read |
 | Pending invitations | `members(operation="invitations-list", client_id=<client_id>)` | read |
 | Invite a teammate | `members(operation="invite", email=..., client_id=<client_id>)` | write |
@@ -116,7 +116,7 @@ workspace(
 
 Only `name`, `website`, `linkedin_company_url`, and `company_context` belong to this step. An empty string clears a field other than name; never send one unless the user asked to clear it. After success, say which of the four are set and which are still empty, and offer edits to the voice and tone.
 
-**Logo:** propose the logo candidate from research, or ask the user for a public image URL. On approval call `workspace(operation="set_logo_from_url", client_id=..., logo_url="https://...")`. The server downloads the image behind an SSRF guard; never fetch it yourself and never ask for a file upload. On a validation error, relay `error.message` and ask for another URL. Skippable.
+**Logo:** propose the logo candidate from research, or ask the user for a public image URL. On approval call `workspace(operation="set-logo-from-url", client_id=..., logo_url="https://...")`. The server downloads the image behind an SSRF guard; never fetch it yourself and never ask for a file upload. On a validation error, relay `error.message` and ask for another URL. Skippable.
 
 ## Step 4 - Invite teammates
 

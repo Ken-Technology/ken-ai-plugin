@@ -82,7 +82,7 @@ Show the user the funnel before you go on: "212 postings, 141 companies, 46 pass
 Write to the person who runs the plan, not the logo. At a company over 200 people, the CEO is not buying your tool: the VP who inherited the hiring plan is.
 
 1. Find each company's search id: `search(operation="search-companies", body={"website": "acme.com", "page": 1, "pageSize": 1})`.
-2. Find the person: `search(operation="people_in_accounts", account_ids=[123456, 234567], current_titles=["VP Sales", "Head of Sales", "Director of Sales Development"], seniority_levels=["Director", "VP", "CLevel"])`. Keep one per company, two at most.
+2. Find the person: `search(operation="people-in-accounts", account_ids=[123456, 234567], current_titles=["VP Sales", "Head of Sales", "Director of Sales Development"], seniority_levels=["Director", "VP", "CLevel"])`. Keep one per company, two at most.
 3. Funding rounds name executives on the round (`people`); use them only when their role owns the plan.
 
 Keep each person's search id. The campaign finds and verifies their email after import.
@@ -110,7 +110,7 @@ Each email quotes its own company's signal. Keep the facts per company (the job 
 
 **Mode B, one-off list.** Build or reuse a Draft campaign with the `create-campaign` skill, with the copy from Step 4. Import the people you picked:
 
-`saved_searches(operation="import_to_campaign", campaign_id=8123, selected_person_ids=[90011, 90012], await_ready=True)`
+`saved_searches(operation="import-to-campaign", campaign_id=8123, selected_person_ids=[90011, 90012], await_ready=True)`
 
 The import skips people already in the campaign. To carry each company's signal facts as custom variables, import a CSV instead: `contacts(operation="contact-imports-create", source="csv", campaign_id=8123, csv_content="...", column_mappings=[...])`, one row per person with the job title or round use in its own column. Then hand it over: the person reviews and launches it in Kenso. Repeat weekly for a fresh list.
 

@@ -11,7 +11,7 @@ Offer the mailbox types of deliverability rule 6, in the `deliverability-guard` 
 
 ## 1. Preflight
 
-`billing(operation="billing_subscription", client_id=...)` for planType. If `managedByWorkspace` is set, this is a white-label child: record `caps.mailboxes` and `caps.domains`. Its plan and credits are run by the parent workspace, so send purchase and credit questions there.
+`billing(operation="billing-subscription", client_id=...)` for planType. If `managedByWorkspace` is set, this is a white-label child: record `caps.mailboxes` and `caps.domains`. Its plan and credits are run by the parent workspace, so send purchase and credit questions there.
 
 Plans that buy Kenso infrastructure, with billing Active or Trialing:
 

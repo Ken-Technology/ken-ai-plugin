@@ -15,8 +15,8 @@ The console is fleet-wide. Every `admin_workflows` operation needs super_admin, 
 | Which workflows run where? | `admin_workflows(operation="workflows", kind="system", workspace_id=24)` | run counts and auto-pause state, across workspaces or for one |
 | Did a scheduled job stop? | `admin_workflows(operation="jobs", host="Ken.Sequencer")`, then `admin_workflows(operation="job-runs", host="Ken.Sequencer", job_name="KenSequencerLaunchJob", status="failed")` | the newest run and the failures in the last 24 hours per job, then one job's runs with errors. `errorMessage` is raw exception text and can carry tenant data: keep it in staff channels. The log does not say whether a job is enabled or when it fires next |
 | Does a workspace have an override? | `admin_workflows(operation="limits-get", workspace_id=24)` | 404 `not_found` means no override (the global limits apply); 503 means Redis is down, never "no override" |
-| What is blocked? | `admin_workflows(operation="workflow_kill_switches", action="list")` | every switch that is on, oldest first, with who set it and why |
-| Code step minutes | `admin_ai(operation="workflow_code_minutes", action="get", workspace_id=24)` | a workspace's `code.run@1` sandbox seconds this UTC month against its limit |
+| What is blocked? | `admin_workflows(operation="workflow-kill-switches", action="list")` | every switch that is on, oldest first, with who set it and why |
+| Code step minutes | `admin_ai(operation="workflow-code-minutes", action="get", workspace_id=24)` | a workspace's `code.run@1` sandbox seconds this UTC month against its limit |
 
 ## Act
 
@@ -28,10 +28,10 @@ Every write here changes live work for one or more workspaces. Say what you will
 | Stop a stuck run | `admin_workflows(operation="runs-cancel", run_id=7, workspace_id=24)` | queued and waiting steps do not run. A finished run is 409 `invalid_state` |
 | Force a provider breaker | `admin_workflows(operation="breaker-set", provider_key="leadmagic", state="open", reason="429s since 09:00")` | `open` reschedules every step on that provider and `closed` lets them all through, both for 24 hours by default; `auto` lifts the force. Use a key `providers` lists: another key answers 409 `unknown_provider` unless `force=True`, which you set only after checking it is not a typo |
 | Raise a workspace's admission limits | `admin_workflows(operation="limits-set", workspace_id=24, soft_runs_per_minute=6000, ttl_hours=6, reason="launch")` | `soft_runs_per_minute` and `hard_event_runs_per_hour`: omit one to keep the global value, 0 turns it off for that workspace. `ttl_hours` 1 to 168 (24 by default). Setting it again replaces the override; undo with `admin_workflows(operation="limits-clear", workspace_id=24)` |
-| Block a step type, provider or workspace | `admin_workflows(operation="workflow_kill_switches", action="set", scope="provider", key="leadmagic", reason="Provider outage")` | blocked steps are rescheduled, not failed, and go on once you clear the switch with `action="clear"` and the same `scope` and `key`. Workers see a change within 5 seconds. A `step_type` key is `ai.qualify@1`, or `ai.qualify` for every version; a `workspace` key is the numeric workspace id |
-| Cap code step minutes | `admin_ai(operation="workflow_code_minutes", action="set_limit", workspace_id=24, limit_seconds=3600)` | `action="clear_limit"` returns the workspace to the fleet default |
+| Block a step type, provider or workspace | `admin_workflows(operation="workflow-kill-switches", action="set", scope="provider", key="leadmagic", reason="Provider outage")` | blocked steps are rescheduled, not failed, and go on once you clear the switch with `action="clear"` and the same `scope` and `key`. Workers see a change within 5 seconds. A `step_type` key is `ai.qualify@1`, or `ai.qualify` for every version; a `workspace` key is the numeric workspace id |
+| Cap code step minutes | `admin_ai(operation="workflow-code-minutes", action="set_limit", workspace_id=24, limit_seconds=3600)` | `action="clear_limit"` returns the workspace to the fleet default |
 
-Read after every write: `providers` after a breaker, `limits-get` after a limit, `workflow_kill_switches` with `action="list"` after a switch, and the run after a retry or cancel.
+Read after every write: `providers` after a breaker, `limits-get` after a limit, `workflow-kill-switches` with `action="list"` after a switch, and the run after a retry or cancel.
 
 ## Playbooks
 

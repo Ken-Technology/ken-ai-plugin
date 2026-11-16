@@ -127,7 +127,7 @@ The deliverability rules are in the `deliverability-guard` skill's `rules.md` re
 
 ### Step 2b: Sending inboxes (staff only)
 
-An empty inbox assignment fails closed. Assigning inboxes from here is staff-only: when `campaign_ops` does not offer these operations, tell the user to assign inboxes in the campaign's settings in the app and move on. Staff list with `campaign_ops(operation="available", campaign_id=...)` (no provider filter), pick the family this campaign should send from (do not default to Google), then `campaign_ops(operation="assign_all_active", campaign_id=..., provider=<chosen family>)`. An empty list is not assignable yet.
+An empty inbox assignment fails closed. Assigning inboxes from here is staff-only: when `campaign_ops` does not offer these operations, tell the user to assign inboxes in the campaign's settings in the app and move on. Staff list with `campaign_ops(operation="available", campaign_id=...)` (no provider filter), pick the family this campaign should send from (do not default to Google), then `campaign_ops(operation="assign-all-active", campaign_id=..., provider=<chosen family>)`. An empty list is not assignable yet.
 
 ### Step 3: AI workflows and rewriting readiness
 
@@ -204,12 +204,12 @@ A replace, create or update writes no version row. After the first full configur
 Offer: "Import contacts from Search now? [Yes / No / Custom limit]" with a default limit of `5 * contact_limit`. An import spends credits on enrichment: say so before a large one.
 
 1. Filters come from the campaign's saved people searches: `saved_searches(operation="list", client_id=...)`, then `saved_searches(operation="get", search_id=...)`. Multi-list campaigns import each list separately; never pass an accounts search as `people_filters_json`. No saved search is a gap: run `load_skill("ken-search")`. Never import invented or pasted filter JSON. Rules and gotchas: `references/configuration-guide.md` (Search import).
-2. Import: `saved_searches(operation="import_to_campaign", campaign_id=..., select_all=True, people_filters_json=<saved filters>, import_limit=<5 * contact_limit or custom>, await_ready=False)`.
-3. A 202 receipt is not success: poll `saved_searches(operation="export_status", job_id=<jobId>)` until Ready / Failed / Expired (or pass `await_ready=True`). Report imported / skipped / failed counts; do not blind-retry.
+2. Import: `saved_searches(operation="import-to-campaign", campaign_id=..., select_all=True, people_filters_json=<saved filters>, import_limit=<5 * contact_limit or custom>, await_ready=False)`.
+3. A 202 receipt is not success: poll `saved_searches(operation="export-status", job_id=<jobId>)` until Ready / Failed / Expired (or pass `await_ready=True`). Report imported / skipped / failed counts; do not blind-retry.
 
 ### Step 8b: Manual vs AI segments after import
 
-- **Manual** (plan says Manual): non-default segments get `segmentation_type="manual"` with `filter_criteria`, then `segments(operation="process_filters", campaign_id=..., segment_id=...)`. Preview a filter first with `segments(operation="preview", campaign_id=..., criteria={...})`. Detach Segmentation (workflow 4) with `campaign_flow(operation="replace-ai-workflows", ...)`; Qualification, Personalization and Rewriting stay as needed. Prefer Manual whenever industry, title, or geo filters are enough: it is free.
+- **Manual** (plan says Manual): non-default segments get `segmentation_type="manual"` with `filter_criteria`, then `segments(operation="process-filters", campaign_id=..., segment_id=...)`. Preview a filter first with `segments(operation="preview", campaign_id=..., criteria={...})`. Detach Segmentation (workflow 4) with `campaign_flow(operation="replace-ai-workflows", ...)`; Qualification, Personalization and Rewriting stay as needed. Prefer Manual whenever industry, title, or geo filters are enough: it is free.
 - **AI**: keep `segmentation_type="ai"` and workflow 4; segment descriptions are the assignment prompts.
 
 ### Step 9: Lead scoring (opt-in)

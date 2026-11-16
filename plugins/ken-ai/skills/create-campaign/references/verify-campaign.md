@@ -148,7 +148,7 @@ Qualification asks one yes/no question per contact; the Qualification pipeline b
 |---|-------|---------------|-----------|---------|
 | 26 | Qualification prompt exists | At least 1 `qualification` row from `prompts` list | FAIL | "No Qualification prompt found." |
 | 27 | Qualification fields populated | At least 2 of {audienceDescription, qualificationCriteria, disqualificationCriteria} populated | FAIL | "Qualification requires at least 2 of 3 structured fields to be populated." |
-| 28 | Qualification model (if override) | A qualification override's model id is returned by `models(operation="ai_supported_models", flow=1)` | WARN | "Using {model} for Qualification override. Confirm it's still in the allowed list - the catalog is dynamic." |
+| 28 | Qualification model (if override) | A qualification override's model id is returned by `models(operation="ai-supported-models", flow=1)` | WARN | "Using {model} for Qualification override. Confirm it's still in the allowed list - the catalog is dynamic." |
 
 ### AI Personalization Checks (per segment)
 
@@ -164,7 +164,7 @@ Run these per segment, including Default.
 | 33 | Names unique per segment | Variable names are unique (case-insensitive) within a segment | FAIL | "Segment '{name}' has duplicate variable name: '{var}'." |
 | 34 | Orders positive | All variable `order` values are positive integers | FAIL | "Segment '{name}' has variable with invalid order." |
 | 35 | Placeholders covered | Every `{{Variable Name}}` placeholder in the segment's live `subject` and `body` matches a personalization variable by name (ignore lead fields like `{firstName}` and `{{tracking_link:ID}}`). Any square-bracket placeholder (`[First Line]`) FAILs: the copy lint rejects it | FAIL | "Segment '{name}' sequence references variables without matching prompts: {missing}." / "Segment '{name}' Email {N} has a square-bracket placeholder {placeholder}; write it as {{Variable Name}}." |
-| 36 | Personalization model (if override) | A personalization override's model id is in `models(operation="ai_supported_models", flow=2)` | WARN | "Using {model} for Personalization override. Confirm the id is still in the allowed list." |
+| 36 | Personalization model (if override) | A personalization override's model id is in `models(operation="ai-supported-models", flow=2)` | WARN | "Using {model} for Personalization override. Confirm the id is still in the allowed list." |
 | 37 | Company context populated | `workspace(operation="get", workspace_id=<campaign clientId>)` has a non-empty `companyContext` | WARN | "Workspace company context is empty. Backend auto-generates system prompts from this field - without it, personalization will lack company context." |
 
 ### AI Rewriting Checks (if workflow 3 attached or variables use rewrite)
@@ -175,7 +175,7 @@ Rewriting prompt is optional - backend applies a default when none is set. Rewri
 |---|-------|---------------|-----------|---------|
 | 38 | Custom rewriting prompt | Custom `rewriting` prompt exists OR backend default in use | PASS (info) | Display which path is active |
 | 39 | Custom prompt quality | If custom exists, length > 10 and <= 4096 | WARN | "Custom rewriting prompt is empty or too short. Delete it to use the backend default, or fill it in." |
-| 40 | Rewriting model (if override) | A rewriting override's model id is in `models(operation="ai_supported_models", flow=3)` | WARN | "Using {model} for Rewriting override. Confirm the id is still in the allowed list." |
+| 40 | Rewriting model (if override) | A rewriting override's model id is in `models(operation="ai-supported-models", flow=3)` | WARN | "Using {model} for Rewriting override. Confirm the id is still in the allowed list." |
 
 ### Lead Scoring Checks (if workflow 6 attached or the user asked for scoring)
 

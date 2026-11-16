@@ -80,7 +80,7 @@ Say which cause the numbers point to, and the numbers. Mark it as your read when
 
 - `domains(operation="get-health", domain_id=12)` is the latest snapshot: blocklists, mail DNS, bounces, placement, nameservers and certificate, with `inboxRate`, `spamRate` and `bounceRate`. `spfStatus`, `dkimStatus`, `dmarcStatus` and `mxStatus` are the SPF, DKIM, DMARC and MX verdicts: `pass`, `fail` or `unknown`. They come from the last check, dated by `checkedAt`, and do not change until the next one, so run a fresh check before you call a record broken or fixed.
 - A fresh check: `domains(operation="domain-health-checks-create", domain_ids=[12])` returns a job. Follow it with `jobs(operation="get", job_id="<job id>", job_type="domain_health")`. A 409 means a check is already running: follow the job it names.
-- Blocklists: `free_tools(operation="check_blacklist", input={"target": "acme-mail.com"})` returns each listing, what it means and where to delist.
+- Blocklists: `free_tools(operation="check-blacklist", input={"target": "acme-mail.com"})` returns each listing, what it means and where to delist.
 - Tracking DNS (the link records, not mail DNS): `domains(operation="get-dns", domain_id=12)`, and `domains(operation="verify-dns", domain_id=12)` to check it again. Each sending domain has its own click-tracking host, `link.<sending domain>` (rule 2); a domain without a working one is a fix for the Kenso team.
 
 ## Step 6 - Warmup

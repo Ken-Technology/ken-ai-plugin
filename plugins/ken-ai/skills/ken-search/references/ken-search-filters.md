@@ -1,6 +1,6 @@
 # Lead Search Filter Reference
 
-All filters use camelCase keys inside `body`. `search-people`, `search-companies`, `get-people-facets`, and `get-company-facets` take that object as `body` and ignore any other filter argument. `expand` and `people_in_accounts` take flat snake_case arguments instead. A key the API does not know (including snake_case inside `body`) is rejected with 400 `unknown_filter_fields` naming it, so check every key against this page.
+All filters use camelCase keys inside `body`. `search-people`, `search-companies`, `get-people-facets`, and `get-company-facets` take that object as `body` and ignore any other filter argument. `expand` and `people-in-accounts` take flat snake_case arguments instead. A key the API does not know (including snake_case inside `body`) is rejected with 400 `unknown_filter_fields` naming it, so check every key against this page.
 
 ## Context-Efficient Usage
 
@@ -124,10 +124,10 @@ Supported countries: United Kingdom, United States, Canada, Ireland, New Zealand
 1. `search(operation="expand", kind="titles", titles=[...])` / `search(operation="expand", kind="industries", industries=[...])` - AI variations of a seed list. If expand errors, keep the values you already have.
 2. `search(operation="get-people-facets", body=...)` / `search(operation="get-company-facets", body=...)` - Query-scoped distribution before the full search (small payloads, safe to call).
 3. `search(operation="search-people", body=...)` / `search(operation="search-companies", body=...)` - Run the search. Put `"page": 1, "pageSize": 1` in `body` for a count.
-4. `search(operation="people_in_accounts", account_ids=[...], current_titles=[...], ...)` - People at specific companies (accounts first, then people). For account-first and ABM campaigns.
+4. `search(operation="people-in-accounts", account_ids=[...], current_titles=[...], ...)` - People at specific companies (accounts first, then people). For account-first and ABM campaigns.
 5. `search(operation="lookup-person", linked_in_url=...)` / `search(operation="lookup-company", linked_in_url=...)` - Sanity-check example prospects or companies from the research.
 6. `saved_searches` - `list`, `get`, `create`, `update`, `run`.
-7. `saved_searches(operation="import_to_campaign")` - Import found leads into a campaign (run by the configuration stage of `create-campaign`, not this skill).
+7. `saved_searches(operation="import-to-campaign")` - Import found leads into a campaign (run by the configuration stage of `create-campaign`, not this skill).
 
 ## Saved Searches (`saved_searches`)
 
