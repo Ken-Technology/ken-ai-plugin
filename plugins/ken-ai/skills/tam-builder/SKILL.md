@@ -80,7 +80,7 @@ Without the classifier, classify in batches of about 50 companies from each comp
 
 For each `core` and `adjacent` company, one or two people with the titles from Step 1 (local-language titles too: "Geschäftsführer", "fondateur"):
 
-`search(operation="people_in_accounts", account_ids=[123456, 234567], current_titles=["founder", "co-founder", "ceo", "owner", "managing director"])`
+`search(operation="people-in-accounts", account_ids=[123456, 234567], current_titles=["founder", "co-founder", "ceo", "owner", "managing director"])`
 
 Keep each person's Kenso Search id. Emails are found and verified after import, by the campaign or the list.
 
@@ -101,7 +101,7 @@ Pick the place by what comes next:
 - **A saved list** (a fixed set, shareable, when Saved lists is on):
   - People: `saved_lists(operation="create", name="Agency TAM - founders", kind="people", description="Fit rubric v1, Oct 27", icp_tags=["agency-tam"])`, then add the saved people search as its source: `saved_lists(operation="create-source", saved_list_id=41, source_type="saved_search", parameters={"savedSearchId": 991})`. Poll `saved_lists(operation="get-source", saved_list_id=41, source_id=7)` until `done`.
   - Companies with their fit class and reason: a list of `kind="companies"`, filled from a CSV with `saved_lists(operation="create-upload", saved_list_id=42, csv_content="company_name,company_domain,fit,reason\n...", column_mappings=[...])`. Map `fit` and `reason` as custom variables.
-- **A Draft campaign** (to send): `contacts(operation="contact-imports-create", source="saved_list", saved_list_id=42, campaign_id=8123, roles=["founder", "ceo", "managing director"])` imports up to 5 people per company from a company list, or `saved_searches(operation="import_to_campaign", campaign_id=8123, selected_person_ids=[90011, 90012], await_ready=True)` for the people you picked. Follow a queued import with `jobs(operation="get", job_id=5501, job_type="contact_import")`. The import dedupes against the campaign and the blocklist.
+- **A Draft campaign** (to send): `contacts(operation="contact-imports-create", source="saved_list", saved_list_id=42, campaign_id=8123, roles=["founder", "ceo", "managing director"])` imports up to 5 people per company from a company list, or `saved_searches(operation="import-to-campaign", campaign_id=8123, selected_person_ids=[90011, 90012], await_ready=True)` for the people you picked. Follow a queued import with `jobs(operation="get", job_id=5501, job_type="contact_import")`. The import dedupes against the campaign and the blocklist.
 
 ## Step 7 - Report the stats
 

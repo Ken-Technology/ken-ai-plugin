@@ -94,7 +94,7 @@ prompts(operation="update", prompt_id=..., changes={"prompt": "<text>"}, confirm
 - Save **every** sequence token plus Subject Line. A variable you leave out stays as it is: nothing is deleted by omission.
 - `to_rewrite`: 0 for Subject Line and other short keep-as-is outputs, 1 for First Line, PS Line and body variables (see Rewriting Instructions). On an existing variable whose `toRewrite` is wrong, send `changes={"to_rewrite": 1}`.
 - `order` is the run order within the flow (1, 2, 3, ...). Omit `fallback_if_empty` / `is_required_for_sending` on an update to keep the stored values.
-- The save takes no model. When the user wants to compare a model, test it with `model_overrides` in Task 5, with a name from `models(operation="ai_supported_models", flow="Personalization")`. Never hard-code a model id.
+- The save takes no model. When the user wants to compare a model, test it with `model_overrides` in Task 5, with a name from `models(operation="ai-supported-models", flow="Personalization")`. Never hard-code a model id.
 - Update only rows whose `segmentId` is this segment.
 - A save that would clear generated AI results is refused with a 409 that says what it would clear. Show that to the user and re-call with `confirm` set to true only after they agree.
 
@@ -238,9 +238,9 @@ Six sentences, conversational, covering voice, rhythm and research signaling, wi
 
 ## Models (dynamic - never hard-code)
 
-- The catalog changes; read it with `models(operation="ai_supported_models", flow="Personalization")` (or `"Rewriting"`) only when the user wants to compare a model.
+- The catalog changes; read it with `models(operation="ai-supported-models", flow="Personalization")` (or `"Rewriting"`) only when the user wants to compare a model.
 - Qualification and Segmentation run on a platform-fixed model; a model choice there does nothing.
-- Optional cost check: `models(operation="ai_token_analysis", campaign_id=..., flow="Personalization", segment_id=...)` shows prompt length and cache friendliness. Not needed for a normal save.
+- Optional cost check: `models(operation="ai-token-analysis", campaign_id=..., flow="Personalization", segment_id=...)` shows prompt length and cache friendliness. Not needed for a normal save.
 
 ## Chat draft shape (for approval)
 

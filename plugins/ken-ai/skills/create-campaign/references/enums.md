@@ -173,9 +173,9 @@ Updates: `prompts(operation="update", prompt_id=..., changes={...}, confirm=Fals
 | `scoringCriteria` | Scoring tuning |
 | `fallbackIfEmpty`, `isRequiredForSending` | Personalization options |
 
-## Search import (`saved_searches(operation="import_to_campaign")`)
+## Search import (`saved_searches(operation="import-to-campaign")`)
 - Params: `campaign_id`, `select_all`, `people_filters_json` (object or JSON string), `import_limit`, `await_ready`
-- Async: returns `jobId`; poll `saved_searches(operation="export_status", job_id=...)`
+- Async: returns `jobId`; poll `saved_searches(operation="export-status", job_id=...)`
 
 ## ReplyClassification (reply `classification`, legacy integer wire)
 - 0 = Interested (the only positive reply)

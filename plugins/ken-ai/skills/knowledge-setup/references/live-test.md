@@ -22,7 +22,7 @@ prompts(operation="test", campaign_id=..., flow="personalization", sample_size=5
 - The test needs the Ask permission. A refusal for that reason means the user lacks it: say so and stop testing.
 - The backend samples personalization-ready contacts in the segment and falls back to other active contacts (or the default segment) when the pool is small. Each call draws fresh contacts, so there is nothing to dedupe across rounds. To keep a contact out, pass its id in `exclude_contact_ids`.
 - Rewriting runs in the same call when the campaign has rewriting enabled and a variable has `to_rewrite > 0`.
-- To compare a model, pass `model_overrides={"personalization": {"model": "<name>"}}` with a name from `models(operation="ai_supported_models", flow="Personalization")`. The override applies to this test only.
+- To compare a model, pass `model_overrides={"personalization": {"model": "<name>"}}` with a name from `models(operation="ai-supported-models", flow="Personalization")`. The override applies to this test only.
 
 ## Response
 

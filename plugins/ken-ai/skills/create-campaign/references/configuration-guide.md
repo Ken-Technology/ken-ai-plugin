@@ -98,7 +98,7 @@ Read: `campaign_flow(operation="list-ai-workflows", campaign_id=...)`. Write: `c
 
 ### Models: auto-selected by default
 
-Do not create per-flow model configurations unless the user asks for an override on a specific flow ("use model X for qualification"). Without one, the backend picks a well-tuned default per flow. Read the live catalog and default with `models(operation="ai_supported_models", flow=<n>)`; never hardcode model ids. Prompt caching is on for the standard flows. The model configuration operations (`models(operation="create"|"update"|"delete", ...)`) are for workspace admins; anyone else changes the model in the campaign's AI settings in the app.
+Do not create per-flow model configurations unless the user asks for an override on a specific flow ("use model X for qualification"). Without one, the backend picks a well-tuned default per flow. Read the live catalog and default with `models(operation="ai-supported-models", flow=<n>)`; never hardcode model ids. Prompt caching is on for the standard flows. The model configuration operations (`models(operation="create"|"update"|"delete", ...)`) are for workspace admins; anyone else changes the model in the campaign's AI settings in the app.
 
 ### What the backend generates
 
@@ -147,7 +147,7 @@ Every search built for a campaign is saved (the ken-search skill makes that mand
 
 - **Single list**: use the campaign's people search as `people_filters_json`.
 - **Multi-list**: import each list's own people search separately, with its share of the target (equal split unless the plan weights them). Never merge them into one import.
-- **Never** pass an account search (`search_type="account"`) as `people_filters_json`. Account searches resolve companies; they seed `search(operation="people_in_accounts", account_ids=...)`, not the import.
+- **Never** pass an account search (`search_type="account"`) as `people_filters_json`. Account searches resolve companies; they seed `search(operation="people-in-accounts", account_ids=...)`, not the import.
 - No saved search for this campaign is a gap: run the ken-search skill or ask for a saved-search id.
 
 Get multi-list right the first time: `lists(operation="delete", list_id=...)` fails while a list still has contacts, and there is no bulk contact wipe. To fix a mixed import, convert segments to Manual filters on the existing contacts instead of planning a clean re-import.
@@ -189,7 +189,7 @@ Say what a step costs before you run it on more than a handful of contacts. Neve
 | `prompts(operation="test", ...)` | Model usage per sample |
 | `campaigns(operation="run-scoring", ...)` | Model usage per contact |
 
-The model catalog is dynamic. Read `models(operation="ai_supported_models", flow=<n>)` for the live default and allowed list.
+The model catalog is dynamic. Read `models(operation="ai-supported-models", flow=<n>)` for the live default and allowed list.
 
 ---
 
@@ -229,7 +229,7 @@ The model catalog is dynamic. Read `models(operation="ai_supported_models", flow
 1. Confirm filters come from `saved_searches(operation="get")` (valid people filter JSON, not an accounts search)
 2. Check connectivity with `health_check`
 3. Verify the campaign id exists
-4. Poll `saved_searches(operation="export_status")`; a 202 is not success
+4. Poll `saved_searches(operation="export-status")`; a 202 is not success
 5. Technology-filter error (400 `technology_filters_retired`): the filters still carry retired technology criteria. Surface it and ask before rebuilding without them; never strip and retry silently.
 
 ### Low qualification rate (under 25%)
