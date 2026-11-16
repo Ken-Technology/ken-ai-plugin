@@ -66,7 +66,7 @@ Resolve the workspace before any other call:
 
 Then preflight the plan with `billing(operation="subscription-get", client_id=...)`. Record:
 
-- `planType`: `free`, `platform` (the self-serve plan), `core`, `premium` (VIP), or grandfathered `starter` / `growth` / `dfy`. Platform, Core / VIP and the grandfathered paid plans count as paid.
+- `planType`: `free`, `platform` (the self-serve plan), `legacy_core`, `legacy_premium` (VIP), grandfathered `legacy_starter` / `legacy_growth` / `legacy_dfy`, or the new plans `basic` / `growth` / `pro`. `growth` now means the new Growth plan; the retired Growth reads `legacy_growth`. Platform, Core / VIP, the grandfathered paid plans and Basic / Growth / Pro count as paid.
 - `usage[]` meters (`{metric, used, reserved, limit, unlimited, remaining}`) and `sendingInfrastructure.status` (`not_required`, `ready`, or `pending`) for Step 6.
 
 Report a meter's `remaining` (or a plan-limit error's `remaining`) as given; never compute it as `limit - used`, and treat `unlimited: true` as no cap. If the preflight fails (for example `category="permission"`), continue with the plan **unknown**. Never block setup on it.
