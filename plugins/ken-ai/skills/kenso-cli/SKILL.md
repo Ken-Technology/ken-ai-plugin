@@ -42,7 +42,7 @@ By hand in a chat: run `kenso work pull`, then give each work file to its own su
 
 ## Setup
 
-`kenso` missing: `npm i -g kenso` (Node 22 or newer), or run a command as `npx -y kenso@latest <command>`. Then `kenso auth login` (the person approves in the browser) and `kenso doctor`. `kenso agent setup -y` installs this skill and the Kenso MCP server (`https://mcp.ken.so/mcp`) for the agent; the person signs in to the MCP once in the agent.
+`kenso` missing: `curl -fsSL https://ken.so/install.sh | sh` (macOS or Linux, no Node needed) or `npm i -g kenso` (Node 22 or newer), or run a command as `npx -y kenso@latest <command>`. Then `kenso auth login` (the person approves in the browser) and `kenso doctor`. `kenso agent setup -y` installs this skill and the Kenso MCP server (`https://mcp.ken.so/mcp`) for the agent; the person signs in to the MCP once in the agent.
 
 ## No Kenso account yet
 
