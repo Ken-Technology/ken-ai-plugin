@@ -15,7 +15,7 @@ Every call takes `client_id`, the workspace id. Send it when the user can see mo
 - **Read an unclear yes back before you act.** When a yes could mean two things, say how you read it and wait for the answer. Never make the change in the same turn.
 - **Find the cause before the fix.** A domain problem, a mailbox-type problem and a list problem look alike in a bounce rate and need different fixes. Step 4 tells them apart.
 - **Use counts when the numbers are small.** Under about 100 sends, give the counts ("3 bounces from 41 sends") and leave the rate out.
-- **The deliverability rules are the source.** `references/rules.md` holds Kenso's six deliverability rules: no open pixel, one click-tracking host per sending domain, format by the recipient's mail provider, the first email to Google recipients, SMTP inboxes, and the mailbox types a client can buy. It also holds amendment A1, which wins where it differs: a plain text email never carries a click-tracking link and counts no clicks. Every number you quote on those comes from there, as written, and every proposal follows them.
+- **The deliverability rules are the source.** `references/rules.md` holds Kenso's six deliverability rules: no open pixel, one click-tracking host per sending domain, format by the recipient's mail provider, the first email to Google recipients, SMTP inboxes, and the mailbox types a client can buy. It also holds amendments A1 and A6, which win where they differ: a plain text email never carries a click-tracking link and counts no clicks, and a first email that carries another link carries no LinkedIn line. Every number you quote on those comes from there, as written, and every proposal follows them.
 - **Never report opens.** Campaign emails never carry an open-tracking pixel. Opens are not tracked and are never reported (rule 1). Asked to turn on open tracking, decline and give rule 1 as written.
 - **Name no vendors to a client.** Say "your sending domains" and "Google mailboxes", never the providers behind the infrastructure. Asked which company sends the mail, say Kenso names mailbox types, not the companies behind them, and give rule 6 as written: "Mailbox types a client can buy: Google, Outlook and SMTP." An inbox on a sending-provider account the workspace connected itself keeps the name the workspace gave it.
 
@@ -72,7 +72,7 @@ Mark each campaign against the table above, and each domain and inbox by its ver
 | One inbox over threshold, its neighbors fine | That inbox | `inboxes(operation="get", inbox_id=301)` and its warmup (Step 6) |
 | Sends dropped, bounces normal | Holds, warmup, limits or leads | Step 1, Step 6, and the campaign's leads left (`analytics(operation="get-weekly-report", campaign_id=42)`, under `next`) |
 | Mail to Google recipients lands in spam, Microsoft is fine | The format | Rules 3 and 4: is the campaign's Send as plain text on, and does step 1 carry anything that forces HTML (bold, an image, a signature logo, a handwritten letter, a Studio email)? |
-| An SMTP inbox sends more than 10 a day, or a domain holds more than 20 SMTP inboxes | The volume | Rule 5: bring each SMTP inbox to 5 to 10 a day |
+| An SMTP inbox's daily limit was raised above the limit the product set for it | The volume | Rule 5: put that inbox's daily limit back to what the product set |
 
 Say which cause the numbers point to, and the numbers. Mark it as your read when two causes fit.
 
@@ -118,7 +118,7 @@ Give each proposal as the exact change, what it does and why, with the numbers:
 | Rest every inbox on a domain | `inboxes(operation="bulk-update", ids=[301, 302, 303], changes={"paused": True})` |
 
 - Rotation: rest the burnt domain's inboxes so the campaign sends from its healthy ones, and add fresh inboxes through `delivery-setup` when capacity falls short.
-- A daily limit you propose stays within the rules: an SMTP inbox sends 5 to 10 a day (rule 5).
+- A daily limit you propose stays within the rules: an SMTP inbox never goes above the daily limit the product sets for it (rule 5).
 - Keep warmup on while an inbox rests.
 - A list problem: clean or rebuild the segment through `create-campaign`. Pausing alone does not fix it.
 

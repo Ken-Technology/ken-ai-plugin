@@ -83,6 +83,8 @@ To start or refresh research: `committee(operation="research", account_id=101)`
 
 `refresh` says what happened: `started` (a run is queued), `waiting_credits` (held until the workspace has credits), `fresh` (research is under 14 days old, so nothing ran), `in_progress`, `daily_limit`, `recent_failure` or `member_credit_limit_reached`. While a run is open you get the previous dossier: read it again later with `get` and `expand="research"`. `force=True` refreshes fresh research too. It costs credits, so ask the user before forcing.
 
+Research you already gathered elsewhere goes on the account for free: `account_views(operation="accounts-write-research", account_id=101, research={...})`, with the fields of the research block (not its `id`, `status`, `trigger`, `researchedAt` or `isStale`). It shows in the Research tab like a run and changes no account field. A person's is `account_views(operation="people-write-research", person_id=..., research={...})`.
+
 Done when each account's research succeeded, or you told the user why it did not.
 
 ## Step 4 - Map the buying committee
