@@ -15,8 +15,9 @@ Offer the mailbox types of deliverability rule 6, in the `deliverability-guard` 
 
 Plans that buy Kenso infrastructure, with billing Active or Trialing:
 
-- Credit plans pay in credits: Platform (`planType` Platform, the public plan: 200,000 sends and 5,000 credits a month), Dfy (the Kenso team adds its credits), and grandfathered Starter / Growth / Core.
-- VIP (`planType` Premium) is exempt and staff-sold: it pays new domains through Stripe checkout, and mailboxes are on the plan.
+- Credit plans pay in credits: Platform (`planType` Platform, the public plan: 200,000 sends and 5,000 credits a month), Dfy (`planType` LegacyDfy; the Kenso team adds its credits), and grandfathered Starter / Growth / Core (`LegacyStarter` / `LegacyGrowth` / `LegacyCore`).
+- VIP (`planType` LegacyPremium) is exempt and staff-sold: it pays new domains through Stripe checkout, and mailboxes are on the plan.
+- `planType` Basic, Growth and Pro are the new plans. Growth now means the new Growth plan; the retired Growth reads LegacyGrowth.
 
 Free (or `PLAN_FEATURE_NOT_AVAILABLE`): Free cannot buy Kenso domains or inboxes. It connects its own inboxes in the app, or upgrades to Platform at https://app.ken.so/<workspace id>/settings/billing (surface `error.recovery.summary` when present). **STOP** any request to add Kenso capacity. You may still list what they have.
 
