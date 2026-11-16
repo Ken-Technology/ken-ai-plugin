@@ -52,7 +52,6 @@ The server URL has not changed. Configs that already name the server `ken` keep 
 | `handoff-to-ae` | Write the handoff to the AE for the call in focus: who, company, pain, what was promised, open questions, next meeting. |
 | `inbox-configuration` | Tune sending inboxes: daily limits, display names, signatures, and reply forwarding. |
 | `infra-planning` | Size sending domains and inboxes against daily send and credits on a paid plan. |
-| `keep-campaigns-running` | Once a week, keep your live campaigns stocked with leads, at the right volume, on healthy inboxes, and propose the rest. |
 | `ken-search` | Build and save people-search filters against the contact database for a campaign. |
 | `kenso-cli` | Bulk lead, CRM and Studio work from files with the Kenso CLI (`npx kenso`): imports, updates and cleanups with dry runs, resumable runs and a results file. Prefer it over the MCP past about 50 records. |
 | `knowledge-setup` | Fill a workspace's Knowledge: company and offer files, website pages, calls, voice, tiers, Review and shared prompts. |
