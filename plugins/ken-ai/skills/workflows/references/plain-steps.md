@@ -30,12 +30,12 @@ The definition's `plain` key holds the words. The engine never runs them, and th
 ## The loop
 
 1. Call `workflows(operation="brief", client_id=...)`. Read `authoring` (this guide), `examples` and `workspace`.
-2. Write the plain steps with the user: one action per step, in order, in their words. Agree on them before writing any JSON.
-3. Turn each step into engine steps from `stepTypes` and `triggers`; ask for `types` details for each type you use and copy its `example` input. Fill `compiledTo` and `summary`.
-4. Create it with `workflows(operation="create", client_id=..., definition=...)`, or change a draft with `workflows(operation="update", client_id=..., workflow_id=..., base_version=..., definition=...)`.
+2. Write the plain steps with the user: one action per step, in order, in their words, with their numbers, countries and titles exactly as they gave them. Ask about what they did not say (what starts it, who qualifies, who to contact, what to send) before writing any JSON, and use only the `triggers` and `stepTypes` the brief lists. `SKILL.md` has the interview, the availability check and the requirement map.
+3. Create the outline: `workflows(operation="create", client_id=..., definition=...)` with the trigger, the limits, the whole plain block and the engine steps of step 1 only. The When line and step 1 carry `compiledTo`; the other plain steps have none yet.
+4. Fill one plain step per save: `workflows(operation="update", client_id=..., workflow_id=..., base_version=..., patch=[...])` adds its engine steps from `stepTypes` (ask for `types` details for each type you use and copy its `example` input), links them through `next`, and sets the plain step's `compiledTo` and `summary`. A step's `title` says only what its settings do. Tell the user each step as it lands.
 5. `workflows(operation="validate", client_id=..., workflow_id=...)`. Fix every error the issues name (path, code, fix) and validate again.
-6. Test on one record: `workflow_builder(operation="test", client_id=..., workflow_id=..., record_type="person", record_id=...)`. Omit the record to use the newest one of the trigger's type. `pinned_outputs={"qualify": {"score": 85, "fit": true, "reasons": ["Series A in March"]}}` stands in for a step's output, so you can re-run the later steps for free while you fix them; pinned steps count as untested, so finish with one test without pins.
-7. Publish: `workflows(operation="publish", client_id=..., workflow_id=...)`.
+6. Test on one record that should pass every filter: `workflow_builder(operation="test", client_id=..., workflow_id=..., record_type="person", record_id=...)`. Omit the record to use the newest one of the trigger's type. A run that stops at a filter is not a pass: read it with `workflow_runs(operation="get", client_id=..., run_id=...)` and check that the last step ran. `pinned_outputs={"qualify": {"score": 85, "fit": true, "reasons": ["Series A in March"]}}` stands in for a step's output, so you can re-run the later steps for free while you fix them; pinned steps count as untested, so finish with one test without pins.
+7. Publish on the user's yes, after they have seen which step enforces each thing they asked for, the estimate and the spend limit (`SKILL.md`, Publish): `workflows(operation="publish", client_id=..., workflow_id=...)`.
 
 A step Kenso cannot express in its types (or that the user wrote as code) stays a `code.run@1` step, pinned. A step the user asks Ken to decide each time is a judgment step.
 
