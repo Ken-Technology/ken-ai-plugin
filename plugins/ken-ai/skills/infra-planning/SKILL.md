@@ -72,7 +72,7 @@ Show credits and dollars together ("2,200 credits, $44"), as the plan returns th
 
 Once domains are chosen, quote the order at `cartCost`, not `cost`: `cost` prices every domain the plan needs, `cartCost` only the domains the carts hold. With `unfilled_slots` in `warnings`, say the order covers fewer domains than the goal needs (`unfilledSlots` of `totals.domains`) and so sends less, and offer more names (plan again with them) before the order.
 
-`canBuy` reflects the workspace, not the caller's seat: a Viewer or Client seat can read the plan and is refused at checkout. The plan does not repeat the member monthly credit limit, the Premium daily limit or a white-label child's caps, so handle a checkout refusal after a plan said `canBuy`. `canBuy` is true with refusal `INSUFFICIENT_CREDITS` or `FREE_CREDITS_NOT_ELIGIBLE`: a credit pack clears both.
+`canBuy` reflects the workspace, not the caller's seat: a Viewer seat can read the plan and is refused at checkout. A Client seat never gets the plan (the tool is not offered to it): tell it a workspace admin sizes and buys the setup. The plan does not repeat the member monthly credit limit, the Premium daily limit or a white-label child's caps, so handle a checkout refusal after a plan said `canBuy`. `canBuy` is true with refusal `INSUFFICIENT_CREDITS` or `FREE_CREDITS_NOT_ELIGIBLE`: a credit pack clears both.
 
 Credit prices, for reference only (the plan already applies them; 50 credits per dollar):
 
