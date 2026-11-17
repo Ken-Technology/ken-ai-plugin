@@ -27,7 +27,7 @@ A person launches the campaign. You build it and hand it over.
 ## Step 0 - Check what is on
 
 - `triggers` operations are open to every member; creating, changing or pausing a trigger needs Campaigns edit access (owners, admins and editors by default). A 403 means the user lacks it: say so in one sentence and stop.
-- Trigger capacity (`trigger-capacity-get`, `trigger-capacity-update`) is listed only for connections with the members feature (admins by default). If they are missing, skip the capacity step and tell the user the daily cap is set in the app and needs Campaigns edit and the workspace settings permission (owners, admins and editors by default).
+- Trigger capacity: `trigger-capacity-get` needs Campaigns view, and `trigger-capacity-update` needs Campaigns edit and the workspace settings permission (owners, admins and editors by default). If they are missing, skip the capacity step and tell the user the daily cap is set in the app by someone with that permission.
 - Job postings answer 503 `service_unavailable` when the index is off. Tell the user and do not retry in a loop.
 - Signals on target accounts (`account_signals`) need the Accounts and Accounts signals flags. Without them, use the searches below.
 - If the workspace has no campaign to attach a trigger to, build one first (Step 5). If none of the operations here are in your tools, tell the user in one sentence and link `https://app.ken.so/<workspace id>`.

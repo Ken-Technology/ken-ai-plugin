@@ -27,12 +27,12 @@ Every call takes `client_id`, the workspace id. Send it on every call when the u
 
 | Part | Operations | Needs |
 |---|---|---|
-| Meetings, briefs, sources, CRM preview | `meetings` list, get, get-brief, list-sources, get-source-transcript, get-crm-changes | full access and Meetings on |
-| Saving and refreshing briefs | `committee` meetings-replace-brief, meetings-write-brief | full access and Meetings on |
+| Meetings, briefs, sources, CRM preview | `meetings` list, get, get-brief, list-sources, get-source-transcript, get-crm-changes | Meetings view and Meetings on |
+| Saving and refreshing briefs | `committee` meetings-replace-brief, meetings-write-brief | Meetings edit and Meetings on |
 | The brief a client may see | `committee` meetings-get-client-brief | Meetings on, any member who can see the meeting |
 | Kenso Notetaker transcripts | `meetings` get-transcript | Kenso Notetaker on |
-| Call scores and the rubric | `meeting_notes` score-call, get-score, notetaker-score-rubric-get | full access and Kenso Notetaker on |
-| Calendar events | `meetings` events-list, events-create, events-update | full access and a connected calendar |
+| Call scores and the rubric | `meeting_notes` score-call, get-score, notetaker-score-rubric-get | Meetings view (Meetings edit to score) and Kenso Notetaker on |
+| Calendar events | `meetings` events-list, events-create, events-update | Meetings view (Meetings edit to create or update) and a connected calendar |
 | Open times | `calendar` get-availability, `scheduler` links-suggested-times | a connected calendar; Scheduler for links |
 | Account, touches, notes | `accounts` get, activity, `account_touches` list, create, `meeting_notes` list, create | Accounts on |
 | Deals | `opportunities` list, get, update, create, fill-details, stages-list | Opportunities on |
