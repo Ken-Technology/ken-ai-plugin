@@ -1,6 +1,6 @@
 # Workflow ops console (staff only)
 
-Part of the `workflows` skill, for Kenso staff only. Open it only when the caller is staff: the `admin_workflows` facade is listed for staff and nobody else. A customer who asks about stuck or failed runs gets `SKILL.md` step 7 on their own workspace, never this page.
+Part of the `workflows` skill, for Kenso staff only. Open it only when the caller is staff: the `admin_workflows` facade is listed for staff and nobody else. A customer who asks about stuck or failed runs gets `references/runs.md` on their own workspace, never this page.
 
 The console is fleet-wide. Every `admin_workflows` operation needs super_admin, sends no workspace header and takes no `client_id`: a target workspace travels as `workspace_id`. Writes are recorded as agent writes with an audit row, so give every write a `reason`.
 
@@ -37,7 +37,7 @@ Read after every write: `providers` after a breaker, `limits-get` after a limit,
 
 - **A queue grows.** `queues`, then `providers`: one provider failing or rate-limited explains most backlogs. Force its breaker open with a reason, tell the team, and set it back to `auto` once its success rate recovers. High `expiredLease` with no due items moving means the workers of that pool are down: that is a host problem, so check the host, not the runs.
 - **Runs are stuck.** `runs-stuck`, grouped by class and workspace. Retry the ones a fixed cause was holding; cancel only those the workspace owner agreed to stop.
-- **A workspace spends far more than usual.** `spenders` with `period="today"`, then `workflows` with that `workspace_id` to see which workflow. The workflow's own spend limit is the customer's setting (`SKILL.md` step 5) and changes only on the customer's yes. The staff brakes are a workspace kill switch or a lower admission override, both on a yes that names that client.
+- **A workspace spends far more than usual.** `spenders` with `period="today"`, then `workflows` with that `workspace_id` to see which workflow. The workflow's own spend limit is the customer's setting (`SKILL.md`, Publish) and changes only on the customer's yes. The staff brakes are a workspace kill switch or a lower admission override, both on a yes that names that client.
 - **A step type misbehaves after a release.** A `step_type` kill switch on that type holds its steps everywhere without failing them. Clear it once the fix ships.
 
 ## System workflows and shadow runs

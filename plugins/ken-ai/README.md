@@ -72,6 +72,6 @@ The server URL has not changed. Configs that already name the server `ken` keep 
 | `studio-template` | Build or edit a Studio template: write the bundle, validate it, preview it on real accounts, publish it and manage its versions. |
 | `tam-builder` | Size a market and build the list: every company that fits, why it fits, who to write to, saved with its stats. |
 | `today-review` | See what needs you today, draft or fix the touches you flag, snooze or skip the rest. You approve every send yourself. |
-| `workflows` | Create a workflow from a goal or template, validate, test and publish it, run it on records, watch and recover runs. |
+| `workflows` | Build a workflow from a goal: ask for the gaps, map each requirement to a step, fill it step by step, test, publish, recover runs. |
 
 Generated from `mcp/src/ken_mcp/skills` in ken-backend by `mcp/scripts/build_skill_packages.py`; do not edit by hand.
