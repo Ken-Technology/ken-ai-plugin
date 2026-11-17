@@ -23,6 +23,8 @@ kenso studio fill 12 --accounts ids.txt --dry-run   # or --campaign 10546 --cont
 kenso opportunities update --each rows.csv --dry-run   # any API command on a file of rows (CSV or JSONL; keys fill flags and body). One record: kenso campaigns update --campaign-id 812 --name Q4 --dry-run
 kenso mcp call list_skills   # only to list Ken's skills
 kenso logs tail --status 4xx,5xx --since 10m   # stream the workspace's failed API calls, one line each; Ctrl-C stops (exit 4 = not on for the workspace yet)
+kenso connect inbox --provider google   # also calendar, crm, github, linkedin ...: hand the printed link to the person (only they can sign in), it waits and prints the connection
+kenso onboarding-builds events --build-id obd_2x --until done,error   # live streams: one JSON line per event, reconnects itself
 ```
 
 Charges: `accounts import` per new account, `studio fill` per page (again for ids from another file): show the estimate. `pinned_by_user`: with the person's OK, rerun with `--overwrite-pinned`. Workflows: `kenso workflows brief` first; secrets only as `{{secrets.NAME}}`. Key: `KENSO_API_KEY`, or pipe a variable, no check: `printf '%s' "$KEY" | kenso auth login --with-key`; never in a flag, output or file.
