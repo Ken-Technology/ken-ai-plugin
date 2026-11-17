@@ -53,7 +53,7 @@ Reference for the reply-handling skill. Ids: threads are `thr_`, messages `msg_`
 
 - Email needs `sender_email_id`. LinkedIn sends plain text through the conversation's seat and needs none.
 - The reply is recorded as the agent's. It is recorded as sent only after the provider accepts it.
-- `idempotency_key`: up to 200 characters, one per draft. The same key with another thread, inbox or body is 409 `idempotency_key_reused`.
+- `idempotency_key`: up to 200 characters, one per draft. The same key with another thread, inbox or body is 422 `idempotency_key_reused` (409 before 2026-11-17).
 - `archive_after_send`: archive the thread once the reply sends.
 - `confirm_suppressed`: only when a person asked for this exact reply to a contact who opted out or is blocked.
 
