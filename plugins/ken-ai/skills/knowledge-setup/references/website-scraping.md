@@ -38,7 +38,7 @@ If map fails or returns nothing usable, scrape the homepage alone.
 - Site unreachable: report it and stop for that site.
 - Web scraping off: the error says "Web scraping is off right now". Skip that page like any failed page and never retry it; the other pages can still come from Kenso's web archive. Say once at the end that live scraping is off.
 - Daily limit: a 429 that says the workspace reached its limit of web reads in a day. Stop scraping, keep the pages already read, and say when it resets (the error gives the time). Never retry before then.
-- An archive copy (`metadata.kenSource: "archive"`) is a normal result. It can be up to 18 months old; `metadata.capturedAt` says when.
+- An archive copy (`metadata.kenSource: "archive"`) is a normal result. It can be up to 18 months old; `metadata.cachedAt` says when.
 - Never echo scraped markdown back into the conversation. Report one line per page: URL and `ok` or `failed`, then how many URLs the map found and how many pages were read.
 - With several sites, finish one before starting the next.
 
