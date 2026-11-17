@@ -30,7 +30,7 @@ Every call takes `client_id`, the workspace id. Send it on every call when the u
 | Read the inbox, save drafts, send, classify | `threads` list, counts, get, list-messages, replace-draft, create-message, update, bulk-update, cancel | every member who can reply |
 | Reply templates | `replies` reply-templates-list, reply-templates-get (create, update and delete need workspace settings) | every member |
 | The reply agent's settings | `replies` autonomous-reply-settings-get (update needs workspace settings) | every member |
-| Kenso drafts a reply for you | `threads` suggest | full access only |
+| Kenso drafts a reply for you | `threads` suggest | Inbox edit and the Ask feature |
 | Booking links and open times | `scheduler` links-create, links-suggested-times, meeting-types-list, meeting-types-slots, bookings-list | workspaces with Scheduler |
 | Open times without Scheduler | `calendar` get-availability | members with a connected calendar |
 | Writing style and account context | `knowledge` context | workspaces with Knowledge |

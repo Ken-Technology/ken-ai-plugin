@@ -26,7 +26,7 @@ Every call takes `client_id`, the workspace id. Send it on every call when the u
 |---|---|---|
 | Deals, stages, settings | `opportunities` list, get, stages-list, settings-get, update, create, fill-details | Opportunities on |
 | Activity on an account | `accounts` get, activity, `account_touches` list | Accounts on |
-| Meetings on an account | `meetings` list | full access and Meetings on |
+| Meetings on an account | `meetings` list | Meetings view and Meetings on |
 | Email threads | `threads` list | every member |
 | CRM sync health | `crm` connections-list, sync-get | every member |
 | Top-of-funnel numbers (optional) | `analytics_campaign` query | staff, or the `generative_ui` flag on for the workspace |

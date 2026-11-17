@@ -116,7 +116,7 @@ When the user bought domains before, check where the orders are: `domain_orders(
 The link host (for example `go.acme.com`) serves Studio pages from the workspace's own domain. It exists only when the workspace has Studio or account sending on (404 otherwise: skip this step).
 
 1. `domains(operation="hosting-hostname-get")` returns the hostname, its status and the DNS record to add.
-2. To set one: `domains(operation="hosting-hostname-set", subdomain="go")`. Workspace admins only.
+2. To set one: `domains(operation="hosting-hostname-set", subdomain="go")`. Needs Delivery edit.
 3. The user adds the DNS record it returns at their DNS host. Then `domains(operation="hosting-hostname-verify")` until the status is ready.
 
 Click tracking is separate: every sending domain gets its own click-tracking host, `link.<sending domain>` (deliverability rule 2), and `domain-selection` says how it is set up. Minting each link on its own domain's host is not switched on yet (`rules.md`, What the product does today), and a plain text email carries no click-tracking link at all (amendment A1).
