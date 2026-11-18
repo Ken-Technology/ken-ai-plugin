@@ -138,6 +138,12 @@ What a signal means:
 
 ## Step 6 - Plan and write touches
 
+**First, why not now.** Every account in `accounts(operation="get")`, `list` and `search` carries `whyNotNow` when there is a reason not to reach out now: `reason`, `outcome` (`stop` or `wait`), `text`, its source (`sourceUrl` and `sourceDate`, or `replyId`), `until` for a wait, and `setBy`. Read it before any touch.
+
+- While it is a `stop`, or a `wait` whose `until` is ahead, do not reach out: plan, write and create no touch there. Tell the user the account's `text` and, for a wait, its `until`. Only a person undoes one: clear it with `account_views(operation="accounts-clear-why-not-now", account_id=101)` only when the user asks.
+- When you find a sourced reason not to reach out now, set it: `account_views(operation="accounts-set-why-not-now", account_id=101, reason="being_acquired", source_url="https://news.example.com/acme-globex", source_date="2026-11-03", note="Acme agreed to be bought by Globex")`. The source is the page that says it and `source_date` is the date on that page, never today's; a reply that says it is `reply_id` (its `msg_` id). Never set one without a source.
+- Reasons: `outside_limits`, `company_gone` and `competitor` stop the account (its stage moves to `not_a_fit` or `competitor`); `open_deal`, `asked_later` (send `until`, the date they gave), `recent_no`, `crisis`, `being_acquired` and `just_bought` wait until a date (the default unless you send `until`, 180 days at most); `person_left` and `wrong_person` stop reaching one stakeholder (send `stakeholder_id`) and leave the account as it is.
+
 There are two ways to put touches on an account.
 
 **Kenso's plan.** `account_touches(operation="plan-start", account_id=101)` places planned touches across the people you can reach. Where account tiers are on, the account's tier sizes the plan: its `maxTouches`, `days` and `gapDays` from `account_signals(operation="account-tiers-get")` (on the default ladder Tier 1 is up to 11 touches over 100 days, Tier 5 up to 3 over 21). Otherwise it places up to 9 over 90 days. The account must be `researching`, `warming` or `engaged`, with one person who has an email or LinkedIn; otherwise `invalid_state` says what is missing. Read the plan with `account_touches(operation="plan-get", account_id=101)`: `thin` means map more people. Then write each planned touch. Have Kenso write it with `account_touches(operation="draft", touch_id=5001)` (charged; the touch lands in `awaiting_approval`), or write the body yourself with `update`.
