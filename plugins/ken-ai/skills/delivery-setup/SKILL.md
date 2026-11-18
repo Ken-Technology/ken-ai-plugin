@@ -99,7 +99,7 @@ Kenso keeps pre-warmed domains ready to claim. These operations are for workspac
 
 These operations are for workspace members, and need the workspace's `sending_providers` flag.
 
-1. `sending_providers(operation="providers-list")` lists the providers Kenso supports, with `termsForbidOutreach`, `defaultDailyCap`, `sendsFromProviderInboxes` and a docs link.
+1. `sending_providers(operation="providers-list")` lists the providers Kenso supports, with `termsForbidOutreach`, `defaultDailyCap`, `sendsFromProviderInboxes` and a docs link. It lists them only for Kenso staff: a workspace member gets an empty list, because Kenso runs those providers and sets them up itself. Then stop here and use the SMTP path in Step 4, or ask Kenso support for a Kenso-managed sending connection.
 2. When `termsForbidOutreach` is true, tell the user that provider's terms forbid cold outreach on their own account, and suggest another path.
 3. Connect it with `sending_providers(operation="create", provider="<slug>")` and the provider key the user pastes (the tool's key field). Then `sending_providers(operation="verify", connection_id=12)`.
 4. Add each sending address with `sending_providers(operation="create-identity", connection_id=12, email="maya@acme.com", display_name="Maya Chen")`. When `sendsFromProviderInboxes` is true, the address must already exist in the provider account.
