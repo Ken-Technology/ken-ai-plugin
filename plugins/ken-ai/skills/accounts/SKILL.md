@@ -40,7 +40,7 @@ Each other part of the loop sits behind its own flag, so a workspace may have so
 
 An operation whose flag is off is not listed for the workspace, or answers 404 `not_found` on every id. Skip that step, tell the user which part is not on for them yet, and carry on with the rest. Do not retry it.
 
-Read the workspace's Contact limits before you plan touches: `account_touches(operation="contact-limits-get")`. Its guardrails bind your touch writes and never a person's: weeks between touches to one person, new people contacted per day, and the send window.
+Read the workspace's Contact limits before you plan touches: `account_touches(operation="contact-limits-get")`. Its guardrails bind your touch writes and never a person's: the send window's days and an open opportunity on the account.
 
 ## Step 1 - Read what Knowledge knows
 
