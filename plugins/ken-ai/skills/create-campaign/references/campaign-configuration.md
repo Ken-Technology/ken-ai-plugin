@@ -125,9 +125,9 @@ The deliverability rules are in the `deliverability-guard` skill's `rules.md` re
 
 **Who sends the first email (sender routing).** Where the workspace has the `sender_routing` flag, `segments(operation="get-sender-routing", campaign_id=...)` reads a campaign's routing, and `segments(operation="replace-sender-routing", campaign_id=..., rules=[{"provider": "google_workspace", "domains": ["acme-mail.com"], "inbox_ids": [101]}])` sends one provider's recipients their first email only from that rule's domains and inboxes (one rule per provider, a full replace, `[]` clears them). It chooses the sender, never the format: rule 3 still comes from Send as plain text. Use it when the user wants a provider's recipients to hear from particular inboxes, and only after their yes.
 
-### Step 2b: Sending inboxes (staff only)
+### Step 2b: Sending inboxes
 
-An empty inbox assignment fails closed. Assigning inboxes from here is staff-only: when `campaign_ops` does not offer these operations, tell the user to assign inboxes in the campaign's settings in the app and move on. Staff list with `campaign_ops(operation="available", campaign_id=...)` (no provider filter), pick the family this campaign should send from (do not default to Google), then `campaign_ops(operation="assign-all-active", campaign_id=..., provider=<chosen family>)`. An empty list is not assignable yet.
+An empty inbox assignment fails closed. New campaigns start with every Kenso-sendable inbox. `campaign_ops(operation="list-inboxes", campaign_id=...)` reads the campaign's own inboxes (`status`, `isKenSendable`, `warmup`, `sendBlock`). To change them, after the user's yes, pick the family this campaign should send from (do not default to Google) and call `campaign_ops(operation="replace-inboxes", campaign_id=..., assign_all_active=true, provider=<google | microsoft | azure | custom_smtp>)`, or pass the exact `inbox_ids=[...]` (a full replace: an inbox left out leaves the campaign). When `campaign_ops` does not offer `replace-inboxes` (it needs Campaigns edit), tell the user to assign inboxes in the campaign's settings in the app and move on.
 
 ### Step 3: AI workflows and rewriting readiness
 
@@ -152,7 +152,7 @@ Classify gaps:
 | Empty or missing sequence steps, tracking links | campaign-strategy / email-copywriting |
 | Missing personalization variables or Subject Line | knowledge-setup `prompt-writer` |
 | Settings, schedule, AI workflows, rewriting readiness | this stage (Steps 2-3) |
-| No sending inboxes | this stage (Step 2b, staff) or the app |
+| No sending inboxes | this stage (Step 2b) or the app |
 
 When the user supplies final, approved content and asks you to push it, use this order (exact calls in `references/update-recipes.md`):
 
@@ -233,7 +233,7 @@ Sync order: campaign settings, qualification, segments, then per-segment resourc
 
 **Campaign**: {name} (id {id}), status {status}
 **Applied**: settings {summary}; AI workflows {ids}; pushes {summary}; checkpoint {ok | partial | skipped}; import {job status or skipped}
-**Change in the app**: {settings the tools cannot write, inbox assignment for non-staff, or none}
+**Change in the app**: {settings the tools cannot write, inbox assignment without Campaigns edit, or none}
 **Remaining gaps**: {owners}
 **Next**: run verify-campaign
 ```
