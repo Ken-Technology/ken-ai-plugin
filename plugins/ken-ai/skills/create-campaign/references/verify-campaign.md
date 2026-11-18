@@ -61,7 +61,7 @@ For each segment: `email_sequences(operation="segment-email-sequences-get", segm
 
 **Phase D - Prelaunch and list reads:**
 
-- Sending inboxes: `inboxes(operation="list", role="sending")` (`status`, `warmup.daysLeft`, `sendBlock`, `healthScore`). The campaign's own inbox pool is `campaign_ops(operation="get", campaign_id=X)`, which only staff can run; everyone else checks every sending inbox in the workspace and says so.
+- Sending inboxes: the campaign's own pool is `campaign_ops(operation="list-inboxes", campaign_id=X)` (`status`, `isKenSendable`, `warmup`, `sendBlock`, `healthScore`); `inboxes(operation="list", role="sending")` is every sending inbox in the workspace.
 - Domains: `domains(operation="get-health", domain_id=...)` once per sending domain - its latest stored DNS, blocklist and certificate snapshot (`spfStatus`, `dkimStatus`, `dmarcStatus`, `mxStatus`, `blacklistStatus`, `sslStatus`; `checkedAt` is its date). `domains(operation="get-dns", domain_id=...)` adds the tracking DNS status.
 - Placement: `approvals(operation="placement-tests-list", campaign_id=X)`, newest first (`inboxRate`, `spamRate` are fractions 0-1); `analytics(operation="placement-tests-get", test_id=...)` for one test. A test on Kenso's seed network (`provider` `kenso`) adds `verdict`: quote `verdict.summary` as is. Needs Delivery view (check 64).
 - Rendering: `email_sequences(operation="segment-email-sequences-preview", segment_id=..., use_random=True)`, 2-3 calls per segment.
