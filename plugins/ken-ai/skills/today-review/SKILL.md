@@ -30,7 +30,7 @@ Today and touches are in beta. They are staff-only until these flags are on for 
 | Today | `today` get, update | `today` and `accounts` |
 | Touches: read, edit, snooze, skip, undo | `account_touches` list, get, update, snooze, skip, undo | `accounts` |
 | Kenso writes or grades a touch | `account_touches` draft, rewrite, feedback | `accounts_writer` |
-| Questions Kenso asks | `ken_questions` list, get | `notifications`, and staff only for now whatever the flags |
+| Questions Kenso asks | `ken_questions` list, get | `notifications` |
 
 - `today` is not listed, or answers 404: Today is not on for this workspace. Stop, say so in one sentence, and link `https://app.ken.so/<workspace id>/today`. Do not retry, and do not read the 404 as "nothing to do".
 - 403 `member_required`: Today belongs to a member, and this connection has no person behind it (an opaque API key). Ask the member to connect as themselves.
