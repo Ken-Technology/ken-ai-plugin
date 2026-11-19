@@ -11,7 +11,7 @@ Use the import operations and billing reads below. Buying new domains (search, c
 
 Preview and import need Delivery edit access (owners, admins and editors by default). The plan, capacity and import-list reads need Delivery view. Confirm the cart with the user before the create call.
 
-Imported domains get Kenso inboxes, so import is paid like any Kenso inbox. Credit plans pay in credits: 200 credits ($4) per Google / Outlook inbox a month and 2,500 credits ($50) per Azure domain a month (up to 50 inboxes). There is no registration charge. Exempt workspaces (VIP) have mailboxes on the plan.
+Imported domains get Kenso inboxes, so import is paid like any Kenso inbox. Credit plans pay in credits: 200 credits ($4) per Google / Outlook inbox a month and 2,500 credits ($50) per Azure domain a month (up to 50 inboxes). Basic, Growth and Pro pay in dollars on the plan's subscription, not credits: $5 per inbox a month and $25 per Azure domain a month. There is no registration charge. Exempt workspaces (VIP) have mailboxes on the plan.
 
 Import onto the mailbox types of deliverability rule 6, in the `deliverability-guard` skill's `rules.md` reference. SMTP inboxes cannot be ordered yet, so an import takes Google or Outlook mailboxes; Azure is not offered for new inboxes, and the plan you size with carries no Azure line (`infra-planning`).
 
@@ -63,7 +63,7 @@ A row whose `errorCode` is DomainBlocklisted is on Spamhaus DBL or SURBL. Drop t
 
 `requiresConfirm` is a warning, not a hard fail. If a pool falls below packing minimum after drops, go back to step 1 or 2.
 
-Paid-plan errors (`PLAN_FEATURE_NOT_AVAILABLE`, Forbidden, "A paid plan is required") and OverCapacity are hard stops. Import needs Platform (`planType` Platform), Dfy, VIP (`planType` Premium), or a grandfathered Starter / Growth / Core plan, with billing Active or Trialing. Free cannot import onto Kenso inboxes: it connects its own inboxes in the app, or upgrades to Platform at https://app.ken.so/<workspace id>/settings/billing. Relay the envelope `message` and `error.recovery.summary` when present. OverCapacity comes only from a hard cap.
+Paid-plan errors (`PLAN_FEATURE_NOT_AVAILABLE`, Forbidden, "A paid plan is required") and OverCapacity are hard stops. Import needs Basic, Growth or Pro (`planType` Basic / Growth / Pro, the new plans), Platform (`planType` Platform), Dfy, VIP (`planType` Premium), or a grandfathered Starter / Growth / Core plan, with billing Active or Trialing. Free cannot import onto Kenso inboxes: it connects its own inboxes in the app, or picks a paid plan (Basic, Growth or Pro) at https://app.ken.so/<workspace id>/settings/billing. Relay the envelope `message` and `error.recovery.summary` when present. OverCapacity comes only from a hard cap.
 
 Done when every remaining name is Eligible, InUseMx, or LiveWebsite, warnings are confirmed or dropped, packing holds, and `canSubmit` is true (or the only failures are names you dropped).
 
@@ -132,7 +132,7 @@ Do not loop the check on a timer. One shot on user request, then `domain-imports
 
 | Signal | What to tell the user |
 |--------|------------------------|
-| Paid-plan / Forbidden / `PLAN_FEATURE_NOT_AVAILABLE` | Free cannot import onto Kenso inboxes. Connect your own inboxes in the app, or upgrade to Platform at https://app.ken.so/<workspace id>/settings/billing. Show `error.recovery.summary` when present |
+| Paid-plan / Forbidden / `PLAN_FEATURE_NOT_AVAILABLE` | Free cannot import onto Kenso inboxes. Connect your own inboxes in the app, or pick Basic, Growth or Pro at https://app.ken.so/<workspace id>/settings/billing. Show `error.recovery.summary` when present |
 | `INSUFFICIENT_CREDITS` | Not enough credits for the first month of the imported inboxes. Show the message (it carries the credits needed and available). Shrink the cart, or buy credits at https://app.ken.so/<workspace id>/settings/billing and retry. Dfy: the Kenso team adds credits. White-label child: ask the parent workspace |
 | `FREE_CREDITS_NOT_ELIGIBLE` | Free and bonus credits can't pay for domains or inboxes, and the bought credits fall short. Show the message (it carries the credits needed, the credits that can pay, and the free part). Buy credits at https://app.ken.so/<workspace id>/settings/billing and retry. Dfy: the Kenso team adds credits. White-label child: ask the parent workspace. |
 | OverCapacity / remaining too small | Hard cap only. Show `remaining` from `triggers(operation="sending-capacity-get", client_id=...)`, plan again with `emails_per_day` at `emailsPerDay.existing` plus `remaining`, and import from the new `importCart`. It is not a mailbox-slot limit |
