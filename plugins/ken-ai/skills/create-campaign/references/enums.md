@@ -178,7 +178,7 @@ Updates: `prompts(operation="update", prompt_id=..., changes={...}, confirm=Fals
 - Async: returns `jobId`; poll `saved_searches(operation="export-status", job_id=...)`
 
 ## ReplyClassification (reply `classification`, legacy integer wire)
-- 0 = Interested (the only positive reply)
+- 0 = Interested (positive; Question 15 also counts as positive in stats)
 - 1 = NotInterested (retired, historical rows)
 - 2 = Automated
 - 3 = Unclassified
@@ -193,7 +193,8 @@ Updates: `prompts(operation="update", prompt_id=..., changes={...}, confirm=Fals
 - 12 = Objection
 - 13 = WrongContact
 - 14 = Referral (recruiting campaigns: "not me, try X")
+- 15 = Question (a factual question about us, our product or terms; positive in stats only, never acted on as Interested; email, workspaces with reply_question_type)
 
-Canonical threads use the snake_case `interest` values instead: interested, not_interested, negative, automated, unclassified, unsubscribe, objection, wrong_contact, out_of_office, referral.
+Canonical threads use the snake_case `interest` values instead: interested, question, not_interested, negative, automated, unclassified, unsubscribe, objection, wrong_contact, out_of_office, referral.
 
 Count replies as distinct contacts. An out-of-office is not a reply. Opens are never a goal or a reported number.
