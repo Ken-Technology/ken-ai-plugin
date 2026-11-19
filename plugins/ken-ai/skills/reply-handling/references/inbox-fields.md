@@ -21,7 +21,7 @@ Reference for the reply-handling skill. Ids: threads are `thr_`, messages `msg_`
 
 ## Interest
 
-`interested`, `not_interested`, `negative`, `automated`, `unclassified`, `unsubscribe`, `objection`, `wrong_contact`, `out_of_office`, `referral`.
+`interested`, `not_interested`, `negative`, `automated`, `unclassified`, `unsubscribe`, `objection`, `wrong_contact`, `out_of_office`, `referral`, `question` (email only; a workspace without the Question label answers 400, so leave the label as it is there).
 
 - `threads(operation="list", interest=...)` filters by it. With no tab, or `all`, it reads each thread's newest reply from the contact, so a thread you answered still lists.
 - `threads(operation="update", thread_id="thr_...", changes={"interest": "interested"})` changes it. LinkedIn threads refuse `automated`.
