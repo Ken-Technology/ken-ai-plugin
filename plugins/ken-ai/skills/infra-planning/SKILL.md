@@ -15,11 +15,11 @@ Offer the mailbox types of deliverability rule 6, in the `deliverability-guard` 
 
 Plans that buy Kenso infrastructure, with billing Active or Trialing:
 
-- Credit plans pay in credits: Platform (`planType` Platform, the public plan: 200,000 sends and 5,000 credits a month), Dfy (`planType` LegacyDfy; the Kenso team adds its credits), and grandfathered Starter / Growth / Core (`LegacyStarter` / `LegacyGrowth` / `LegacyCore`).
+- Credit plans pay in credits: Platform (`planType` Platform, closed to new sign-ups: 200,000 sends and 5,000 credits a month), Dfy (`planType` LegacyDfy; the Kenso team adds its credits), and grandfathered Starter / Growth / Core (`LegacyStarter` / `LegacyGrowth` / `LegacyCore`).
 - VIP (`planType` LegacyPremium) is exempt and staff-sold: it pays new domains through Stripe checkout, and mailboxes are on the plan.
-- `planType` Basic, Growth and Pro are the new plans. Growth now means the new Growth plan; the retired Growth reads LegacyGrowth.
+- `planType` Basic, Growth and Pro are the new plans, the ones a new workspace picks. Inboxes and Azure domains are monthly add-ons billed in dollars on the plan's subscription, not in credits; a domain registration is paid in credits. Growth now means the new Growth plan; the retired Growth reads LegacyGrowth.
 
-Free (or `PLAN_FEATURE_NOT_AVAILABLE`): Free cannot buy Kenso domains or inboxes. It connects its own inboxes in the app, or upgrades to Platform at https://app.ken.so/<workspace id>/settings/billing (surface `error.recovery.summary` when present). **STOP** any request to add Kenso capacity. You may still list what they have.
+Free (or `PLAN_FEATURE_NOT_AVAILABLE`): Free cannot buy Kenso domains or inboxes. It connects its own inboxes in the app, or picks a paid plan (Basic, Growth or Pro) at https://app.ken.so/<workspace id>/settings/billing (surface `error.recovery.summary` when present). **STOP** any request to add Kenso capacity. You may still list what they have.
 
 ## 2. Read current state
 
@@ -74,14 +74,14 @@ Once domains are chosen, quote the order at `cartCost`, not `cost`: `cost` price
 
 `canBuy` reflects the workspace, not the caller's seat: a Viewer seat can read the plan and is refused at checkout. A Client seat never gets the plan (the tool is not offered to it): tell it a workspace admin sizes and buys the setup. The plan does not repeat the member monthly credit limit, the Premium daily limit or a white-label child's caps, so handle a checkout refusal after a plan said `canBuy`. `canBuy` is true with refusal `INSUFFICIENT_CREDITS` or `FREE_CREDITS_NOT_ELIGIBLE`: a credit pack clears both.
 
-Credit prices, for reference only (the plan already applies them; 50 credits per dollar):
+Prices, for reference only (the plan already applies them; 50 credits per dollar):
 
-| Item | Credits |
-|------|---------|
-| Google / Outlook inbox | 200 credits ($4) per inbox a month |
-| Azure domain already in the workspace (up to 50 inboxes; not offered for new orders) | 2,500 credits ($50) per domain a month |
-| Domain registration | each name's first-year price in credits, as the domain search shows it, upfront |
-| Credit pack | 1,000 credits for $20; at most 10 packs per checkout (fewer while the new-payer checkout cap applies, see section 5) |
+| Item | Credit plans | Basic / Growth / Pro |
+|------|--------------|----------------------|
+| Google / Outlook inbox | 200 credits ($4) per inbox a month | $5 per inbox a month, an add-on billed on the plan (no credits) |
+| Azure domain already in the workspace (up to 50 inboxes; not offered for new orders) | 2,500 credits ($50) per domain a month | $25 per domain a month, an add-on billed on the plan (no credits) |
+| Domain registration | each name's first-year price in credits, as the domain search shows it, upfront | the registrar's price in credits (50 credits per dollar), upfront |
+| Credit pack | 1,000 credits for $20; at most 10 packs per checkout (fewer while the new-payer checkout cap applies, see section 5) | the same |
 
 Exempt workspaces skip credits: they pay each domain's price as the domain search shows it (the full price) for one year at Stripe checkout, and mailboxes are on the plan.
 The plan marks them with `balance.creditsExempt` true. For them quote only what the order charges today, the registrations (`cost.registration`, or `cartCost.registration` once domains are chosen). Never quote the inboxes' monthly credits (`cost.monthly`, `cost.dueOnConnect`) and never ask them to buy credit packs: `balance.shortfallCredits` is always 0 for them.
@@ -110,11 +110,11 @@ Surface the normalized envelope fields (`refusal` object + message).
 
 | Code | What to tell the user |
 |------|------------------------|
-| `PLAN_FEATURE_NOT_AVAILABLE` | Free cannot buy Kenso infrastructure. Connect your own inboxes in the app, or upgrade to Platform at https://app.ken.so/<workspace id>/settings/billing. Show `error.recovery.summary` when present. |
+| `PLAN_FEATURE_NOT_AVAILABLE` | Free cannot buy Kenso infrastructure. Connect your own inboxes in the app, or pick Basic, Growth or Pro at https://app.ken.so/<workspace id>/settings/billing. Show `error.recovery.summary` when present. |
 | `INSUFFICIENT_CREDITS` | Not enough credits for the order. Show the message (it carries the credits needed and available). Shrink the cart, or buy credits at https://app.ken.so/<workspace id>/settings/billing and retry. Dfy: the Kenso team adds credits. White-label child: ask the parent workspace. |
 | `FREE_CREDITS_NOT_ELIGIBLE` | Free and bonus credits can't pay for domains or inboxes, and the bought credits fall short. Show the message (it carries the credits needed, the credits that can pay, and the free part). Buy credits at https://app.ken.so/<workspace id>/settings/billing and retry. Dfy: the Kenso team adds credits. White-label child: ask the parent workspace. |
 | `NEW_PAYER_DOMAIN_LIMIT` / `NEW_PAYER_MAILBOX_LIMIT` | The new-payer limit (3 domains and 10 inboxes until 14 days of paid history). Show the message, order what fits and leave the rest for later. |
-| `UPGRADE_REQUIRED` / `PAID_PLAN_REQUIRED` | Same as the Free plan: Free cannot buy Kenso infrastructure. Connect your own inboxes in the app, or upgrade to Platform at https://app.ken.so/<workspace id>/settings/billing. |
+| `UPGRADE_REQUIRED` / `PAID_PLAN_REQUIRED` | Same as the Free plan: Free cannot buy Kenso infrastructure. Connect your own inboxes in the app, or pick Basic, Growth or Pro at https://app.ken.so/<workspace id>/settings/billing. |
 | `DISPUTE_HOLD` | The workspace has a payment dispute on hold. Do not order: the Kenso team resolves it. |
 | `FIRST_PAYMENT_PENDING` | The first payment has not cleared yet. Wait for it to clear, then plan again. |
 | `INBOX_LIMIT_REACHED` | Show metrics. Offer upgrade or rebalance limits on existing inboxes. |
