@@ -18,9 +18,9 @@ Summarize per inbox: address, domain, daily limit, display name. The inboxes pag
 
 ## 2. Daily limits
 
-- Healthy, warmed Google and Outlook inboxes: **30-50/day**
+- Healthy Google and Outlook inboxes past the send ramp: **30-50/day**
 - SMTP inboxes, Azure inboxes included, follow deliverability rule 5 (the `deliverability-guard` skill's `rules.md` reference): **5-10/day**, and a new one starts at 5. Never suggest more than 10, though the product lets them go to 30
-- New or still warming: **5-10/day**, ramp over 2-3 weeks
+- New Google and Outlook inboxes: the send ramp sets the pace, starting at **5/day** and adding 2 per sending day, up to 30. They do not need warmup first
 - Never suggest **more than an inbox's ceiling**: 50/day for Google and Outlook, 30/day for Azure and SMTP. A higher value is capped at the ceiling
 - `0` pauses that inbox. No explicit limit means the planning rate (Google and Outlook 25, Azure 5): that is what capacity is sized with, not the ceiling
 
@@ -30,7 +30,7 @@ After the user approves a number:
 `inboxes(operation="update", inbox_id=..., changes={"daily_send_limit": 40})`.
 For many: `inboxes(operation="bulk-update", ids=[...], changes={"daily_send_limit": 40})`. Only fields in `changes` are sent.
 
-Give one sentence on why the limit protects deliverability. Warmup shares the same provider budget, so leave room for it.
+Give one sentence on why the limit protects deliverability. On an inbox with warmup on, warmup sends share the same provider budget, so leave room for them.
 
 ## 3. Display names
 
@@ -55,6 +55,8 @@ The mail provider renames the mailbox first, then Kenso changes the inbox's addr
 
 Forward to the client's own external email only:
 `inboxes(operation="update", inbox_id=..., changes={"forwarding_destination": ...})`, or `bulk-update` with `ids`. Details, plus warmup status and pause/resume: `references/forwarding-and-warmup.md`.
+
+Warmup is optional and off by default: new inboxes are not enrolled and rely on the send ramp (section 2). Kenso does not recommend warmup, so never suggest turning it on. Inboxes already warming keep warming. When the user asks to turn warmup on or resume it, first tell them in one or two sentences: there is no independent evidence that warmup networks improve inbox placement or replies with real prospects (every positive number comes from a warmup vendor), and Validity's Heatwave blocklist, used or evaluated by Proofpoint, Spamhaus, Comcast and SURBL, lists domains that trade automated warmup mail, with listings that never expire, while Google and Microsoft document a slow ramp of real sending instead. Turn it on only after they confirm.
 
 ## 7. Boundaries
 

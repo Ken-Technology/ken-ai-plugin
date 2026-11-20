@@ -125,7 +125,7 @@ Done when every setting matches the plan, or the user has the list of what to ch
 
 ### 9. Verify
 
-Open `verify-campaign`. It is read-only: `campaign_flow(operation="get-launch-readiness", campaign_id=...)`, the full checklist (segments, sequences, prompts, workflows, settings, tracking links), the prelaunch gate (domain authentication, warmup, placement, schedule and caps, merge fields render, a 50 to 200 lead canary) and a list audit (duplicates, blocklist, free mail, unverified emails). Each check reports PASS, FAIL or "not checked" with the reason. Fixes go back to the stage that owns them, after a yes.
+Open `verify-campaign`. It is read-only: `campaign_flow(operation="get-launch-readiness", campaign_id=...)`, the full checklist (segments, sequences, prompts, workflows, settings, tracking links), the prelaunch gate (domain authentication, inbox status, placement, schedule and caps, merge fields render, a 50 to 200 lead canary) and a list audit (duplicates, blocklist, free mail, unverified emails). Each check reports PASS, FAIL or "not checked" with the reason. Fixes go back to the stage that owns them, after a yes.
 
 Done when the report is in the chat. Hand the user the campaign at https://app.ken.so/<workspace id>/campaigns/<campaign id> to launch it themselves.
 

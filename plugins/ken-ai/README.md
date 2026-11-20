@@ -45,7 +45,7 @@ The server URL has not changed. Configs that already name the server `ken` keep 
 | `campaign-improvement` | Fix the email that isn't working in a live campaign: a before and after, graded, saved as a version you can roll back. |
 | `connect-domains` | Import your own sending domains and complete the nameserver cutover. |
 | `create-campaign` | Build a campaign from an ICP and offer to launch-ready: plan, segments, copy, review, settings and prelaunch checks. |
-| `deliverability-guard` | Find out why bounces are up or sends dropped, and what to pause, warm up or rotate before it hurts your domains. |
+| `deliverability-guard` | Find out why bounces are up or sends dropped, and what to pause, slow down or rotate before it hurts your domains. |
 | `delivery-setup` | Get your sending ready: inboxes, domains, LinkedIn accounts and the link host, one step at a time. |
 | `domain-selection` | Review sending domains or order new ones on a paid workspace. |
 | `event-outbound` | Plan outreach around a conference: build its list, match it to your accounts, find who is likely there, plan touches for Today. |

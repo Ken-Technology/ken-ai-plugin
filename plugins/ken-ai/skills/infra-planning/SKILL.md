@@ -68,7 +68,7 @@ Read these fields from the response and quote them as the plan gives them:
 | Cut by the limits | `capped`: when true the new-payer limits trimmed the plan; show `warnings` |
 | Would checkout refuse it now | `limits.refusal` (`code`, `message`), and `limits.canBuy` |
 
-Show credits and dollars together ("2,200 credits, $44"), as the plan returns them. Dollars are each amount's `usd` (`"44.00"` is $44) and `balance.packsUsd`. `usdCents` and `packsUsdCents` are US cents (`4400` is $44, divide by 100), never dollars: never quote them as dollars. Credits are 50 to the dollar, so an amount's `usd` is its `credits` divided by 50. Read the timeline from `timeline`: warmup is not a fixed number of weeks. Full volume is mailboxes ramping at 5 a day, plus 2 per sending day, up to 30: about 13 sending days after sending starts.
+Show credits and dollars together ("2,200 credits, $44"), as the plan returns them. Dollars are each amount's `usd` (`"44.00"` is $44) and `balance.packsUsd`. `usdCents` and `packsUsdCents` are US cents (`4400` is $44, divide by 100), never dollars: never quote them as dollars. Credits are 50 to the dollar, so an amount's `usd` is its `credits` divided by 50. Read the timeline from `timeline`, never a fixed number of weeks. Full volume is mailboxes ramping at 5 a day, plus 2 per sending day, up to 30: about 13 sending days after sending starts.
 
 Once domains are chosen, quote the order at `cartCost`, not `cost`: `cost` prices every domain the plan needs, `cartCost` only the domains the carts hold. With `unfilled_slots` in `warnings`, say the order covers fewer domains than the goal needs (`unfilledSlots` of `totals.domains`) and so sends less, and offer more names (plan again with them) before the order.
 

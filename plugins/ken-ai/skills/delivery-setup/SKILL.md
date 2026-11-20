@@ -35,7 +35,7 @@ New domains and warmed inboxes need a paid plan. On a Free workspace, say so and
 
 If an operation this skill names is not listed for you, or answers 404, that part is not on for this workspace or this caller. Say which part in one sentence, point to https://app.ken.so/<workspace id>/delivery?tab=inboxes, and carry on with the rest. Do not retry it.
 
-Tell the user what they have in one short block: active inboxes and domains, inboxes still warming, the daily capacity (the daily limits of active inboxes added up), LinkedIn accounts, and credits.
+Tell the user what they have in one short block: active inboxes and domains, inboxes with warmup on, the daily capacity (the daily limits of active inboxes added up), LinkedIn accounts, and credits.
 
 ## Step 1 - Size it, then pick the path
 
@@ -129,10 +129,11 @@ Click tracking is separate: every sending domain gets its own click-tracking hos
 
 ## Step 9 - Check and hand over
 
-- Each new inbox: `inboxes(operation="get-warmup", inbox_id=301)`. New inboxes warm before they send: read `timeline` from the sending plan (`startsSendingAt`, `fullVolumeAt`) and quote those dates, never a fixed number of weeks. Google and Outlook mailboxes then ramp at 5 a day, plus 2 per sending day, up to 30: about 13 sending days after sending starts. An SMTP inbox sends at the daily limit the product sets for it (rule 5 holds the numbers): never raise it with `inbox-configuration`.
+- Each new inbox sends on the send ramp, not after warmup: read `timeline` from the sending plan (`startsSendingAt`, `fullVolumeAt`) and quote those dates, never a fixed number of weeks. Google and Outlook mailboxes start at 5 a day and add 2 per sending day, up to 30: about 13 sending days after sending starts. An SMTP inbox sends at the daily limit the product sets for it (rule 5 holds the numbers): never raise it with `inbox-configuration`.
+- Warmup is optional, off by default for new inboxes, and Kenso does not recommend it: never suggest it. If the user asks for it, `inbox-configuration` holds the warning to give before it goes on.
 - Each new domain, once its DNS is in: `domains(operation="verify-dns", domain_id=12)`, then `domains(operation="get-health", domain_id=12)`. Its `spfStatus`, `dkimStatus`, `dmarcStatus` and `mxStatus` (`pass`, `fail` or `unknown`) come from the last check, dated by `checkedAt`: run `domains(operation="domain-health-checks-create", domain_ids=[12])` after the records change, then read it again.
 - Placement auto-pause, a workspace setting: on, a Kenso placement test that finds a domain's mail in spam pauses sending from that domain. It is on by default; `domain_setup(operation="delivery-settings-update", placement_auto_pause=False)` turns it off and `True` back on (Delivery edit, after a yes; 404 where the workspace's tests do not run on Kenso's seed network).
-- Report: what is connected, what is warming and until when, what the user still has to do (DNS records, sign-ins, admin consent, payments), and the daily capacity now and once warm.
+- Report: what is connected, where each new inbox is on the send ramp, what the user still has to do (DNS records, sign-ins, admin consent, payments), and the daily capacity now and at full volume.
 - Next: `inbox-configuration` for names, signatures, forwarding and limits; `deliverability-guard` once mail is flowing.
 
 ## What this skill cannot do yet
