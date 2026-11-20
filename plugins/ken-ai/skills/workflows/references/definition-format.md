@@ -198,7 +198,7 @@ To turn one plain-words condition into a formula: `workflow_builder(operation="c
 | `runsPerDay` | runs a day |
 | `atLimit` | what happens at a limit: `pause` (the workflow turns `off`), `ask` (the run waits in Needs attention) or `hold` (runs wait until the window resets). Left out, the workflow's spend limits start from the workspace's at-limit rule (`pause` unless the workspace changed it) |
 
-Credits are whole credits. Every number must be more than 0 (`invalid_limits`). `limits` has no other fields: an unknown one is ignored with an `unknown_property` warning.
+Credits are whole credits. Every number must be more than 0 (`invalid_limits`). A workflow with an `account.research@1` node needs `creditsPerRun` and `creditsPerMonth`, when set, of at least 20: outside the LinkedIn connections enrich job each research run the step opens counts 20 credits against them (`invalid_limits` at publish). `limits` has no other fields: an unknown one is ignored with an `unknown_property` warning.
 
 To start at most one run per record in N days, set `oncePerRecordDays` in the trigger's `with`. Only `trigger.signal@1`, `trigger.website_visit@1`, `trigger.account_hot@1`, `trigger.opportunity_stage@1`, `trigger.hot_page@1` and `trigger.reply@1` take it.
 
@@ -309,7 +309,7 @@ What validate reports beyond the table in the skill body. Each issue carries a `
 | `placeholder_not_filled` | a template's `<fill in: ...>` value still in the trigger's or a step's `with`, or an `account.add_to_campaign@1` step with no campaign picked (`campaignId` 0, or none outside a campaign workflow): a warning in draft, an error in publish |
 | `knowledge_prompt_not_found` | an AI step's `with.knowledgePromptId` that is not a Knowledge prompt of this workspace (a deleted one is fine); the draft save refuses it too |
 | `invalid_knowledge_prompt_id` | an AI step's `with.knowledgePromptId` not written as a whole number above 0 (`12` or `"12"`: no leading zero, sign, spaces or decimals); the draft save refuses it too |
-| `invalid_limits` | a limit at 0 or below, or an unknown `atLimit` |
+| `invalid_limits` | a limit at 0 or below, an unknown `atLimit`, or `creditsPerRun` / `creditsPerMonth` below the 20 credits an `account.research@1` node counts |
 | `plain_duplicate_id`, `plain_empty_text`, `plain_unknown_ref`, `plain_duplicate_owner`, `plain_invalid_mode` | the `plain` block: a repeated plain id, blank text, a `compiledTo` entry that names no source or step, an engine step owned by two plain steps (a source by two besides the When line), a mode other than `compiled` or `judgment` |
 | `plain_uncovered_step` | a warning, only with `plain` present: an engine step no plain step owns |
 | `duplicate_id`, `unknown_target`, `cross_scope_edge`, `nested_for_each`, `cycle`, `unreachable`, `ignored_next` | graph problems: repeated ids, `next` to a missing step, edges out of a for-each body, nested for each, loops, steps the trigger never reaches, `next` on a branch |
