@@ -158,7 +158,8 @@ When the next meeting is agreed with a time, offer the calendar invite and creat
 - For anything shown to a client, read `committee(operation="meetings-get-client-brief", meeting_id="mtg_812")`: the same brief without credit or write fields.
 - Call briefs for phone calls are staff-only.
 - Starting a new email thread is staff-only (see step 6).
-- Held meetings are not tracked yet: a booking or a calendar event is not proof the meeting happened.
+- A booking or a calendar event is not proof the meeting happened.
+- Held meetings are tracked only where the workspace has meeting attribution on: `meeting_results(operation="get-meeting-attribution")` counts them per campaign, and answers not found where it is off. It does not say whether this one meeting happened: ask the person.
 
 `references/prep-template.md` and `references/followup-template.md` hold the layouts and checks. Open one with `load_skill("meeting-prep-and-followup", reference="references/followup-template.md")`.
 

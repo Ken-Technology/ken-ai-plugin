@@ -124,7 +124,7 @@ It reads the counts once, as given, so a finding from the nightly run, when ther
 
 ## What this skill cannot do yet
 
-- Count held meetings. Meetings booked are on the performance rows. Meetings held are not tracked yet.
+- Count held meetings where the workspace has meeting attribution off. Meetings booked are on the performance rows. Where it is on, `meeting_results(operation="get-meeting-attribution", campaign_id=42, group_by="step")` gives each step's `held`, `noShow` and `needsAnswer` next to `booked`; a not found answer means it is off. Never report bookings as meetings held.
 
 ## No Kenso account yet
 

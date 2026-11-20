@@ -150,7 +150,8 @@ An interested contact who stopped answering is the cheapest meeting you will fin
 
 ## What this skill cannot do yet
 
-- A booking is not a held meeting. Held meetings are not tracked yet, so never report bookings as meetings held.
+- A booking is not a held meeting: never report bookings as meetings held.
+- Held meetings are tracked only where the workspace has meeting attribution on (`meeting_results(operation="get-meeting-attribution")`, which answers not found where it is off).
 - Starting a new thread (for example to a referral) is `replies(operation="threads-create")`, listed only where the workspace's `agent_send` flag is on, for every seat that can reply. Send only the text the person approved, from a shared cold inbox: an `inboxes(operation="list", role="sending", status="active")` entry with no `ownerMemberId`, on a cold sending domain. Where it is not listed, or it answers 404 (the flag is off) or 409 `client_approval_required`: draft the email and the person sends it from their own mail.
 - No op books a meeting for the contact: they book through the link.
 
