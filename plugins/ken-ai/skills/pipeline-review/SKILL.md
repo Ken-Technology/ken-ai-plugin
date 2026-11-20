@@ -16,7 +16,8 @@ It ends with a short pipeline report, a list of next actions with owners, and ea
 - **Moving a deal to won can block the account.** When the workspace's `markCustomerOnWon` is on, a won deal marks its account a customer and blocklists its domains, so its contacts stop getting campaign email. Say that before you move a deal to a won stage.
 - **Stages belong to the workspace.** You may read them. You never rename, reorder, add or remove one. Change a stage's win probability only when the user asks for that exact change.
 - **Replies are distinct contacts.** Out-of-office is not a reply. Never report opens.
-- **A booked meeting is not a held meeting.** Held meetings are not tracked yet: never report bookings as meetings held.
+- **A booked meeting is not a held meeting.** Never report bookings as meetings held.
+- **Held meetings are tracked only where the workspace has meeting attribution on.** `meeting_results(operation="get-meeting-attribution", group_by="campaign")` gives `held` per campaign and in `totals`. A not found answer means it is off: then held meetings are not tracked.
 
 Every call takes `client_id`, the workspace id. Send it on every call when the user can see more than one workspace.
 
@@ -118,7 +119,7 @@ If replies came in but `interested` is 0, the replies may not be classified yet.
 - No stale-deal or forecast report: Step 2 rebuilds staleness from activity each time.
 - No deal delete, and no stage edits beyond win probabilities.
 - No "sync now" for the CRM: `sync-get` is status only.
-- Held meetings are not tracked yet.
+- No held meetings where the workspace has meeting attribution off.
 
 `references/stale-signals.md` holds the thresholds and how to read each signal. `references/weekly-update.md` holds the update layout and the metric definitions. Open one with `load_skill("pipeline-review", reference="references/stale-signals.md")`.
 

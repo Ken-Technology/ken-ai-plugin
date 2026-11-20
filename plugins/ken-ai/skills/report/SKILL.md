@@ -14,7 +14,7 @@ Every call takes `client_id`, the workspace id. Send it when the user can see mo
 - **Replies are people.** Count distinct contacts, never messages. Out-of-office is not a reply.
 - **Never report opens.** Campaign emails never carry an open-tracking pixel, so opens are not tracked (rule 1 of the deliverability rules, in the `deliverability-guard` skill's `rules.md` reference).
 - **Three interested replies, or none.** Quote exactly three, from three different people, or leave the section out. Never pad it with a neutral or out-of-office reply.
-- **N/A, never 0, for anything you could not read.** A 0 says nothing happened; N/A says you do not know. Every N/A that only the reader can fill (meetings held, pipeline, cost per meeting) becomes a question under "Where we need you".
+- **N/A, never 0, for anything you could not read.** A 0 says nothing happened; N/A says you do not know. Every N/A that only the reader can fill (meetings held when they are not tracked, pipeline, cost per meeting) becomes a question under "Where we need you".
 - **Benchmarks and targets are the workspace's own.** Use the ones Step 0 gives you, or one the user gives you with its source. Write N/A for one you do not have, and never quote an "industry average".
 - **No vendor names.** Never name a sending provider, data vendor, mailbox host or AI model maker in the report. Say "your sending domains", "our data", "the AI".
 - **Names as the app shows them.** Use each campaign's and segment's name exactly as it appears in Kenso. Never an internal label such as "plan 3" or "v2 series".
@@ -42,7 +42,9 @@ Use `week.startDate` and `week.endDate` as the window for every other read in th
 
 **Monthly**, per campaign: `analytics(operation="get-campaign-performance", from_time="2026-10-01T00:00:00Z", to_time="2026-10-31T23:59:59Z", campaign_id=42)`, and the same call with `group_by="segment"` for the segment rows. Read the weekly report for each week of the month for `changed`.
 
-**Workspace totals:** the same performance call without `campaign_id`. Its `meetingsBooked` counts meetings booked from campaigns. Meetings held are not tracked yet, so that row is N/A.
+**Workspace totals:** the same performance call without `campaign_id`. Its `meetingsBooked` counts meetings booked from campaigns.
+
+**Meetings held:** tracked only where the workspace has meeting attribution on. Read `meeting_results(operation="get-meeting-attribution", group_by="campaign", from_date="2026-10-01", to_date="2026-10-31")` for the report's window. Use each campaign row's `held`, and `totals.held` for the workspace, and say how many still wait for an answer (`needsAnswer`). A not found answer means it is off: then that row is N/A.
 
 **Clicks:** use the human `clickCount` and the returned `clickRate`. Never add `botClickCount`. A 0 on a campaign that sent volume with links in it can mean tracking is not recording: when you cannot confirm it, write N/A. A campaign that sends as plain text counts no clicks from 15 Nov 2026 on, because a plain text email carries no click-tracking link (amendment A1 of the deliverability rules, in the `deliverability-guard` skill's `rules.md` reference), and the performance read says so with `clicksTracked` `false`: write N/A (not tracked) for its clicks, never 0 or a rate. A non-zero count there is only partial (steps kept as HTML, or clicks before 15 Nov 2026).
 
@@ -102,7 +104,7 @@ Return the report and the cover email as text in your reply.
 ## What this skill cannot do yet
 
 - Render a slide deck. The report is text, or a Studio doc where Step 8 offers one.
-- Count meetings held, or read the reader's CRM pipeline. Both are N/A until the reader gives them.
+- Count meetings held where the workspace has meeting attribution off, or read the reader's CRM pipeline. Both are N/A until the reader gives them.
 
 ## No Kenso account yet
 
