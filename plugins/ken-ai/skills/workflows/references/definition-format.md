@@ -200,7 +200,7 @@ To turn one plain-words condition into a formula: `workflow_builder(operation="c
 
 Credits are whole credits. Every number must be more than 0 (`invalid_limits`). `limits` has no other fields: an unknown one is ignored with an `unknown_property` warning.
 
-To start at most one run per record in N days, set `oncePerRecordDays` in the trigger's `with`. Only `trigger.signal@1`, `trigger.website_visit@1`, `trigger.account_hot@1` and `trigger.opportunity_stage@1` take it.
+To start at most one run per record in N days, set `oncePerRecordDays` in the trigger's `with`. Only `trigger.signal@1`, `trigger.website_visit@1`, `trigger.account_hot@1`, `trigger.opportunity_stage@1`, `trigger.hot_page@1` and `trigger.reply@1` take it.
 
 ## Save to field
 
