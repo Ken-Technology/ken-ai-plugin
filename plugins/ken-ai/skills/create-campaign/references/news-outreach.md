@@ -1,6 +1,6 @@
 # News outreach: a campaign from a market story
 
-A market story is a news event in the workspace's market: a security incident, trouble at a vendor, a new regulation, big industry news, or a trend several outlets keep covering. A campaign built on one works only while the story is fresh, and only when the email is about what the story changes for the reader, not about the story itself.
+A market story is a news event in the workspace's market: a security incident, trouble at a vendor, a new regulation or big industry news. A campaign built on one works only while the story is fresh, and only when the email is about what the story changes for the reader, not about the story itself.
 
 Use this reference at the plan, strategy and copy stages of a campaign that starts from a story. Everything else in `create-campaign` still applies, and the build still stops at a draft: a person launches it.
 
@@ -19,10 +19,10 @@ Never use a story about deaths, disasters, violence, politics or elections, even
 
 | Angle type | The story is about | Who gets the email | What connects the story to the offer |
 |---|---|---|---|
-| `direct` | The market the workspace sells to: a regulation, an industry event, a trend | People in that market whose work the story changes | What the story asks of them now, and how the offer makes it easier |
+| `direct` | The market the workspace sells to: a regulation, an industry event | People in that market whose work the story changes | What the story asks of them now, and how the offer makes it easier |
 | `vendor` | A company whose customers the workspace can help: an outage, a breach, a price change, a product shut down | People at that vendor's customers, and optionally at customers of similar vendors | What the vendor's customers have to do now, and how the offer helps them do it |
 
-A trend has no single event. Write it as a pattern the reader has likely seen ("three outlets covered ... in the week of 9 November"), never as one company's news.
+An older story may be a trend: several outlets covering one pattern, with no single event. Write it as a pattern the reader has likely seen ("three outlets covered ... in the week of 9 November"), never as one company's news.
 
 ## Rules for a story that names a company
 
