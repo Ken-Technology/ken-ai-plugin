@@ -41,7 +41,7 @@ Use this layout for every verify-campaign run. One row per executed check; SKIP 
 | 56 | Quality | Campaign name | PASS | "Acme - Series A SaaS founders" |
 | 60 | Prelaunch | Launch readiness | INFO | not_ready: Draft, workflows still running |
 | 61-62 | Prelaunch | Domain auth + blocklists | PASS | 3/3 domains SPF, DKIM, DMARC pass; none listed (checked 2026-10-26) |
-| 63 | Prelaunch | Inbox warmup | FAIL | 2 of 9 inboxes have 6 warmup days left |
+| 63 | Prelaunch | Inboxes ready | PASS | 9/9 inboxes active, no send blocks |
 | 64 | Prelaunch | Placement test | WARN | No placement test for this campaign yet |
 | 65 | Prelaunch | Merge fields render | PASS | 9 previews over 3 segments, no empty or literal tokens |
 | 66 | Prelaunch | Tracking HTTPS | PASS | Tracking DNS verified, certificate valid |
@@ -57,7 +57,6 @@ Use this layout for every verify-campaign run. One row per executed check; SKIP 
 
 **CRITICAL (must fix before launch):**
 1. Segment "early-stage" reuses tracking link 116 from segment "growth-stage" - create its own link with `tracking_links(operation="tracking-links-create", campaign_id={id}, name="early-stage url_1", domain_name="{destination url}", text_value="{display text}")`, then replace every early-stage body that links to that URL with `<a href="{{tracking_link:NEW_ID}}">{display text}</a>` through `email_sequences(operation="segment-email-sequences-replace", segment_id={early-stage id}, steps=[...])` (every step, flags carried unchanged) and `email_sequences(operation="save-version", segment_id={early-stage id}, name="Own tracking links")`.
-2. 2 inboxes are still warming up - wait until their warmup days reach 0 before launch, or launch without them; this needs time, not a write.
 
 **WARNINGS (recommended fixes):**
 1. Status is Draft (0) - launch from the campaign page when ready; this check does not launch.

@@ -42,9 +42,9 @@ Paid plan:
 
 > Cold email goes out from separate sending domains with a few inboxes on
 > each. Each Google or Microsoft inbox sends about 25 emails a day, and new
-> inboxes warm up before full volume. You can buy new domains, connect ones
-> you already own, and see your inboxes on the domains and inboxes page:
-> <domains and inboxes link>.
+> inboxes ramp up, starting at 5 a day and adding 2 per sending day. You can
+> buy new domains, connect ones you already own, and see your inboxes on the
+> domains and inboxes page: <domains and inboxes link>.
 
 If `sendingInfrastructure.status` is `ready`, say sending is already set up and
 link the domains and inboxes page for review. If `pending`, say it is still being set up

@@ -153,7 +153,7 @@ OAuth stays in the browser. Never claim setup connected anything.
 
 Explain, then link. Never buy, import, or provision anything in this flow.
 
-Cold email goes out from separate sending domains (never the main company domain) with a few inboxes on each. A Google or Microsoft inbox sends about 25 emails a day, so volume comes from several inboxes, and new inboxes warm up before they reach full volume.
+Cold email goes out from separate sending domains (never the main company domain) with a few inboxes on each. A Google or Microsoft inbox sends about 25 emails a day, so volume comes from several inboxes, and a new inbox ramps up: it starts at 5 emails a day and adds 2 per sending day.
 
 Branch on the Step 1 preflight:
 

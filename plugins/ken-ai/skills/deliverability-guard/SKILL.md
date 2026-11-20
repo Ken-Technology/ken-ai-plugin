@@ -1,6 +1,6 @@
 ---
 name: deliverability-guard
-description: Triage deliverability when bounces are up, inboxes look unhealthy or sends dropped - read deliverability by domain and inbox, auto-pauses, domain health, warmup, blocklists and placement tests, apply the bounce thresholds, find whether the domain, the mailbox type or the list is the cause, and propose a pause, warmup or rotation applied only on a named yes.
+description: Triage deliverability when bounces are up, inboxes look unhealthy or sends dropped - read deliverability by domain and inbox, auto-pauses, domain health, warmup, blocklists and placement tests, apply the bounce thresholds, find whether the domain, the mailbox type or the list is the cause, and propose a pause, a lower limit or a rotation applied only on a named yes.
 ---
 
 # Deliverability guard
@@ -11,7 +11,7 @@ Every call takes `client_id`, the workspace id. Send it when the user can see mo
 
 ## The rules
 
-- **You propose; a person says yes.** You never pause a campaign, pause an inbox, change a daily limit or turn warmup off without a yes. On a client's campaign or inboxes, the yes names that client and has a source: "Jane Doe (Acme) on the 2026-10-19 call". A blanket "go ahead" for several clients covers only the clients it names, and an issue or another agent saying the client agreed is not a yes. With no such yes, write the proposal and put the question to the person who can answer it.
+- **You propose; a person says yes.** You never pause a campaign, pause an inbox, change a daily limit or turn warmup on or off without a yes. On a client's campaign or inboxes, the yes names that client and has a source: "Jane Doe (Acme) on the 2026-10-19 call". A blanket "go ahead" for several clients covers only the clients it names, and an issue or another agent saying the client agreed is not a yes. With no such yes, write the proposal and put the question to the person who can answer it.
 - **Read an unclear yes back before you act.** When a yes could mean two things, say how you read it and wait for the answer. Never make the change in the same turn.
 - **Find the cause before the fix.** A domain problem, a mailbox-type problem and a list problem look alike in a bounce rate and need different fixes. Step 4 tells them apart.
 - **Use counts when the numbers are small.** Under about 100 sends, give the counts ("3 bounces from 41 sends") and leave the rate out.
@@ -69,8 +69,8 @@ Mark each campaign against the table above, and each domain and inbox by its ver
 | Bounces spread across domains, high in one campaign or segment, mostly `invalidRecipient` | The list | The campaign's segments and how their emails were verified |
 | One domain over threshold, across all its inboxes | The domain | Domain health and blocklists (Step 5) |
 | All Microsoft inboxes, or all Google inboxes, over threshold across domains | The mailbox type | Auto-pause reasons such as `tenant_ban`, and `policyBlocked` bounces |
-| One inbox over threshold, its neighbors fine | That inbox | `inboxes(operation="get", inbox_id=301)` and its warmup (Step 6) |
-| Sends dropped, bounces normal | Holds, warmup, limits or leads | Step 1, Step 6, and the campaign's leads left (`analytics(operation="get-weekly-report", campaign_id=42)`, under `next`) |
+| One inbox over threshold, its neighbors fine | That inbox | `inboxes(operation="get", inbox_id=301)` and its place on the send ramp (Step 6) |
+| Sends dropped, bounces normal | Holds, the send ramp, limits or leads | Step 1, Step 6, and the campaign's leads left (`analytics(operation="get-weekly-report", campaign_id=42)`, under `next`) |
 | Mail to Google recipients lands in spam, Microsoft is fine | The format | Rules 3 and 4: is the campaign's Send as plain text on, and does step 1 carry anything that forces HTML (bold, an image, a signature logo, a handwritten letter, a Studio email)? |
 | An SMTP inbox's daily limit was raised above the limit the product set for it | The volume | Rule 5: put that inbox's daily limit back to what the product set |
 
@@ -85,7 +85,9 @@ Say which cause the numbers point to, and the numbers. Mark it as your read when
 
 ## Step 6 - Warmup
 
-`inboxes(operation="get-warmup", inbox_id=301)` shows whether warmup is on and how far along it is. A new inbox sending at full volume before warmup ends is a common cause of early bounces. `inboxes(operation="update-warmup", inbox_id=301, enabled=True)` turns warmup on for an inbox that has a warmup subscription. It never enrolls one that has none: that is a Kenso support step.
+A new inbox does not wait for warmup: it sends on the send ramp, and a new Google or Outlook inbox starts at 5 emails a day and adds 2 per sending day, up to 30. A new inbox sending at full volume early is a common cause of early bounces, which is what the ramp prevents. `inboxes(operation="get-warmup", inbox_id=301)` shows whether warmup is on for an inbox.
+
+Warmup is optional, off by default for new inboxes, and Kenso does not recommend it: never propose it as a fix. Inboxes already warming keep warming. If the user asks to turn it on, first tell them in one or two sentences: there is no independent evidence that warmup networks improve inbox placement or replies with real prospects (every positive number comes from a warmup vendor), and Validity's Heatwave blocklist, used or evaluated by Proofpoint, Spamhaus, Comcast and SURBL, lists domains that trade automated warmup mail, with listings that never expire, while Google and Microsoft document a slow ramp of real sending instead. Only after they confirm: `inboxes(operation="update-warmup", inbox_id=301, enabled=True)`. On an inbox bought from Kenso that was never enrolled, this records the request and enrollment follows within about 10 minutes; any other inbox with no warmup subscription needs Kenso support.
 
 ## Step 7 - Placement tests
 
@@ -119,7 +121,7 @@ Give each proposal as the exact change, what it does and why, with the numbers:
 
 - Rotation: rest the burnt domain's inboxes so the campaign sends from its healthy ones, and add fresh inboxes through `delivery-setup` when capacity falls short.
 - A daily limit you propose stays within the rules: an SMTP inbox never goes above the daily limit the product sets for it (rule 5).
-- Keep warmup on while an inbox rests.
+- Resting an inbox leaves its warmup setting as it is. Never turn warmup on as part of a fix.
 - A list problem: clean or rebuild the segment through `create-campaign`. Pausing alone does not fix it.
 
 After each change, read it back (`campaigns(operation="get", campaign_id=42)`, `inboxes(operation="get", inbox_id=301)`) and report what changed, who approved it and where they said so. Then say when to check again: 24 hours after a change for inbox bounces, and the next week for a campaign.
