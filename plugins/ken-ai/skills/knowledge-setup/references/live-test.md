@@ -76,6 +76,8 @@ samples[]: contactId, fullName, title, companyName, segmentName, success, errorM
 | Off-tone | Clashes with the sequence style | Minor | Point the prompt at the sequence's tone explicitly |
 | "I noticed / I saw" opener | Starts with "I noticed you" or "I saw that" | Minor | "Never start with 'I noticed' or 'I saw' - state the observation directly" |
 
+Five samples cannot show repetition across a campaign. Once a prompt has 15 or more outputs for one campaign (a bigger test run, or the first lines it generated for the segment), pass them all to `email_copy(operation="check-sameness", texts=[...])`. A `reject` finding (half the lines on one two-word opener, a third on one three-word opener, or 30% near or exact copies) is a Major issue in the prompt, a `flag` is Minor: fix the prompt and regenerate, never edit single lines.
+
 ## Revision loop (max 3 rounds)
 
 1. All pass: done.
