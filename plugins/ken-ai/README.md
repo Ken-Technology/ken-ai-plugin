@@ -53,7 +53,9 @@ The server URL has not changed. Configs that already name the server `ken` keep 
 | `inbox-configuration` | Tune sending inboxes: daily limits, display names, signatures, and reply forwarding. |
 | `infra-planning` | Size sending domains and inboxes against daily send and credits on a paid plan. |
 | `ken-search` | Build and save people-search filters against the contact database for a campaign. |
+| `kenso` | Start here for any outbound job: it picks the right skill and sets the rules for workspace, credits, sends and the final reply. |
 | `kenso-cli` | Bulk lead, CRM and Studio work from files with the Kenso CLI (`npx kenso`): imports, updates and cleanups with dry runs, resumable runs and a results file. Prefer it over the MCP past about 50 records. |
+| `kenso-start` | A short interview, one question at a time, that finds the outbound job to do first and starts it with one yes. |
 | `kenso-triage` | What needs attention: find the campaigns, imports and workflow runs that failed or stalled, and trace each cause with reads only. |
 | `knowledge-setup` | Fill a workspace's Knowledge: company and offer files, website pages, calls, voice, tiers, Review and shared prompts. |
 | `meddic-summary` | Summarize the call in focus as MEDDIC. Anything the call did not cover says Unknown. |

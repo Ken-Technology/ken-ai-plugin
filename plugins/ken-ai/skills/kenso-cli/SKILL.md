@@ -27,7 +27,7 @@ kenso connect inbox --provider google   # also calendar, crm, github, linkedin .
 kenso onboarding-builds events --build-id obd_2x --until done,error   # live streams: one JSON line per event, reconnects itself
 ```
 
-Charges: `accounts import` per new account, `studio fill` per page (again for ids from another file): show the estimate. `pinned_by_user`: with the person's OK, rerun with `--overwrite-pinned`. Workflows: `kenso workflows brief` first; secrets only as `{{secrets.NAME}}`. Key: `KENSO_API_KEY`, or pipe a variable, no check: `printf '%s' "$KEY" | kenso auth login --with-key`; never in a flag, output or file.
+Charges: follow the kenso skill's spend rules; every dry run prints the credit estimate. `pinned_by_user`: with the person's OK, rerun with `--overwrite-pinned`. Workflows: `kenso docs workflows` first; secrets only as `{{secrets.NAME}}`. Key: `KENSO_API_KEY`, or pipe a variable, no check: `printf '%s' "$KEY" | kenso auth login --with-key`; never in a flag, output or file.
 
 ## Work (beta): My agent
 
