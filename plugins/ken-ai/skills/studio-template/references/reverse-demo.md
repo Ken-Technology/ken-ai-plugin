@@ -86,7 +86,7 @@ The key steps from the starter, prompts shortened:
   "rubric": "... Score quick_read, makes_sense, cta, ps from 0 to 10. Answer easy, would_reply, weird_word yes or no. Automatic fail: an em dash or en dash, the word demo, an email address or phone number, a price, a subject of 6 words or more ..." }
 ```
 
-`"filters": "{{ data.search }}"` is exactly one output tag, so the filter object the `plan` prompt wrote passes through with its type. That is how a prompt steers the search. Search results carry `{name, title, company, linkedin_url}` and never an email or phone number. An `enrich.email` step after `leads` adds each person's verified email, at 1 credit per email found on Kenso's key.
+`"filters": "{{ data.search }}"` is exactly one output tag, so the filter object the `plan` prompt wrote passes through with its type. That is how a prompt steers the search. Search results carry `{name, title, company, linkedin_url}` and never an email or phone number. An `enrich.email` step after `leads` adds each person's verified email, charged per email found on Kenso's key.
 
 `rd-ken-native` replaces the `copy` prompt with a `ken.copy` tool step that writes the email core once (`"kind": "email"`, `"maxWords": 90`) and a `pick` prompt that adds a first line per person. `rd-your-product` starts with your endpoint:
 
@@ -100,7 +100,7 @@ The webhook gets a POST of `{account, person, data, template: {id, versionId}, a
 
 Credits, in plain words:
 
-- 1 credit per page, charged when its first link is published. More person links on that page are free.
+- Each page is charged when its first link is published. More person links on that page are free.
 - `bind`, `scrape.page`, `ken_search.people`, `webhook` and `dataset` cost nothing today.
 - `prompt`, `grade` and the `ken.copy` tool are model calls. When Studio runs them (`executor="ken"`), they cost credits for their AI work, and a prompt answer that breaks a slot schema is retried with the reason, so each retry costs tokens too. When your own agent fills the page (`executor="agent"`, then prepare and submit), its prompt and grade steps cost nothing. `ken.copy` is a tool step, so Studio runs and charges it on both paths.
 

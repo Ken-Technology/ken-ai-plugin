@@ -11,7 +11,7 @@ Use the import operations and billing reads below. Buying new domains (search, c
 
 Preview and import need Delivery edit access (owners, admins and editors by default). The plan, capacity and import-list reads need Delivery view. Confirm the cart with the user before the create call.
 
-Imported domains get Kenso inboxes, so import is paid like any Kenso inbox. Credit plans pay in credits: 200 credits ($4) per Google / Outlook inbox a month and 2,500 credits ($50) per Azure domain a month (up to 50 inboxes). Basic, Growth and Pro pay in dollars on the plan's subscription, not credits: $5 per inbox a month and $25 per Azure domain a month. There is no registration charge. Exempt workspaces (VIP) have mailboxes on the plan.
+Imported domains get Kenso inboxes, so import is paid like any Kenso inbox. Credit plans pay in credits: a monthly price per Google / Outlook inbox and per Azure domain (up to 50 inboxes), at the workspace's rate card. Basic, Growth and Pro pay a monthly add-on per inbox and per Azure domain on the plan's subscription, not credits. There is no registration charge. Exempt workspaces (VIP) have mailboxes on the plan.
 
 Import onto the mailbox types of deliverability rule 6, in the `deliverability-guard` skill's `rules.md` reference. SMTP inboxes cannot be ordered yet, so an import takes Google or Outlook mailboxes; Azure is not offered for new inboxes, and the plan you size with carries no Azure line (`infra-planning`).
 
@@ -126,7 +126,7 @@ Do not loop the check on a timer. One shot on user request, then `domain-imports
 
 `check-nameservers` re-checks one domain right away. A domain read (`domains(operation="get", domain_id=...)`) shows its `nameservers` (`expected`, `current` and `status`: `active`, `action_required` or `pending`) and the registrar as `registrarInfo`.
 
-`waitingForCredits` true, on the check or in `nameservers`: the nameservers already point at Kenso, but setup waits until the balance pays the first month of the domain's inboxes. Show `requiredMillicredits` and `availableMillicredits` as credits (1 credit = 1,000 millicredits) and send them to buy credits at https://app.ken.so/<workspace id>/settings/billing; setup continues on the next check.
+`waitingForCredits` true, on the check or in `nameservers`: the nameservers already point at Kenso, but setup waits until the balance pays the first month of the domain's inboxes. Show `requiredMillicredits` and `availableMillicredits` as credits (millicredits divided by 1,000) and send them to buy credits at https://app.ken.so/<workspace id>/settings/billing; setup continues on the next check.
 
 ## Errors
 

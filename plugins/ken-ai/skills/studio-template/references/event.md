@@ -62,7 +62,7 @@ The prompt step from the starter, shortened:
 
 Rewrite the line that starts with "The event" whenever you change the event, or every page explains why they belong at a different event.
 
-Credits, in plain words: the `bind` is free. The prompt is short and costs credits for its AI work when Studio runs it (`executor="ken"`), nothing when your agent fills the page. The page costs 1 credit when its first link is published. Form submissions cost nothing.
+Credits, in plain words: the `bind` is free. The prompt is short and costs credits for its AI work when Studio runs it (`executor="ken"`), nothing when your agent fills the page. The page is charged at the rate card's price when its first link is published. Form submissions cost nothing.
 
 ## The CTA: the form
 

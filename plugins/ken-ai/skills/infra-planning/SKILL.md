@@ -15,7 +15,7 @@ Offer the mailbox types of deliverability rule 6, in the `deliverability-guard` 
 
 Plans that buy Kenso infrastructure, with billing Active or Trialing:
 
-- Credit plans pay in credits: Platform (`planType` Platform, closed to new sign-ups: 200,000 sends and 5,000 credits a month), Dfy (`planType` LegacyDfy; the Kenso team adds its credits), and grandfathered Starter / Growth / Core (`LegacyStarter` / `LegacyGrowth` / `LegacyCore`).
+- Credit plans pay in credits: Platform (`planType` Platform, closed to new sign-ups; its sends and credits a month are on the plan), Dfy (`planType` LegacyDfy; the Kenso team adds its credits), and grandfathered Starter / Growth / Core (`LegacyStarter` / `LegacyGrowth` / `LegacyCore`).
 - VIP (`planType` LegacyPremium) is exempt and staff-sold: it pays new domains through Stripe checkout, and mailboxes are on the plan.
 - `planType` Basic, Growth and Pro are the new plans, the ones a new workspace picks. Inboxes and Azure domains are monthly add-ons billed in dollars on the plan's subscription, not in credits; a domain registration is paid in credits. Growth now means the new Growth plan; the retired Growth reads LegacyGrowth.
 
@@ -68,20 +68,20 @@ Read these fields from the response and quote them as the plan gives them:
 | Cut by the limits | `capped`: when true the new-payer limits trimmed the plan; show `warnings` |
 | Would checkout refuse it now | `limits.refusal` (`code`, `message`), and `limits.canBuy` |
 
-Show credits and dollars together ("2,200 credits, $44"), as the plan returns them. Dollars are each amount's `usd` (`"44.00"` is $44) and `balance.packsUsd`. `usdCents` and `packsUsdCents` are US cents (`4400` is $44, divide by 100), never dollars: never quote them as dollars. Credits are 50 to the dollar, so an amount's `usd` is its `credits` divided by 50. Read the timeline from `timeline`, never a fixed number of weeks. Full volume is mailboxes ramping at 5 a day, plus 2 per sending day, up to 30: about 13 sending days after sending starts.
+Show credits and dollars together, as the plan returns them. Dollars are each amount's `usd` (`"44.00"` is $44) and `balance.packsUsd`. `usdCents` and `packsUsdCents` are US cents (`4400` is $44, divide by 100), never dollars: never quote them as dollars. Read the timeline from `timeline`, never a fixed number of weeks. Full volume is mailboxes ramping at 5 a day, plus 2 per sending day, up to 30: about 13 sending days after sending starts.
 
 Once domains are chosen, quote the order at `cartCost`, not `cost`: `cost` prices every domain the plan needs, `cartCost` only the domains the carts hold. With `unfilled_slots` in `warnings`, say the order covers fewer domains than the goal needs (`unfilledSlots` of `totals.domains`) and so sends less, and offer more names (plan again with them) before the order.
 
 `canBuy` reflects the workspace, not the caller's seat: a Viewer seat can read the plan and is refused at checkout. A Client seat never gets the plan (the tool is not offered to it): tell it a workspace admin sizes and buys the setup. The plan does not repeat the member monthly credit limit, the Premium daily limit or a white-label child's caps, so handle a checkout refusal after a plan said `canBuy`. `canBuy` is true with refusal `INSUFFICIENT_CREDITS` or `FREE_CREDITS_NOT_ELIGIBLE`: a credit pack clears both.
 
-Prices, for reference only (the plan already applies them; 50 credits per dollar):
+What each item is charged, in words (the plan prices them: quote the plan, never a number from memory):
 
 | Item | Credit plans | Basic / Growth / Pro |
 |------|--------------|----------------------|
-| Google / Outlook inbox | 200 credits ($4) per inbox a month | $5 per inbox a month, an add-on billed on the plan (no credits) |
-| Azure domain already in the workspace (up to 50 inboxes; not offered for new orders) | 2,500 credits ($50) per domain a month | $25 per domain a month, an add-on billed on the plan (no credits) |
-| Domain registration | each name's first-year price in credits, as the domain search shows it, upfront | the registrar's price in credits (50 credits per dollar), upfront |
-| Credit pack | 1,000 credits for $20; at most 10 packs per checkout (fewer while the new-payer checkout cap applies, see section 5) | the same |
+| Google / Outlook inbox | a monthly price per inbox | a monthly add-on per inbox, billed on the plan (no credits) |
+| Azure domain already in the workspace (up to 50 inboxes; not offered for new orders) | a monthly price per domain | a monthly add-on per domain, billed on the plan (no credits) |
+| Domain registration | each name's first-year price in credits, as the domain search shows it, upfront | the registrar's price in credits, upfront |
+| Credit pack | the pack the app's Billing page sells; at most 10 packs per checkout (fewer while the new-payer checkout cap applies, see section 5) | the same |
 
 Exempt workspaces skip credits: they pay each domain's price as the domain search shows it (the full price) for one year at Stripe checkout, and mailboxes are on the plan.
 The plan marks them with `balance.creditsExempt` true. For them quote only what the order charges today, the registrations (`cost.registration`, or `cartCost.registration` once domains are chosen). Never quote the inboxes' monthly credits (`cost.monthly`, `cost.dueOnConnect`) and never ask them to buy credit packs: `balance.shortfallCredits` is always 0 for them.
@@ -91,7 +91,7 @@ The plan marks them with `balance.creditsExempt` true. For them quote only what 
 State these when the plan is `capped`, when `limits.refusal` is a new-payer code, or when the user asks how much they can order:
 
 - Until a workspace has 14 days of paid history, it can have at most **3 domains and 10 inboxes**, and Azure inboxes count toward the 10.
-- Until it has 30 days of paid history, it can order at most **$2,400 a week**, and a checkout is capped (5,000 credits at the current setting: quote `limits.maxCreditsPerCheckout` and the refusal message from the plan, not this number).
+- Until it has 30 days of paid history, it can order at most **$2,400 a week**, and a checkout is capped (quote `limits.maxCreditsPerCheckout` and the refusal message from the plan).
 - The rest is never ordered automatically. The plan shows what fits today; the user orders the next part once the limit lifts, or asks the Kenso team.
 
 Do not move, waive or work around these limits: read them from the plan and report them.

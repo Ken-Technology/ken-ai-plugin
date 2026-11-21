@@ -73,7 +73,7 @@ The key steps from the starter, prompts shortened:
 
 The grader scores the weakest rewrite, not the average of all three, so one weak card cannot hide behind two good ones.
 
-Credits, in plain words: `scrape.page` is free until the rate card prices it. The two prompts and the grade are model calls: when Studio runs them (`executor="ken"`) they cost credits for their AI work, and a failed grade reruns the `rewrites` prompt up to twice, which costs tokens again. Your own agent filling over prepare and submit pays nothing for them. The page costs 1 credit when its first link is published.
+Credits, in plain words: `scrape.page` is free until the rate card prices it. The two prompts and the grade are model calls: when Studio runs them (`executor="ken"`) they cost credits for their AI work, and a failed grade reruns the `rewrites` prompt up to twice, which costs tokens again. Your own agent filling over prepare and submit pays nothing for them. The page is charged at the rate card's price when its first link is published.
 
 ## The CTA
 

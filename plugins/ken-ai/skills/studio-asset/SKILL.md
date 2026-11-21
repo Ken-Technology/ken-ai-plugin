@@ -16,7 +16,7 @@ Every call takes `client_id`, the workspace id. Send it on every call when the u
 - **Nothing sends.** You fill pages, create links and write drafts. A person approves every touch and every send.
 - **Never invent.** A field you cannot fill from real data falls back; it is never made up. No invented customers, numbers, prices, dates, times or offers, and every number on a page traces to its source.
 - **Gate before the first link.** A page in review, on its fallbacks or failing the confidentiality check never gets a link.
-- **Costs are said out loud.** Estimate before a `"ken"` run, and say before you create first links on many pages that each costs 1 credit.
+- **Costs are said out loud.** Estimate before a `"ken"` run, and say before you create first links on many pages that each one is charged (`billing(operation="credit-rate-card-get")` has the price).
 - **Vendor names never reach a reader**, and prospects never read "demo" or "reverse demo".
 - Changing a template that live client campaigns use, or pinning one to a sending campaign, needs a yes that names that client: that is the `studio-template` skill's job.
 
@@ -108,7 +108,7 @@ A `needs_review` page failed a grade after its retries or holds data that broke 
 
 `studio_pages(operation="create-link", asset_id=901, person_id=5521)` returns the person's link. Get person ids from `accounts(operation="stakeholders-list", account_id=3101)`. `shared=True` makes the shared link (`person.*` is null there); `contact_id=` links a lead of a campaign.
 
-- The first link publishes the page, charges 1 credit, sets it `live` and freezes its URL. More links are free; asking again for the same person returns the existing link.
+- The first link publishes the page, charges it at the rate card's price, sets it `live` and freezes its URL. More links are free; asking again for the same person returns the existing link.
 - Change the `{page-slug}` part only before the first link: `studio_pages(operation="update", asset_id=901, page_slug="churn-plan")`.
 - List a page's links with `studio_pages(operation="list-links", asset_id=901)`. A `publishedAt` of null is still publishing: create the same link again to retry.
 - A doc page can also go out as a file in the member's Google Drive or OneDrive (flag `rd_docs`): `studio_docs(operation="create-doc-export", asset_id=901, provider="google_drive")`.
@@ -118,7 +118,7 @@ A `needs_review` page failed a grade after its retries or holds data that broke 
 | 402 | not enough credits; nothing was created: tell the user |
 | 409 `studio_no_host` | the workspace has no link host: set up link tracking on a sending domain, then retry |
 | 409 `studio_page_not_ready` | not filled with no fallback, or in review: Step 5 |
-| 409 `studio_page_retired` | `studio_pages(operation="republish", asset_id=901)` first (1 credit) |
+| 409 `studio_page_retired` | `studio_pages(operation="republish", asset_id=901)` first (charged) |
 | 429 | 2,000 link creates a day: wait until tomorrow |
 
 ## Step 7 - Use it in a touch
@@ -153,7 +153,7 @@ For a campaign's pages, `studio_pages(operation="asset-engagement-get", campaign
   - A page with its own layout stays on its version when the template publishes. `studio_pages(operation="update-version", asset_id=901)` merges the new version into it and returns the run with `layoutMerge` (`clean` or `identical`). The run merges again when it finishes, so read the page after it and check `layoutConflict`. A `409` with `layout_conflict` lists the clashing lines and moved nothing: ask the user, then call again with `layout="keep"` (stay on this version; returns `{"kept": true}`, no run and no charge; a page a run is filling answers `studio_page_building`, so wait for the run and read the page first) or `layout="take"` (drop this page's layout for the new version; its slot overrides stay).
 - **Refill:** `studio_pages(operation="refill", asset_id=901)` reruns the recipe with Kenso's executor, charged like a fill. A live page keeps its links.
 - **New template version:** `studio_pages(operation="update-version", asset_id=901)` moves one page to the latest published version and refills only what changed. Ask first: it is charged. A page with its own layout merges first; see "Edit one page's layout" for a `layout_conflict`.
-- **Retired** pages (30 days after the account's last activity) come back with `republish` for 1 credit.
+- **Retired** pages (30 days after the account's last activity) come back with `republish`, which is charged.
 
 ## Sample campaign for a prospect
 
@@ -169,13 +169,13 @@ When a prospect asks to see the work, build them a real sample: their campaign, 
 
 | What | Cost |
 |---|---|
-| A page, on its first link (shared or person) | 1 credit |
+| A page, on its first link (shared or person) | charged, at the rate card's price |
 | More links on the same page | free |
-| Republishing a retired page | 1 credit |
+| Republishing a retired page | charged, at the rate card's price |
 | Kenso writing `prompt` and `grade` steps (executor `"ken"`, refill, update-version) | its AI work, in credits |
 | Your own agent writing them (executor `"agent"`) | no token charge |
 | A `ken.copy` step, on any path | its AI work, in credits |
-| An `enrich.email` step (only when Kenso fills the page) | 1 credit per email found on Kenso's key; an email Kenso already holds, or one found on the workspace's own key, is free |
+| An `enrich.email` step (only when Kenso fills the page) | each email found on Kenso's key, at the rate card's price; an email Kenso already holds, or one found on the workspace's own key, is free |
 | Data steps | rate card; today's (`bind`, Kenso Search, `chart.data`, scraping, `webhook`, `dataset`) cost nothing |
 | Previews, hosting, PDFs | free |
 
