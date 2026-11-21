@@ -74,6 +74,7 @@ A queued email reply waits 5 minutes before it sends. `threads(operation="cancel
 ## Reply templates
 
 - `replies(operation="reply-templates-list")` and `replies(operation="reply-templates-get", reply_template_id=12)`: `name`, `description`, `body`, `authorSource` (`user` or `agent`).
+- `channel` is `imessage` on an iMessage template and absent on an email one. `channel="email"` lists only email templates and `channel="imessage"` only iMessage ones; with no channel the list has the email templates only. An iMessage template also has `firstTextSafe`: true when its body has no link, email address, phone number or money amount, so it can start a conversation.
 - Bodies keep raw tokens such as `{firstName}`. The app fills them when a person inserts a template. You fill them yourself.
 - An agent cannot edit or delete a template a person wrote.
 

@@ -49,12 +49,12 @@ What comes back:
 | Field | Holds |
 |---|---|
 | `data.brief` | `greeting`, `text` (at most two sentences on replies waiting and the next meeting), `needsYou` (the count that needs the member) and up to 3 `chips` with a prompt each |
-| `data.items` | the open rows, already in the backend's order: setup and Knowledge rows, paused and ended plans, opportunities, touches and tasks by due time, the other plan rows, new leads and merge suggestions, then calls, meeting notes, replies, meetings today and signals. `data.hasMore` says more exist |
+| `data.items` | the open rows, already in the backend's order: setup and Knowledge rows, the iMessage credits row, paused and ended plans, opportunities, touches and tasks by due time, the other plan rows, new leads and merge suggestions, then calls, meeting notes, replies, meetings today and signals. `data.hasMore` says more exist |
 | `data.done` | rows the member cleared today, each with `doneAs` (`approved`, `done`, `snoozed`, `skipped`) |
 | `data.calls` | call counts while calls are on (`open`, `callableNow`, `dueToday`), else null |
 | `data.batches` | campaign batches waiting for approval, oldest first, whatever the scope |
 
-Each row has `id`, `kind`, `title`, `detail` and `dueAt`. A touch row (`touch_<id>`) also has `touch`, `approval` (`canDecide`, `note`) and `notice`: `reconnect_inbox` or `reconnect_linkedin` when the sender must reconnect, `connect_inbox` when the account has no Sends from inbox. A notice never blocks approval, but the send waits until it is fixed.
+Each row has `id`, `kind`, `title`, `detail` and `dueAt`. A touch row (`touch_<id>`) also has `touch`, `approval` (`canDecide`, `note`) and `notice`: `reconnect_inbox` or `reconnect_linkedin` when the sender must reconnect, `connect_inbox` when the account has no Sends from inbox, and on an iMessage text `connect_imessage`, `imessage_line_paused`, `imessage_line_unpaid`, `imessage_line_down` or `imessage_low_reply_rate` when its line holds it. Those notices never block approval, but the send waits until they are fixed. `imessage_line_owner_left` does: the text's line has no owner, so nobody approves it until an admin gives the line to another member.
 
 ## Step 2 - Group and present
 
@@ -70,10 +70,11 @@ Open with `data.brief.text`, then the groups that have rows, most urgent first:
 | Pipeline | `opportunity_suggestion`, `opportunity_no_show` | create the opportunity, or move the deal |
 | People | `new_lead`, `merge_suggestion` | look at the lead; merge or dismiss the pair |
 | Accounts | `plan_paused_<id>`, `plan_ended_<id>`, `plan_thin_<id>`, `signal` | resume or end the plan, map more people, read the signal (the `accounts` skill) |
-| Setup | `hosting_setup`, `knowledge_review_all`, `knowledge_daily` | finish the step in the app |
+| Setup | `hosting_setup`, `knowledge_review_all`, `knowledge_daily`, `imessage_order_credits`, `imessage_order_credits_unknown` | finish the step in the app; for the iMessage rows, add paid credits or check the lines in Delivery |
 
 - Give each group a count and its top 3 rows with title, person or account, and due time. Ask which ones to work; do not walk the whole list unasked.
 - A reply row whose `interest` is `out_of_office` is not a reply and nobody is waiting on it: list it apart, and never count it in "replies waiting". Count replies by distinct person.
+- `imessage_order_credits` (notice `imessage_order_needs_credits`): the workspace's iMessage line orders wait until paid credits cover each line's first month (15,000 credits a line), the older orders still waiting and any month the workspace's live lines still owe (free credits count only where Kenso allowed them). `imessage_order_credits_unknown`: Kenso could not read whether an order waits, so the member checks the lines in Delivery. Only a member with the billing permission sees either, while the imessage feature is on; Done hides it until the next local midnight.
 - Never report opens.
 - `data.done` is the member's progress today: mention it in one line when it has rows.
 - For the touches waiting across the workspace, not only the member's Today: `account_touches(operation="list", client_id=..., status="awaiting_approval,failed")`. Each item's `approverMemberId` is who must approve it (null when anyone may).
@@ -142,7 +143,7 @@ Report back: what waits for the member (by group, with counts), what you changed
 | `invalid_transition` | the touch moved past that status | read it with `get` |
 | 422 `guardrail_violation` | a Contact limits rule | offer `nextAllowedAt` |
 | `already_written` on draft | the touch has a body | rewrite or edit it instead |
-| `not_draftable` on draft | that channel cannot be drafted | the member writes it |
+| `not_draftable` on draft | that channel, or an iMessage warm path step that is not a text (handoff, blurb, after the intro), is not drafted | the member writes it, or skips it |
 | 409 `nothing_to_undo` or `concurrent_change` on undo | something else changed the touch | read it and tell the member |
 
 ## No Kenso account yet
