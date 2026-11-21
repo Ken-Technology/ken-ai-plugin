@@ -100,7 +100,7 @@ Show the proposed changes as a list: the deal, the field, the current value, the
 - `account_id` in `changes` moves a deal to another account: only on the user's explicit request.
 - Win probabilities, on the user's explicit request only: `opportunities(operation="stages-replace", win_probabilities={"proposal": 50})`. Nothing else about the stages changes.
 
-There is no deal delete. A deal that should not exist goes to a lost stage with a reason, on the user's yes.
+A deal that should not exist goes to a lost stage with a reason, on the user's yes. Delete it (`opportunities(operation="delete", opportunity_id=78)`) only when the user asks for a delete by name: a deleted deal has no restore.
 
 ## Step 5 - The weekly update
 
@@ -117,7 +117,7 @@ If replies came in but `interested` is 0, the replies may not be classified yet.
 ## What this skill cannot do yet
 
 - No stale-deal or forecast report: Step 2 rebuilds staleness from activity each time.
-- No deal delete, and no stage edits beyond win probabilities.
+- No stage edits beyond win probabilities.
 - No "sync now" for the CRM: `sync-get` is status only.
 - No held meetings where the workspace has meeting attribution off.
 
