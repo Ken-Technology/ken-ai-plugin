@@ -27,7 +27,7 @@ kenso connect inbox --provider google   # also calendar, crm, github, linkedin .
 kenso onboarding-builds events --build-id obd_2x --until done,error   # live streams: one JSON line per event, reconnects itself
 ```
 
-Charges: follow the kenso skill's spend rules; every dry run prints the credit estimate. `pinned_by_user`: with the person's OK, rerun with `--overwrite-pinned`. Workflows: `kenso docs workflows` first; secrets only as `{{secrets.NAME}}`. Key: `KENSO_API_KEY`, or pipe a variable, no check: `printf '%s' "$KEY" | kenso auth login --with-key`; never in a flag, output or file.
+Charges: follow the kenso skill's spend rules; the dry run of a `spend` command (one call or an `--each` file) and of `kenso workflows run` prints `credits` (`needed`, `available`, `sufficient`; `null` where it cannot tell, and an unknown `needed` is never free). `pinned_by_user`: with the person's OK, rerun with `--overwrite-pinned`. Workflows: `kenso docs workflows` first; secrets only as `{{secrets.NAME}}`. Key: `KENSO_API_KEY`, or pipe a variable, no check: `printf '%s' "$KEY" | kenso auth login --with-key`; never in a flag, output or file.
 
 ## Work (beta): My agent
 
@@ -45,7 +45,7 @@ By hand in a chat: run `kenso work pull`, then give each work file to its own su
 
 ## Setup
 
-`kenso` missing: `curl -fsSL https://ken.so/install.sh | sh` (macOS or Linux, no Node needed) or `npm i -g kenso` (Node 22 or newer), or run a command as `npx -y kenso@latest <command>`. Then `kenso auth login` (the person approves in the browser) and `kenso doctor`. `kenso agent setup -y` installs this skill and the Kenso MCP server (`https://mcp.ken.so/mcp`) for the agent; the person signs in to the MCP once in the agent.
+`kenso` missing: `curl -fsSL https://ken.so/install.sh | sh` (macOS or Linux, no Node needed) or `npm i -g kenso` (Node 22 or newer), or run a command as `npx -y kenso@latest <command>`. Then sign in: `kenso login --no-wait` prints a link and a code for the person to open and approve, then `kenso auth wait` saves the key. Then `kenso doctor`. `kenso agent setup -y` installs this skill and the Kenso MCP server (`https://mcp.ken.so/mcp`) for the agent; the person signs in to the MCP once in the agent.
 
 ## No Kenso account yet
 

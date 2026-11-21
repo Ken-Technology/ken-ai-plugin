@@ -17,6 +17,7 @@ kenso credits balance
 ```
 
 - `kenso doctor` checks the CLI, the key, the skills and the MCP. When a check fails, run its `next` before anything else.
+- No key, or `key_valid` failed: hand the sign-in to the person. `kenso login --no-wait` prints a link and a code; give both to the person, and once they say they approved it, run `kenso auth wait`.
 - `kenso whoami` shows the workspace this folder and key use (`activeWorkspace`, with its `id` and `name`) and where it comes from (`workspaceSource`); `kenso workspace list` lists every workspace the key reaches. Before any change, tell the person: "I will work in <name> (<id>)."
 - `kenso credits balance` shows the credits `available`. Read it before you plan anything that charges.
 
@@ -29,7 +30,7 @@ kenso describe email-finds create
 
 1. `kenso discover` with the request in plain words finds the command, doc, skill or workflow step for it, offline. Each hit has its `effect` (read, write, spend, send or destructive), its cost line and the `describe` command to run next.
 2. `kenso describe <resource> <action>` prints the command's flags, body, `effect` and `cost` as JSON.
-3. Run it with `--dry-run` and read the plan: what it would send and, for paid work, `credits` with `needed`, `available` and `sufficient`.
+3. Run it with `--dry-run` and read the plan: what it would send and, for paid work, `credits` with `needed`, `available` and `sufficient` (`null` where the CLI could not read or price it). A `null` `needed` is unknown, never free: ask before you run it.
 4. Run it for real only as the rules below allow, with the plan's `next`.
 
 While you only look around, set `KENSO_READ_ONLY=1`: any command that is not a read is then refused before it sends anything, and a `--dry-run` still prints its plan.
@@ -103,8 +104,10 @@ These rules hold in every Kenso skill.
 
 - A bounded request ("find emails for these 200 people") covers that scope and nothing wider. An open one ("find me leads") needs a row count and a budget from the person first.
 - Sample first. When a paid step covers more than 25 records, or the estimate's `credits.needed` is over 10, run 3 to 5 records first, show the result and the projected cost of the rest, and ask before the rest. These four numbers are thresholds of this contract, not prices.
+  - A workflow samples on the full ids file, never on a separate file of a few ids, which the full run would start again: `kenso workflows run` with a `--max-credits` that covers 3 to 5 records starts only those. After the yes, run the same command with only `--max-credits` changed: it stops with `already_started`, and its `next` runs only the records the sample did not start.
+  - Any other paid batch: sample with a file of 3 to 5 rows, then run the rest from a file without them.
 - Prices come from a `--dry-run`, `kenso credits quote` or `kenso credits rate-card`, never from memory or from a skill.
-- `Effect: write.` in a command's help is not proof that it is free: not every route that charges is marked. The dry run or `kenso credits quote` is the authority.
+- `Effect: write.` or `Effect: send.` in a command's help is not proof that it is free: not every route that charges is marked, and `kenso workflows run` is a send that charges for its steps. The dry run or `kenso credits quote` is the authority.
 - Ask once, with one approval block, and wait for the yes:
 
 ```text

@@ -1,6 +1,6 @@
 ---
 name: kenso-triage
-description: Diagnose Kenso work that failed, stalled or came out wrong - a campaign not sending, an import with failed rows, a workflow run that stopped, replies not arriving - when nothing names the cause.
+description: Diagnose Kenso work that failed, stalled or came out wrong - a campaign not sending, an import with failed rows, a workflow run that stopped, replies not arriving - when nothing names the cause, or when the person asks what needs their attention.
 ---
 
 # Triage
