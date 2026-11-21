@@ -28,6 +28,7 @@ Every call takes `client_id`, the workspace id. Send it on every call when the u
 | Part | Operations | Who has it |
 |---|---|---|
 | Read the inbox, save drafts, send, classify | `threads` list, counts, get, list-messages, replace-draft, create-message, update, bulk-update, cancel | every member who can reply |
+| Read several email threads in one call | `replies` threads-batch-messages (up to 50 threads) | every member who can reply |
 | Reply templates | `replies` reply-templates-list, reply-templates-get (create, update and delete need workspace settings) | every member |
 | The reply agent's settings | `replies` autonomous-reply-settings-get (update needs workspace settings) | every member |
 | Kenso drafts a reply for you | `threads` suggest | Inbox edit and the Ask feature |
@@ -73,7 +74,7 @@ Group the human replies into situations. `references/situations.md` has what to 
 | Pushes back | `objection` or `negative` |
 | No thanks | `not_interested` |
 
-Read the newest inbound message before you trust its label: `threads(operation="list-messages", thread_id="thr_...")`. Use its `extractedText`, the contact's own words without the quoted history and signature.
+Read the newest inbound message before you trust its label. Read the email threads of a page together, up to 50 a call: `replies(operation="threads-batch-messages", thread_ids=["thr_...", "thr_..."])`. `data.threads` holds each thread's messages, oldest first, and `data.failed` the ids it did not read: a LinkedIn or other non-email thread there is one `threads(operation="list-messages", thread_id="thr_...")` call, as is a single thread, or every thread when `threads-batch-messages` is not in your tools. Use each message's `extractedText`, the contact's own words without the quoted history and signature.
 
 When a label is wrong, fix it, because reports and the To Reply tab follow it:
 
@@ -85,7 +86,7 @@ Interest values: `interested`, `not_interested`, `negative`, `automated`, `uncla
 
 For each thread that needs an answer:
 
-1. Read the whole thread with `list-messages`. Answer every question the contact asked, in the order they asked.
+1. Read the whole thread. Step 2's batch read already holds it; for threads you have not read, one `replies(operation="threads-batch-messages", thread_ids=[...])` call reads up to 50, and `list-messages` reads one. Answer every question the contact asked, in the order they asked.
 2. Check for a draft first: `threads(operation="get-draft", thread_id="thr_...")`. A 404 means there is none. If a person wrote the draft, leave the thread and tell the user.
 3. Find a template that fits: `replies(operation="reply-templates-list", channel="email")`, then `replies(operation="reply-templates-get", reply_template_id=12)`. Answer an email with an email template: an iMessage template (`channel` `imessage`) is plain text for texts. Template bodies keep raw tokens such as `{firstName}`: fill them from the thread and contact yourself, and never save or send a token unfilled.
 4. When Knowledge is on, read the writing style and what the workspace says about its offer and prices once per session: `knowledge(operation="context", purpose="answer cold email replies about pricing and meetings")`. When the thread has an `accountId`, add `account_id` for that account's files and history. Use only what the pack says.
@@ -132,7 +133,7 @@ What the send can answer:
 An interested contact who stopped answering is the cheapest meeting you will find.
 
 1. List the yeses: `threads(operation="list", interest="interested", limit=100)`. Each row is a thread whose newest reply from the contact is filed `interested`, and it shows that reply, not your answer.
-2. Keep the ones that went quiet: read each with `threads(operation="list-messages", thread_id="thr_...")` and keep the thread when its last message is yours (`direction` `outbound`) and 3 or more days old (or the gap the user names). A thread whose last message is the contact's waits for your answer: that is Step 1's work.
+2. Keep the ones that went quiet: read them 50 a call with `replies(operation="threads-batch-messages", thread_ids=[...])`, never one `list-messages` call per thread (100 threads are 2 calls, not 100), and keep the thread when its last message is yours (`direction` `outbound`) and 3 or more days old (or the gap the user names). A thread whose last message is the contact's waits for your answer: that is Step 1's work.
 3. Check they have not booked: `scheduler(operation="bookings-list", campaign_id=4410, start_after="2026-10-01T00:00:00Z")` and match the booker's email.
 4. Draft one short nudge per thread with a concrete time or the booking link (Step 4), save it with `replace-draft`, and hand it over as in Step 5.
 5. For "not now, try me in March", set a reminder instead: `threads(operation="update", thread_id="thr_...", changes={"reminder_at": "2027-03-02T09:00:00Z"})`.
