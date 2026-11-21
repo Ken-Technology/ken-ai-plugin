@@ -108,7 +108,9 @@ From the transcript only, with the minute it was said:
 
 `references/followup-template.md` lists the checks.
 
-When the user wants coaching on the call, score it: `meeting_notes(operation="score-call", meeting_id="mtg_812")` scores the transcript against the workspace's rubric, or Kenso's default, and saves the score. `meeting_notes(operation="get-score", meeting_id="mtg_812")` reads a saved score without scoring again; its 404 "never scored" means there is none yet. Lead with the two lowest criteria and their reasons. A 409 `no_transcript` means there is nothing to score. Read the rubric with `meeting_notes(operation="notetaker-score-rubric-get")`, and change it only when an admin asks.
+When the user wants coaching on the call and you list the `coaching` tool, read the coaching review: `coaching(operation="get-review", meeting_id="mtg_812")` returns each scorecard criterion scored 1 to 5 with the words behind it and up to three moments to handle differently, and `coaching(operation="review-call", meeting_id="mtg_812")` reviews the call now when it has none. Lead with the moments. A 404 that names the `call_coaching` flag means coaching is off in that workspace: score the call instead.
+
+Without the `coaching` tool, score the call: `meeting_notes(operation="score-call", meeting_id="mtg_812")` scores the transcript against the workspace's rubric, or Kenso's default, and saves the score. `meeting_notes(operation="get-score", meeting_id="mtg_812")` reads a saved score without scoring again; its 404 "never scored" means there is none yet. Lead with the two lowest criteria and their reasons. A 409 `no_transcript` means there is nothing to score. A 409 `conflict` that names the coaching review means the workspace has call coaching, which replaced this score: nothing was scored, so do not retry, and send the user to the meeting's Coaching tab in Kenso. Read the rubric with `meeting_notes(operation="notetaker-score-rubric-get")`, and change it only when an admin asks.
 
 ### 3. Show the CRM changes
 
