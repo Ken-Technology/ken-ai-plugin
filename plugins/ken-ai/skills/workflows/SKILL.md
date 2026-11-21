@@ -1,6 +1,6 @@
 ---
 name: workflows
-description: Build the workflow the user meant over MCP - ask for the gaps, check what the workspace can run, map every requirement to a step, fill it in step by step and test it to the last step - then publish it and watch and recover its runs.
+description: Build the workflow the user meant over MCP - ask for the gaps, check what the workspace can run, map every requirement to a step, fill it in step by step and test it to the last step - then publish it and watch and recover its runs; workflow files, CSV runs, results files.
 ---
 
 # Workflows
@@ -21,6 +21,7 @@ Open a reference with `load_skill(name="workflows", reference="references/exampl
 | `references/lead-source-workflows.md` | the user wants leads or accounts to come in by themselves (Sales Navigator, forms, website visitors, hiring signals, imports), or picks a template: every template, what it needs, and the template loop with a spend limit |
 | `references/test-and-publish.md` | a validate issue code to fix, a test that needs pins, live steps or a wait, a test result you cannot read, a publish refusal |
 | `references/runs.md` | the workflow is live: run-on-records results, reading a run, retry, restart, replay, a send step that waits, why a workflow fails |
+| `references/files.md` | the person works with the Kenso CLI (`kenso`): a workflow kept as a file with `kenso.json`, check, push, test and publish from the file, a run on ids or a CSV with a credit cap, a results file |
 | `references/ops-console.md` | the caller is Kenso staff and the question is fleet-wide: queues, provider breakers, stuck runs, spenders, kill switches, system and shadow workflows. Never for anyone else |
 
 Every call takes `client_id`, the workspace id. Send it on every call when the user can see more than one workspace.
