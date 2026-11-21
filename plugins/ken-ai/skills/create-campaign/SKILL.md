@@ -151,7 +151,7 @@ Only a manual segment (`segmentationType` `manual`) holds filters: `update` refu
 
 1. Read the segment: `segments(operation="get", segment_id=...)`, or `segments(operation="list", campaign_id=...)` to find it. `filterCriteria` is its filter object. On a manual segment, `{}` (or no `filterCriteria`) means it has no filters yet: a valid start, not a failed read.
 2. Send the whole object: `segments(operation="update", segment_id=..., filter_criteria={...})` replaces every filter, so a key you leave out is cleared. Copy every current key, then add or change yours. Keys are camelCase; `describe_tools(["segments.create"])` lists them all.
-3. `titles` keeps a contact whose job title contains any of its values, ignoring case. `profileCountries` (the person's country) and `companyHqCountries` (the company's headquarters) match the stored text exactly, case included: read a few of the campaign's contacts with `contacts(operation="list", campaign_id=...)` and list every spelling their `country` or `headquartersCountry` uses.
+3. `titles` keeps a contact whose job title contains any of its values, ignoring case. `profileCountries` (the person's country) and `companyHqCountries` (the company's headquarters) match the stored text exactly, case included: read a few of the campaign's contacts with `contacts(operation="list", campaign_id=..., fields=["country", "headquartersCountry"])` and list every spelling their `country` or `headquartersCountry` uses.
 4. Check the count with the same object: `segments(operation="preview", campaign_id=..., segment_id=..., criteria={...})`, then send the update.
 5. A manual segment reassigns its leads only after `segments(operation="process-filters", campaign_id=..., segment_id=...)`.
 

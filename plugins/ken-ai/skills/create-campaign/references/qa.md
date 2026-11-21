@@ -201,7 +201,7 @@ The opener is only the sentence before the first static sentence, and that sente
 
 ### List Building QA
 1. **Title Verification:** Check accuracy
-2. **ICP Fit:** Random check ~50 leads (`contacts(operation="list", campaign_id=..., segment_id=..., limit=50)`)
+2. **ICP Fit:** Random check ~50 leads (`contacts(operation="list", campaign_id=..., segment_id=..., limit=50, fields=["id", "firstName", "lastName", "title", "seniorityLevel", "companyName", "companyIndustry", "companySize", "country", "qualificationResponse"])`)
 3. **Preview Testing:** Preview a few leads with `email_sequences(operation="segment-email-sequences-preview", segment_id=..., use_random=True)` (read-only) and check that every variable fills
 4. **AI Lines Review:** Check quality and relevance with the first-line checks above
 
