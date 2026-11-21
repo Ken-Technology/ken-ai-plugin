@@ -114,6 +114,8 @@ Give each proposal as the exact change, what it does and why, with the numbers:
 |---|---|
 | Pause a campaign | `campaigns(operation="pause", campaign_id=42)` |
 | Resume it after the cause is fixed | `campaigns(operation="resume", campaign_id=42)` |
+| Pause several campaigns the user named (up to 50), in one call | `campaign_flow(operation="bulk-pause", campaign_ids=[42, 43])`: `results` has one row per campaign, so report each one |
+| Resume several after the cause is fixed | `campaign_flow(operation="bulk-resume", campaign_ids=[42, 43])` |
 | In the in-app support chat (no pause or resume there) | Name the campaign and tell the user to pause or resume it at https://app.ken.so/<workspace id>/campaigns/<campaign id> |
 | Stop one inbox | `inboxes(operation="update", inbox_id=301, changes={"paused": True})` |
 | Lower one inbox's daily limit | `inboxes(operation="update", inbox_id=301, changes={"daily_send_limit": 15})` |
