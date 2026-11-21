@@ -28,7 +28,7 @@ The build loop, in short:
   ideas.md           optional: three ways to adapt the template, shown as idea cards next to brief.md
 ```
 
-Nothing else may sit in a bundle: a push, a validate or an upload that names any other path is refused with 400 `invalid_path` and stores nothing (`bundle-unknown-file`). Assets may sit in folders under `assets/`; samples sit directly in `samples/`, named after their account in lowercase letters, digits, `-` and `_` (`samples/acme.json`), never with a name a tool reads as its own config (`package.json`, `tsconfig.json`, `opencode.json`). No file or folder name starts or ends with `.` or is a Windows device name (`CON`, `NUL`, `COM1`).
+Nothing else may sit in a bundle: a push, a validate or an upload that names any other path is refused with 400 `invalid_path` and stores nothing (`bundle-unknown-file`). Assets may sit in folders under `assets/`; samples sit directly in `samples/`, named after their account in lowercase letters, digits, `-` and `_` (`samples/acme.json`), never with a name a tool reads as its own config (`package.json`, `tsconfig.json`, `opencode.json`). A sample `.json` is one JSON object with only the top-level keys `account`, `person`, `sender`, `brand`, `link`, `data`, `role` and `roles`: a push or validate refuses one with any other top-level key, an array, or text that is not JSON (400 `content_mismatch`), so keep notes, labels and comments out of its top level. No file or folder name starts or ends with `.` or is a Windows device name (`CON`, `NUL`, `COM1`).
 
 | Limit | Value |
 |---|---|
