@@ -28,7 +28,7 @@ The build loop, in short:
   ideas.md           optional: three ways to adapt the template, shown as idea cards next to brief.md
 ```
 
-Nothing else may sit in a bundle: a push, a validate or an upload that names any other path is refused with 400 `invalid_path` and stores nothing (`bundle-unknown-file`). Assets may sit in folders under `assets/`; samples sit directly in `samples/`. No file or folder name starts or ends with `.`.
+Nothing else may sit in a bundle: a push, a validate or an upload that names any other path is refused with 400 `invalid_path` and stores nothing (`bundle-unknown-file`). Assets may sit in folders under `assets/`; samples sit directly in `samples/`, named after their account in lowercase letters, digits, `-` and `_` (`samples/acme.json`), never with a name a tool reads as its own config (`package.json`, `tsconfig.json`, `opencode.json`). No file or folder name starts or ends with `.` or is a Windows device name (`CON`, `NUL`, `COM1`).
 
 | Limit | Value |
 |---|---|
