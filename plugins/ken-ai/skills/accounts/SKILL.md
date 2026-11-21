@@ -110,7 +110,7 @@ To add one person yourself:
 - Roles: `champion`, `economic_buyer`, `approver`, `evaluator`, `user`, `executive_sponsor`, `blocker`, `unknown`. Coverage: `engaged`, `planned`, `gap`, `not_targeted`. Priority 1 to 3.
 - A person who matches by email, LinkedIn URL or `ken_person_id` is reused, never duplicated.
 - `previously_removed` means a person took them off this account. Ask the user, and resend with `force=True` only if they say so.
-- A stakeholder with no email cannot get an email touch. `people(operation="find-emails", person_ids=[401], account_id=101)` queues a find, 1 credit per email found.
+- A stakeholder with no email cannot get an email touch. `people(operation="find-emails", person_ids=[401], account_id=101)` queues a find, charged per email found at the rate card's price (`billing(operation="credit-rate-card-get")`).
 
 Done when the committee has the people you will write to, each with an email or a LinkedIn URL.
 
@@ -207,7 +207,7 @@ Every write you make is recorded as an agent write through your client, with the
 
 ## Credits and errors
 
-Adding accounts, grading a touch, a hand-off brief and a signals scan (apart from its news search) are free. Research runs, mapping runs, touch plans, drafts and rewrites are charged, and an email find costs 1 credit per email found. Before research or mapping runs on more than a few accounts, tell the user what it costs.
+Adding accounts, grading a touch, a hand-off brief and a signals scan (apart from its news search) are free. Research runs, mapping runs, touch plans, drafts and rewrites are charged, and an email find is charged per email found. `billing(operation="credit-rate-card-get")` has each price; never quote one from memory. Before research or mapping runs on more than a few accounts, tell the user what it costs.
 
 The cost of each step and what each error code means (`domain_taken`, `pinned_by_user`, `account_merged`, `committee_run_active`, `guardrail_violation`, 402 and the rest) are in `references/credits-and-errors.md`. Open it with `load_skill("accounts", reference="references/credits-and-errors.md")` when a call fails.
 

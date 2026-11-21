@@ -59,7 +59,7 @@ Each hit has `price` and a registrar quote, both money objects in minor units: e
 
 What the user pays for the first year:
 
-- Credit plans, when the hit has `priceMillicredits`: that many millicredits for the first year (1,000 millicredits is 1 credit). `renewalPriceMillicredits`, when present, is the yearly renewal.
+- Credit plans, when the hit has `priceMillicredits`: that many millicredits for the first year (divide by 1,000 for credits). `renewalPriceMillicredits`, when present, is the yearly renewal.
 - Exempt workspaces, or a hit without `priceMillicredits`: `price` at Stripe checkout, in dollars (`price.amount` / 100). It is the full price, so add nothing to it.
 
 Show name, the first-year price, and Google/Microsoft availability flags. Do not put Google inboxes on a name that is not Google-available.
@@ -88,7 +88,7 @@ Forwarding URL defaults to the workspace website (add `https://` if missing). A 
 
 `domain-orders-create` returns the order as `id`, `status`, `paidWithCredits`, `paidByKenso` and `checkoutUrl`. When `paidWithCredits` is true the order is already paid from credits and has no checkout link. When `paidByKenso` is true (a Kenso staff order for an active Performance workspace, while Kenso-paid Performance orders are on) Kenso paid it, the client is charged nothing and there is no checkout link; an item whose price rose above the quote is not bought and fails. Otherwise `checkoutUrl` is a Stripe checkout link: give them the link. Then poll `domain_orders(operation="get", order_id=<id>)`: each `items[].status` until every item is `active`, `action_required` or `failed` (in flight: `pending`, `setting_up`, `awaiting_client_approval`: paid, waiting for the client to approve in External approvals; the sweep skips it), with `items[].progress.step` for where each domain is in its setup. Order `status`: `processing`, `completed`, `completed_with_issues` or `action_required`. `domain_orders(operation="domain-orders-list")` lists the workspace's orders.
 
-Mailboxes on credit plans: 200 credits ($4) per Google/Microsoft inbox a month; an Azure domain already in the workspace bills 2,500 credits ($50) a month (up to 50 inboxes). On Basic, Growth and Pro they are add-ons billed in dollars on the plan, not credits: $5 per inbox a month, $25 per Azure domain a month. On exempt workspaces they are on the plan.
+Mailboxes on credit plans: a monthly price in credits per Google/Microsoft inbox, and per Azure domain already in the workspace (up to 50 inboxes), at the workspace's rate card. On Basic, Growth and Pro they are monthly add-ons billed on the plan, not credits. On exempt workspaces they are on the plan.
 
 ## 7. Present live inventory
 

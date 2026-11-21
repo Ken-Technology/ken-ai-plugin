@@ -210,7 +210,7 @@ A `needs_review` page had a grade fail after its retries, or its data could not 
 - `shared=True` makes the shared link, `https://{host}/{account-slug}/{page-slug}`, where `person.*` is null.
 - `contact_id=` makes a link for a lead on a campaign page.
 
-The first link publishes the page and charges 1 credit. The page goes `live` and its URL freezes. More links on that page are free, and asking again for the same person returns the existing link. Say so before you create first links on many pages.
+The first link publishes the page and is charged at the rate card's price. The page goes `live` and its URL freezes. More links on that page are free, and asking again for the same person returns the existing link. Say so before you create first links on many pages.
 
 To change the `{page-slug}` part, do it before the first link: `studio_pages(operation="update", asset_id=901, page_slug="churn-plan")`.
 
@@ -219,7 +219,7 @@ To change the `{page-slug}` part, do it before the first link: `studio_pages(ope
 | 402 | not enough credits; nothing was created | tell the user to add credits |
 | 409 `studio_no_host` | the workspace has no link host of its own | set up link tracking on a sending domain in the app, then retry |
 | 409 `studio_page_not_ready` | not filled and the template has no fallback, or the page needs review | wait for the fill, refill, or prepare and submit |
-| 409 `studio_page_retired` | the page retired | republish it first (1 credit) |
+| 409 `studio_page_retired` | the page retired | republish it first (charged) |
 | 429 | 2,000 link creates a day per workspace | wait until tomorrow |
 
 A link whose `publishedAt` is null is still being published to the host. Create the same link again to retry.
@@ -264,7 +264,7 @@ A recruiting page is for one candidate, not for an account. It needs the workspa
   - Back to the template: `reset_layout=True` drops the page's layout, `reset_ken_overrides=True` its Kenso-value overrides.
   - A page with its own layout stays on its version when the template publishes. `studio_pages(operation="update-version", asset_id=901)` merges the new version into it. A `409` with `layout_conflict` lists the clashing lines and moved nothing: ask the user, then call again with `layout="keep"` (stay on this version; returns `{"kept": true}`) or `layout="take"` (drop this page's layout for the new version; its slot overrides stay).
 - **Refill:** `studio_pages(operation="refill", asset_id=901)` reruns the recipe with Kenso's executor on the page's pinned version, charged like a fill. A live page stays live and keeps its links. A page that follows the latest version and is not live or retired refills on the latest published version, so a filled page a publish left on its version (because the new version reruns its steps) catches up.
-- **Republish a retired page:** `studio_pages(operation="republish", asset_id=901)` brings back the same URLs for 1 credit.
+- **Republish a retired page:** `studio_pages(operation="republish", asset_id=901)` brings back the same URLs, and is charged.
 - **Change the template:** pull, edit, validate, push, then publish with the `update_live` you want.
 - **Delete:** only when the user asks. `studio_templates(operation="delete", template_id=41)` fails while pages are live; `force=True` retires them first, so ask before sending it.
 
@@ -272,13 +272,13 @@ A recruiting page is for one candidate, not for an account. It needs the workspa
 
 | What | Cost |
 |---|---|
-| A Studio page, on its first link (shared or person) | 1 credit |
+| A Studio page, on its first link (shared or person) | charged, at the rate card's price |
 | More person links on the same page | free |
-| Republishing a retired page | 1 credit |
+| Republishing a retired page | charged, at the rate card's price |
 | The platform writing the `prompt` and `grade` steps (executor `"ken"`, refill, `update_live`) | its AI work, in credits |
 | Your own agent writing the `prompt` and `grade` steps over MCP (executor `"agent"`) | no token charge |
 | A `ken.copy` tool step, on any path | its AI work, in credits |
-| Data steps the platform runs | rate card: email found 1 credit, qualification 0.05, personalization 0.3. Today's data steps (`bind`, Kenso Search, `chart.data`) cost nothing |
+| Data steps the platform runs | the rate card's prices (`billing(operation="credit-rate-card-get")`). Today's data steps (`bind`, Kenso Search, `chart.data`) cost nothing |
 | Scraping | free until the rate card prices it |
 | `webhook` and `dataset` steps, PDF, hosting, previews | free |
 

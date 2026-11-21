@@ -174,7 +174,7 @@ Pinning, unpinning or pinning an email template to a sequence step changes what 
 
 ## Credits
 
-Previews, validation, pushes, hosting and PDFs are free. Publishing is free. Pages cost 1 credit on their first link, and fills cost credits for their AI work when Kenso writes them: the `studio-asset` skill has the full table.
+Previews, validation, pushes, hosting and PDFs are free. Publishing is free. Pages are charged on their first link, and fills cost credits for their AI work when Kenso writes them: the `studio-asset` skill has the full table.
 
 ## What this skill cannot do yet
 

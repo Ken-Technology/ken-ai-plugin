@@ -63,7 +63,7 @@ There is no tool for the confidentiality and poaching checks yet: you read the p
 
 ## 7. Link it and draft the reply
 
-1. Create the person's link: `studio_pages(operation="create-link", asset_id=901, person_id=5521)`. The first link publishes the page and charges 1 credit. For a lead on a campaign page, use `contact_id=` instead. A doc page can also go out as a Google Drive or OneDrive file with the `rd_docs` flag: `studio_docs(operation="create-doc-export", asset_id=901, provider="google_drive")`.
+1. Create the person's link: `studio_pages(operation="create-link", asset_id=901, person_id=5521)`. The first link publishes the page and is charged at the rate card's price. For a lead on a campaign page, use `contact_id=` instead. A doc page can also go out as a Google Drive or OneDrive file with the `rd_docs` flag: `studio_docs(operation="create-doc-export", asset_id=901, provider="google_drive")`.
 2. Check the thread for a draft first: `threads(operation="get-draft", thread_id="thr_...")`. A draft a person wrote is theirs: do not replace it. Hand over the links in your summary instead.
 3. Otherwise write the reply as a draft: `threads(operation="replace-draft", thread_id="thr_...", body="...")`. Short: thank them in their own terms, one line on what is in the sample, the link (and the External approvals link from step 5 when there is one), and one easy next step. No invented prices, times or offers. A person reads and sends it.
 

@@ -72,7 +72,7 @@ Upload the CSV before the first fill:
 
 CSV rules: a header row whose column names equal the slot's item properties (`industry`, `size_band`, `metric`, `unit`, `better`, `p25`, `median`, `p75`, `sample_size`, `source`). Plain numbers (`3.4`, not `3.4%` or `3,4`). `p25 <= median <= p75` on every row, even when lower is better. `industry` in the lowercase LinkedIn form accounts carry (`software development`), `size_band` the way accounts write it (`11-50`, `51-200`). Quote any value with a comma. At most 12 metrics per peer group (the step's `limit`); 6 to 8 read best. 5 MB and 50,000 rows at most.
 
-Credits, in plain words: `dataset`, `scrape.page`, the PDF and hosting are free. The one prompt costs credits for its AI work when Studio runs it (`executor="ken"`) and nothing when your agent fills the page. The page costs 1 credit when its first link is published.
+Credits, in plain words: `dataset`, `scrape.page`, the PDF and hosting are free. The one prompt costs credits for its AI work when Studio runs it (`executor="ken"`) and nothing when your agent fills the page. The page is charged at the rate card's price when its first link is published.
 
 ## The CTA
 

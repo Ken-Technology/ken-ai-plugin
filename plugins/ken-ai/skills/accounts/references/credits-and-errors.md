@@ -13,7 +13,7 @@ The cost of each step in the Accounts loop, and what to do when a call fails. Th
 | Drafting or rewriting a touch (`draft`, `rewrite`) | its AI work |
 | Grading a touch (`feedback`) | free |
 | A signals scan | free; the news source is billed like any web search |
-| An email find | 1 credit per email found |
+| An email find | each email found, at the rate card's price |
 | A hand-off brief (`handoff-brief`) | free: nothing is sent or charged |
 
 Running out of credits is not an error for research and mapping: the run waits and resumes when credits arrive. Before research or mapping runs on more than a few accounts, tell the user what it costs.
