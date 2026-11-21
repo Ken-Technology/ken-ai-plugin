@@ -1,6 +1,6 @@
 ---
 name: signal-outreach
-description: Reach companies when something changes - hiring, a funding round, a new leader, a job change - with a free gate before any spend, one decision maker per company, copy about the plan behind the signal, and a trigger that keeps it running.
+description: Watch accounts or people for hiring, funding, job changes, website visits or replies and act on each finding.
 ---
 
 # Signal outreach
@@ -134,6 +134,29 @@ The import skips people already in the campaign. To carry each company's signal 
 - `triggers(operation="triggers-update", trigger_id=77, changes={"status": "paused"})` and `changes={"status": "active"}` stop and restart it. On a client's campaign both need a yes that names that client.
 
 Report the signal, the gate funnel, who you picked and why, the campaign and trigger ids, and what the person has to click.
+
+## Signals that start a workflow
+
+A campaign trigger (Mode A) adds each match to one campaign. A workflow trigger starts a run on each finding instead, and the run can research, score, route or write before anything is sent. Build one with the `workflows` skill (`load_skill("workflows")`). The signal triggers today:
+
+| Signal | Trigger | Runs on | Narrowed by today | Template |
+|---|---|---|---|---|
+| Funding, headcount growth or decline, a job change, ICP timing, tenure, new in seat, a promotion, a reply, a click or open, a dormant lead | `trigger.signal@1` | lead | `signals`, `watch`, `oncePerRecordDays` | `hiring-signal-outreach`, `signals-to-pipeline`, `champion-changed-jobs` |
+| Hiring: open job posts that match your filters, read on a schedule | `trigger.job_posts@1` | account | `filters`, `backfillDays`, `limit`, `rerunAfterDays`, `includeUnmatched` | none yet |
+| A visit to your website | `trigger.website_visit@1` | account | `who`, `pages`, `minVisits`, `withinDays`, `oncePerRecordDays` | `hot-website-visitor`, `visitor-id` |
+| A past champion moved to a new company | `trigger.champion_moved@1` | person | `leadersOnly`, `reachableOnly` | none yet |
+| An account heats up | `trigger.account_hot@1` | account | `minScore`, `oncePerRecordDays` | `hand-off-hot-accounts` |
+| A reply | `trigger.reply@1` | lead | `classes`, `campaignId`, `oncePerRecordDays` | `revive-not-now-replies`, `find-phones-interested-replies`, `text-interested-replies` |
+
+From a terminal, the CLI lists every trigger with its scope, the flags it needs and its cost, with no sign-in, and the templates the workspace can start from:
+
+```bash
+kenso signals types
+kenso signals types --workflow-type bulk_import
+kenso workflow-templates list
+```
+
+`kenso signals create` queues up to 100 test signals for this workspace, to check that a test campaign's triggers fire on them. Run it only on a test campaign, with a yes from the person: it is not a way to add real signals.
 
 ## What this skill cannot do yet
 
