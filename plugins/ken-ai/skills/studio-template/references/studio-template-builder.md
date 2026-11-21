@@ -22,13 +22,13 @@ The build loop, in short:
   template.liquid    the page, rendered per link with Kenso variables and the filled data; a full HTML document
   fallback.liquid    optional: a page that reads only Kenso variables, for when the fill has nothing usable
   assets/            files the page loads from its own host: images, fonts, pdf, csv
-  samples/           optional: <name>.json = {account, person, data} for local preview (.json, .csv); never served
+  samples/           optional: <name>.json = {account, person, data} for preview, .json and .csv directly in it; never served
   README.md          optional notes for the next editor (a webhook contract, a CSV layout)
   brief.md           optional: the plan (who it is for, the one ask, sections, variables); the builder's Plan page and Brief step show it, and a Ken library template ships one
   ideas.md           optional: three ways to adapt the template, shown as idea cards next to brief.md
 ```
 
-Anything else is ignored with a `bundle-unknown-file` warning.
+Nothing else may sit in a bundle: a push, a validate or an upload that names any other path is refused with 400 `invalid_path` and stores nothing (`bundle-unknown-file`). Assets may sit in folders under `assets/`; samples sit directly in `samples/`. No file or folder name starts or ends with `.`.
 
 | Limit | Value |
 |---|---|
@@ -670,7 +670,7 @@ The loop:
 | **Bundle layout and limits** | | |
 | `bundle-missing-file` | error | Add `studio.json` and `template.liquid` |
 | `bundle-path` | error | Relative path, `/` separators, letters, digits, `.`, `_`, `-`; no `..` |
-| `bundle-unknown-file` | warning | Move the file under `assets/` or `samples/` (`.json`, `.csv`), or drop it; it is ignored |
+| `bundle-unknown-file` | error | Move the file under `assets/` or directly into `samples/` (`.json`, `.csv`), or remove it; the push is refused until then |
 | `bundle-encoding` | error | Save the text file as UTF-8 |
 | `size-template` | error | Keep each `.liquid` file at most 256 KB: move inline SVG and images into `assets/`, trim CSS |
 | `size-asset` | error | Compress or resize the file to 5 MB or less |
