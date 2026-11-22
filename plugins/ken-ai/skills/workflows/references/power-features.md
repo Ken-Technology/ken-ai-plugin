@@ -4,11 +4,11 @@ Part of the `workflows` skill. `SKILL.md` builds a workflow and takes it live, a
 
 ## Is it on
 
-Everything here needs the `workflows_power` feature next to `workflows`. Only Kenso turns a feature on. Two things every workspace has: the formula functions under "More formula functions", and the `changes` list of a version diff. Without the feature the operations on this page are not available, and a step type or a `{{vars.NAME}}` reference from this page is a `feature_disabled` issue: an error at publish, nothing in a draft.
+Everything here needs the `workflows_power` feature next to `workflows`. Only Kenso turns a feature on. Two things every workspace has: the `plain.assumptions` list and the `changes` list of a version diff. Without the feature the operations on this page are not available, and a step type, a `{{vars.NAME}}` reference or a call to a function under "More formula functions" is a `feature_disabled` issue: an error at publish, nothing in a draft.
 
 The operations sit on two facades: `workflow_data` (variables, tables, rows) and `workflow_tools` (formulas, calls, approvals, connections, schedules, step tests, summaries). `describe_tools` lists each operation's fields.
 
-When the feature is turned off again for a workspace, two published steps stop instead of half-running. `webhook.wait@1` fails with `feature_disabled` where it would open a new wait, because the run has no resume address then. A `flow.subworkflow@1` step fails with `feature_disabled` when the called workflow has an interface or its `inputs` hold a computed value; a called workflow with no interface and plain inputs starts as before.
+When the feature is turned off again for a workspace, three published steps stop with `feature_disabled` instead of half-running. `webhook.wait@1` fails where it would open a new wait, because the run has no resume address then. `human.approve@1` fails where it would open an approval, because nobody could decide it then, and an approval opened earlier that times out fails the step instead of applying `onTimeout`. A `flow.subworkflow@1` step fails when the called workflow has an interface, its `inputs` hold a computed value, or the step has a `record` input; a called workflow with no interface, plain inputs and no `record` starts as before.
 
 ## Variables
 
@@ -34,7 +34,7 @@ A formula's result holds lists and objects nested at most 32 levels deep. A deep
 
 ## More formula functions
 
-Every workspace has these, wherever a formula goes. Names are case-sensitive.
+These need the `workflows_power` feature: with it off, publish refuses a formula that calls one (`feature_disabled`). With it on, they work wherever a formula goes. Names are case-sensitive.
 
 | Group | Functions |
 |---|---|
@@ -45,7 +45,7 @@ Every workspace has these, wherever a formula goes. Names are case-sensitive.
 | numbers | `abs`, `floor`, `ceil` |
 | other | `toJson`, `parseJson`, `hash` |
 
-`where` takes the operators `eq`, `ne`, `gt`, `gte`, `lt`, `lte`, `contains`, `in`, `is_empty` and `is_not_empty`. A pattern in `matches` and `extract` is a regular expression read in linear time: no lookaround, no backreference, at most 200 characters, case-sensitive unless it starts with `(?i)`.
+`where` takes the operators `eq`, `ne`, `gt`, `gte`, `lt`, `lte`, `contains`, `in`, `is_empty` and `is_not_empty`. A pattern in `matches` and `extract` is a regular expression read in linear time: no lookaround, no backreference, at most 200 characters, case-sensitive unless it starts with `(?i)`. They read text of up to 4,096 characters: longer text is `formula_too_large`.
 
 With the feature on, two operations help you write one. `workflow_tools(operation="workflow-formula-functions-list", client_id=...)` returns every function with its `category`, `arguments`, `returns`, `description` and `examples`. To try a formula on sample data before it goes into a step:
 
@@ -242,14 +242,14 @@ Or a five-field cron (minute, hour, day of month, month, day of week), read in `
 
 After a step failed under `onFailure: continue` or `branch:<step id>`, a later step reads why: `{{run.errors.fetch.class}}`, `{{run.errors.fetch.message}}` (cut at 500 characters) and `{{run.errors.fetch.attempts}}`. They are null for a step that did not fail. The errors of steps inside a for each are read inside it, by a step of the same body: read from anywhere else they are always empty, so saving refuses that (`unknown_reference`).
 
-`class` is one of four values: `temporary` (the step was retried and still failed), `permanent` (it cannot work as written, or the other side refused), `setup` (something a person must connect or fix first) and `budget` (a spending or run limit was reached). `message` is the step's own error text. Most start with a code and a colon, so compare the start in a formula: `startsWith({{run.errors.wait.message}}, 'webhook_wait_timed_out')`. The forms a workflow can meet from these steps:
+`class` is one of four values: `temporary` (the cause was transient, such as a time limit or a provider that was briefly unavailable: a step the executor runs was retried before it failed with it, and a sub-workflow's start is not retried), `permanent` (it cannot work as written, or the other side refused), `setup` (something a person must connect or fix first) and `budget` (a spending or run limit was reached). `message` is the step's own error text. Most start with a code and a colon, so compare the start in a formula: `startsWith({{run.errors.wait.message}}, 'webhook_wait_timed_out')`. The forms a workflow can meet from these steps:
 
 | `message` | Step and cause |
 |---|---|
 | `approval timed out` | `human.approve@1`: nobody decided in time under `"onTimeout": "fail"` (no code, the whole text) |
 | `approval cancelled` | `human.approve@1`: the approval was closed without a decision (the whole text) |
 | `unknown_assignee: ...` | `human.approve@1`: the assignee is not an active member, or cannot edit workflows |
-| `feature_disabled: ...` | `human.approve@1`: the feature is off for the workspace |
+| `feature_disabled: ...` | `human.approve@1`, `webhook.wait@1`, or `flow.subworkflow@1` with a called workflow that has an interface, a computed input or a `record` input: the feature is off for the workspace |
 | `webhook_wait_timed_out: ...` | `webhook.wait@1`: nothing was posted in time under `"onTimeout": "fail"` |
 | `unexpected_error: <type>` | any step: something failed on Kenso's side (`temporary`) |
 

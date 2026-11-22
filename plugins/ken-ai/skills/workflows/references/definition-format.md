@@ -307,7 +307,7 @@ With the `workflows_power` feature a definition can use what follows. Without it
 | reports and team | `report.query@1`, `team.pick_member@1`, `notify.email@1` (`unknown_member` for a member id in either that is not an active member) |
 | assumptions | `plain.assumptions`: a list of `{id, text, stepIds, status, why}` with the status `open` or `confirmed`. Every workspace has it: no `feature_disabled` issue. |
 
-Every workspace, with or without the feature, also has these formula functions: `replace`, `substring`, `join`, `matches`, `extract`, `titleCase`, `emailDomain`, `urlDomain`, `get`, `keys`, `merge`, `pick`, `object`, `toJson`, `parseJson`, `hash`, `abs`, `floor`, `ceil`, `pluck`, `where`, `sum`, `min`, `max`, `avg`, `sort`, `unique`, `slice`, `concat`, `last`, `flatten`, `formatDate`, `parseDate`, `dateDiff`, `addHours`, `addMinutes`, `startOfDay`, `weekday`. Their arguments are in `references/power-features.md`.
+The feature also adds these formula functions, and with it off publish refuses a formula that calls one (`feature_disabled`): `replace`, `substring`, `join`, `matches`, `extract`, `titleCase`, `emailDomain`, `urlDomain`, `get`, `keys`, `merge`, `pick`, `object`, `toJson`, `parseJson`, `hash`, `abs`, `floor`, `ceil`, `pluck`, `where`, `sum`, `min`, `max`, `avg`, `sort`, `unique`, `slice`, `concat`, `last`, `flatten`, `formatDate`, `parseDate`, `dateDiff`, `addHours`, `addMinutes`, `startOfDay`, `weekday`. Their arguments are in `references/power-features.md`.
 
 ## Issue codes
 
