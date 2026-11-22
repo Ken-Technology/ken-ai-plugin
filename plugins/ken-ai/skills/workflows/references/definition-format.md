@@ -305,7 +305,7 @@ With the `workflows_power` feature a definition can use what follows. Without it
 | for each | `logic.for_each@1` takes `collect` (adds `items` to its output) and `maxItems` (`for_each_max_items_out_of_range`) |
 | failures | `{{run.errors.<step id>.class}}`, `.message` and `.attempts` after a step failed under `onFailure: continue` or `branch:<step id>` (`unknown_error_step` for an id that is not a step) |
 | reports and team | `report.query@1`, `team.pick_member@1`, `notify.email@1` (`unknown_member` for a member id in either that is not an active member) |
-| assumptions | `plain.assumptions`: a list of `{id, text, stepIds, status, why}` with the status `open` or `confirmed`. Every workspace has it: no `feature_disabled` issue. |
+| assumptions | `plain.assumptions`: a list of `{id, text, stepIds, status, why}` with the status `open` or `confirmed`. Every workspace has it: no `feature_disabled` issue. Ids are `a1`, `a2`, ... and never reused: `plain.assumptionsIssued` keeps the highest number given, so leave it as it is (`plain_assumption_duplicate_id` for an id used twice). |
 
 The feature also adds these formula functions, and with it off publish refuses a formula that calls one (`feature_disabled`): `replace`, `substring`, `join`, `matches`, `extract`, `titleCase`, `emailDomain`, `urlDomain`, `get`, `keys`, `merge`, `pick`, `object`, `toJson`, `parseJson`, `hash`, `abs`, `floor`, `ceil`, `pluck`, `where`, `sum`, `min`, `max`, `avg`, `sort`, `unique`, `slice`, `concat`, `last`, `flatten`, `formatDate`, `parseDate`, `dateDiff`, `addHours`, `addMinutes`, `startOfDay`, `weekday`. Their arguments are in `references/power-features.md`.
 
@@ -337,4 +337,5 @@ What validate reports beyond the table in the skill body. Each issue carries a `
 | `invalid_limits` | a limit at 0 or below, an unknown `atLimit`, or `creditsPerRun` / `creditsPerMonth` below the 20 credits an `account.research@1` node counts |
 | `plain_duplicate_id`, `plain_empty_text`, `plain_unknown_ref`, `plain_duplicate_owner`, `plain_invalid_mode` | the `plain` block: a repeated plain id, blank text, a `compiledTo` entry that names no source or step, an engine step owned by two plain steps (a source by two besides the When line), a mode other than `compiled` or `judgment` |
 | `plain_uncovered_step` | a warning, only with `plain` present: an engine step no plain step owns |
+| `plain_assumption_duplicate_id` | an assumption id another entry of `plain.assumptions` already has: an error, so publish refuses it. Give it the id the fix names, or remove it |
 | `duplicate_id`, `unknown_target`, `cross_scope_edge`, `nested_for_each`, `cycle`, `unreachable`, `ignored_next` | graph problems: repeated ids, `next` to a missing step, edges out of a for-each body, nested for each, loops, steps the trigger never reaches, `next` on a branch |
