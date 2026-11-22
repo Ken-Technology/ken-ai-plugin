@@ -45,7 +45,9 @@ These need the `workflows_power` feature: with it off, publish refuses a formula
 | numbers | `abs`, `floor`, `ceil` |
 | other | `toJson`, `parseJson`, `hash` |
 
-`where` takes the operators `eq`, `ne`, `gt`, `gte`, `lt`, `lte`, `contains`, `in`, `is_empty` and `is_not_empty`. A pattern in `matches` and `extract` is a regular expression read in linear time: no lookaround, no backreference, at most 200 characters, case-sensitive unless it starts with `(?i)`. They read text of up to 4,096 characters: longer text is `formula_too_large`.
+`where` takes the operators `eq`, `ne`, `gt`, `gte`, `lt`, `lte`, `contains`, `in`, `is_empty` and `is_not_empty`. A pattern in `matches` and `extract` is a regular expression read in linear time: no lookaround, no backreference, at most 200 characters, case-sensitive unless it starts with `(?i)`.
+
+To look for a phrase in a long reply, scraped page or transcript, use `contains(text, 'pricing')` (exact case, any length) or `matches(text, '(?i)pricing')` (any case, up to 262,144 characters, the most a step output holds; longer text is `formula_too_large`, as it is for `extract`). `contains(lower(text), ...)` fails on text over 64 KB, because `lower` builds a copy and a built value is capped at 64 KB. `extract` reads text over 4,096 characters only with a pattern whose every repetition has an upper count: write `{0,50}` for `*`, `{1,50}` for `+` and `{n,m}` for `{n,}`, as in `extract(text, '(?i)budget:? {0,3}([0-9,$]{1,12})', 1)`; with a `*`, `+` or `{n,}` it is `formula_too_large` there, so either count the repetitions or cut the text first with `substring(text, 0, 4096)`.
 
 With the feature on, two operations help you write one. `workflow_tools(operation="workflow-formula-functions-list", client_id=...)` returns every function with its `category`, `arguments`, `returns`, `description` and `examples`. To try a formula on sample data before it goes into a step:
 
