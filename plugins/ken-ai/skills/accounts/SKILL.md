@@ -28,9 +28,9 @@ These wait for a person at every mode:
 - A touch a member created, or one a member is working on: they edited it or acted on it, or somebody asked Ken to write it with `account_touches(operation="draft")`, from the app, a key or you.
 - A touch approved before, and one that became ready before its action's mode was set.
 - A touch with no one to approve it: no account owner and no Sends from inbox or LinkedIn account.
-- A touch a key or an agent wrote for a send that is not its own person's. A send belongs to the member whose inbox or LinkedIn account it goes from, else the account owner. A teammate's key or agent may not approve that member's send, and a workspace API key that is nobody's may not approve any, so a touch either one creates waits for that member, and so does a draft a teammate's key or agent acts on, or whose body a key that is nobody's edits.
+- A touch a key or an agent wrote for a send that is not its own person's. A send belongs to the member whose inbox or LinkedIn account it goes from, else the account owner. A teammate's key or agent may not approve that member's send, and a workspace API key that is nobody's may not approve any, so a touch either one creates waits for that member, and so does a draft a teammate's key or agent acts on, or that a key that is nobody's acts on, directly or through you.
 - A reply, a meeting email, an after-call follow-up, a reschedule note, a touch with a spend scope, and a workflow's touch (its step's approval setting decides).
-- The first message after someone's LinkedIn connection request that came with a note: it answers what a stranger wrote.
+- The first message after someone's LinkedIn connection request is accepted. This permission never sends it: the LinkedIn account's own inbound setting decides. On an autonomous account Ken sends it when the request came with no note; on a manual account, or when the request came with a note (it answers what a stranger wrote), its owner approves it.
 - A LinkedIn follow, like or connection request with no note that you create. `engage_linkedin`, where it is listed, releases only the ones Ken's plan places.
 - Every iMessage, WhatsApp, Facebook and Instagram touch.
 
