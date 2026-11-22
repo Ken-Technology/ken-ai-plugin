@@ -38,7 +38,7 @@ The work runs in stages. Each stage produces one thing, ends at a gate where a p
 | HTML steps (never step 1 to Google recipients, deliverability rule 4) | the `html_steps` feature | plain steps (the default) |
 
 4. **New or existing.** If the user names an existing campaign, read it with `campaigns(operation="get", campaign_id=...)`, then `segments(operation="list", campaign_id=...)`, and start at the first stage whose output is missing (see "Picking up a campaign" below).
-5. **Credits.** Imports, enrichment and AI workflows spend credits, and prompt tests spend model usage. Say what a step costs before you run it on more than a handful of contacts. On `plan_limit` or `billing` errors, show `error.message` and `error.recovery.summary` and stop that step; never retry blindly.
+5. **Credits.** Imports, enrichment and a campaign's AI work spend credits or the plan's AI limit. Before a step that spends on more than a handful of contacts, read the cost with `billing(operation="credit-estimates-create", kind="campaign", campaign_id=...)` (`kind="leads"` with `lead_count` before the campaign exists) and say it from the answer's `quote`, as `references/costs.md` says. Never state a price you did not read from a tool in this conversation. On `plan_limit` or `billing` errors, show `error.message` and `error.recovery.summary` and stop that step; never retry blindly.
 
 ## Opening a stage reference
 

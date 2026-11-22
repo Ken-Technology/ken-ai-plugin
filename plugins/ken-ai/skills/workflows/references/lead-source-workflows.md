@@ -42,9 +42,9 @@ A workflow that finds its own people (a `trigger.schedule@1` or `trigger.webhook
 | `template_key` | Use it to |
 |---|---|
 | `signals-to-pipeline` | turn hiring, funding, job change and ICP timing signals into qualified accounts and the company in the CRM, and a first email |
-| `hiring-signal-outreach` | when a lead's company starts hiring for sales or growth, research the hiring push and draft an email to the lead for your approval |
-| `champion-changed-jobs` | follow a past champion to their new company |
-| `enrich-imported-list` | enrich every new lead from an import, the API or a webhook |
+| `hiring-signal-outreach` | when a lead's company starts hiring for sales or growth, score the company against your ICP, and for a good fit find one sales or growth leader, research the hiring push and draft an email for your approval |
+| `champion-changed-jobs` | follow a past champion to their new company: score the company against your ICP, and for a good fit research the new role and draft a LinkedIn note for your approval |
+| `enrich-imported-list` | enrich every new lead from an import, the API or a webhook, score it against your ICP, then find the missing email and write the opening line only for good fits |
 | `enrich-imported-list-clay` | enrich every new lead through your own Clay table, then write an opening line |
 | `icp-list-to-sequence` | take a list of people from search or an import to a first email |
 | `email-waterfall-verified` | get a verified work email for every person mapped to an account |

@@ -147,9 +147,37 @@ Done when `valid` is true in `mode="publish"` and you have read every warning.
 
 `workflows(operation="estimate-create", client_id=..., workflow_id=12, records=500)`
 
-`records` is how many records will run (1 to 100,000): the list size for a run on records, or the expected runs a month for a trigger. It returns `expectedCredits`, `maxCredits` (every record reaching and paying at every step) and the cost per step, and charges nothing. A step line with `chargedBy` `campaign` is a `campaign.sequence@1` step: the campaign charges its copy per lead written, outside the workflow's `limits`; estimate a campaign workflow by `workflow_id`, or that line stays out of the totals (`variable: true`) and you add it yourself. That line is an upper bound: a lead that already has copy, a campaign without personalization prompts, or a workspace on its own AI key is not charged for it.
+`records` is how many records will run (1 to 100,000): the list size for a run on records, or the expected runs a month for a trigger. It charges nothing. Read `quote` first:
 
-Tell the user both numbers, and the `limits` that cap them, before anything runs.
+- `quote.credits`: the expected cost (`expectedMillicredits`), the range it usually lands in (`lowMillicredits` to `highMillicredits`) and the same three in US cents. Divide millicredits by 1,000 for credits.
+- `quote.aiLimit`: the share of the AI limit the run uses (`expectedPercent`) and whether it fits (`fits`). Where the workspace pays AI work in credits its `applies` is false (or `aiLimit` is null): that work is then in `quote.credits`. AI work is a percent of the limit, never dollars.
+- `quote.balance`: the credits left after (`afterMillicredits`) and whether there are enough (`sufficient`).
+- `quote.basis.source`: `workspace` (this workspace's own history), `kenso` (typical Kenso usage), `pilot` (this workflow's own first runs) or `preset` (no history yet: call it a first estimate).
+- `quote.per`: what the numbers are for, such as 500 records.
+- `quote.savings`: ways to spend less (Spend less).
+
+Say the cost as one line, credits first, each part filled from the quote: `About <credits> credits · $<dollars> · usually <low> to <high> · <percent>% of your AI limit`. Work the AI limit pays in full reads `About <percent>% of your AI limit · no credits`, and where `quote.aiLimit.applies` is not true that part is left out. Round to whole credits, dollars and percents, as the app does.
+
+When `quote` is null or missing, the server does not quote workflows yet, or the AI limit pays for a step and could not be read or is 0: tell the user `expectedCredits` and `maxCredits` (every record reaching and paying at every step) instead. Either way the answer lists the cost per step. A step line with `chargedBy` `campaign` is a `campaign.sequence@1` step: the campaign charges its copy per lead written, outside the workflow's `limits`; estimate a campaign workflow by `workflow_id`, or that line stays out of the totals (`variable: true`) and you add it yourself. That line is an upper bound: a lead that already has copy, a campaign without personalization prompts, or a workspace on its own AI key is not charged for it.
+
+Tell the user the cost, and the `limits` that cap it, before anything runs.
+
+## Spend less
+
+Build the cheap shape first. These eight hold for every workflow, whatever the amounts. The code after each is the `code` the server gives a saving of that kind:
+
+1. **Qualify before you pay** (`cost_qualify_first`). An `ai.qualify@1` with a `logic.filter@1` on its result goes before the first paid step, so a find, an enrichment or research runs only on records that passed. A workflow that starts from a signal the person already gave (a reply, a booked meeting, a form fill) needs no such gate.
+2. **A gate must stop the run** (`cost_gate_does_not_stop`). Only `logic.filter@1` ends a run. A step's `when` skips that one step, and the steps after it still run and still charge. To stop on a condition, use `logic.filter@1`, or a `logic.branch@1` arm with `"next": []`.
+3. **No verify after find** (`cost_verify_after_find`). `data.find_email@1` returns an email it already verified. A verify step on that email pays for the same answer twice.
+4. **No agent without tools** (`cost_agent_without_tools`). An `ai.agent@1` with no `tools` is a prompt that costs more: use `ai.prompt@1`.
+5. **The cheap tier for simple work** (`cost_tier_for_simple_task`). An `ai.prompt@1` that classifies, extracts or picks from a list runs on the cheap tier. Keep balanced or smart for writing and judgment. `ai.qualify@1`, `ai.condition@1` and `ai.research@1` cost the same at every tier, so leave their tier alone.
+6. **Find only the people later steps use** (`cost_find_people_limit`). Set `limit` on `data.find_people@1` (5 by default) to the number of people the next steps act on.
+7. **No phones nobody calls** (`cost_phones_unused`). `account.map_committee@1` finds signers' phones unless `signerPhones` is false: set it to false unless a later step calls or texts.
+8. **Do not pay twice for the same records** (`cost_rerun_overlap`). Before a run on records, leave out the records this workflow already processed. `restart` and `retry` do not charge a step that succeeded again.
+
+Never make a step cheaper in a way that changes what the user asked for, and never recommend a pricier option to save somewhere else.
+
+The server checks these too, for a workspace that has cost estimates on. The estimate's `quote.savings` lists what it finds, largest first, at most three: each has a `code`, a `title`, a `detail`, what it saves (`savesMillicredits`, or `savesAiLimitPercent` for AI-limit work) for `per` records, and `fixDefinition`, the definition with the fix applied. `workflows(operation="validate", ...)` returns the same savings as warnings whose `code` starts with `cost_`, with the saving in `message` and the same `fixDefinition`. The estimate of a run on records (`estimate_only=True`) adds `cost_rerun_overlap` when some of its records already ran. Show at most three, one line each (`Qualify before the first paid step: saves about <credits> credits per <per> records`), and say what a `detail` says the fix adds, such as more AI-limit use. Apply one only on the user's yes: save its `fixDefinition` as the draft with `workflows(operation="update", ...)`, validate, and estimate again. A saving the server did not return has no amount: state none of your own.
 
 ## Test to the end
 
@@ -194,7 +222,7 @@ Up to 1,000 records per call; `type` is `account`, `person` or `lead` and must m
 - The user's numbers, ranges, countries, titles and names go into settings, the workflow's name and its description verbatim, and a title says only what its settings do.
 - One step per save. A change touches the step it names and every title, text and description that states the value it changes, and nothing else.
 - A test that stops at a filter is not a pass.
-- Show the estimate before every publish and every run on records, and set or confirm a spend limit before you publish. Quote only the credits and dollars the tools return.
+- Show the cost before every publish and every run on records, and set or confirm a spend limit before you publish. Say it from the estimate's `quote`; state only credits, dollars and AI-limit percent the tools return.
 - Keep every send step (`send.email@1`, `send.linkedin@1`, `send.whatsapp@1`, `send.imessage@1`, `send.facebook@1`, `send.instagram@1`), and every `browser.run@1` step with `canSubmit: true`, at `approval: "required"`. Set `"auto"` on `send.linkedin@1`, `send.whatsapp@1` or `send.imessage@1` only when the user asks for automatic sends and the workspace has the `workflows_auto_send` flag; `send.email@1`, `send.facebook@1` and `send.instagram@1` always wait for a person, and so does an iMessage text that would answer the person in a conversation or go to a person who said no on any channel.
 - `logic.wait_for_event@1` on `reply.received` also resolves on a 1:1 email, LinkedIn, WhatsApp or iMessage reply from the person in a person run, with `channel` in the event (`"match": {"channel": "whatsapp"}` waits for one channel). An iMessage reply carries `classification`: `unclassified` for a photo, voice memo or file with no words (or a text Kenso could not class), so a wait that matches a class (`"match": {"classification": "interested"}`) does not resolve on one.
 - One workflow per goal: list first, and change the one that fits instead of creating a duplicate.
