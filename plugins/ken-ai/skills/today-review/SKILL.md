@@ -9,13 +9,16 @@ Today in Kenso is one member's queue for the day: touches waiting for approval o
 
 Trigger on "what needs me today?", "clear my queue", "go through my Today", or the start of a member's day.
 
-This skill reads the queue in the member's time zone, groups it, works the touches the member points at (draft, rewrite, grade, snooze, skip), clears the rows they are done with, shows the questions Kenso asked them, and hands every approval back to them.
+This skill reads the queue in the member's time zone, groups it, works the touches the member points at (draft, rewrite, grade, snooze, skip), clears the rows they are done with, shows the questions Kenso asked them, and hands back every approval that waits for them.
 
-## The rule: the member approves every send
+## The rule: the member approves what waits for them
 
-You draft, rewrite, grade, snooze and skip. The member approves. Approve a row only when the member asks you to approve that exact item, after they saw this version of it: `client_approvals(operation="approvals-decide", client_id=..., approval_id="touch_9001", action="approve", updated_at="<its updatedAt>")` decides it as them. Never approve a row because it looks ready, and never clear your own drafts or proposals unasked. No tool you have answers a question Kenso asked.
+You draft, rewrite, grade, snooze and skip. The member approves what waits for them. Approve a row only when the member asks you to approve that exact item, after they saw this version of it: `client_approvals(operation="approvals-decide", client_id=..., approval_id="touch_9001", action="approve", updated_at="<its updatedAt>")` decides it as them. Never approve a row because it looks ready, and never clear your own drafts or proposals unasked. No tool you have answers a question Kenso asked.
 
-- A touch with a body waits as `awaiting_approval` until the person clicks Approve in Today or on the approval card, or tells you to approve it. Never say a touch was sent or approved because you wrote it: say it waits for their approval, and when it is due.
+- Today holds only what needs the member. The workspace's Ken agent permission decides which touches wait: `agent_permissions(operation="get")`, the `mode` of `send_email` and `send_linkedin`. At `runs_on_its_own` Ken's own first draft that its quality check kept, and at `runs_everything` most email and LinkedIn touches no member is working on, are approved with no click and send at their due time without reaching Today. A 404 means the permission is off and every touch waits; when you cannot read it at all, assume `runs_everything`. The `accounts` skill has the full rule.
+- A row missing from Today may have gone out. Before you tell the member something was not sent, read the touch (`account_touches(operation="get", client_id=..., touch_id=9001)`: `status`, `approvedAt`, `sentAt`) or the account's timeline (`accounts(operation="activity", client_id=..., account_id=101)`).
+- Your writes are an agent's, even when the member asked for them. A body you save with `update` is agent text: where its action reads `runs_on_its_own` or `asks_first` it waits for the member, and where it reads `runs_everything` Ken may approve it with no click. There, show the exact text and when it sends before you save, and tell the member it goes out at that time without their click, or let them save the edit in Today, where it waits for them. A draft the member asks for with `draft` waits for them at every mode.
+- Never say a touch was sent or approved because you wrote it. Read it back and say what its `status` shows, and when it is due.
 - Retrying a failed send needs the member's ask too: `client_approvals(operation="touches-retry", client_id=..., touch_id=9001, updated_at="<its updatedAt>")`.
 - Every write in this skill happens only on the member's request, one row at a time unless they ask for a batch.
 
@@ -85,10 +88,10 @@ Touch row `touch_9001` is touch id `9001`. Read it first: `account_touches(opera
 
 | The member wants | Call | Note |
 |---|---|---|
-| Kenso to write it | `account_touches(operation="draft", client_id=..., touch_id=9001)` | a planned touch with no body, on email, LinkedIn connect or message, or call. Charged. It lands `awaiting_approval` with a rationale and its sources |
+| Kenso to write it | `account_touches(operation="draft", client_id=..., touch_id=9001)` | a planned touch with no body, on email, LinkedIn connect or message, or call. Charged. It lands `awaiting_approval` with a rationale and its sources, and waits for the member at every mode |
 | it shorter, warmer, more specific, or in their voice | `account_touches(operation="rewrite", client_id=..., touch_id=9001, instruction="shorter")` | `shorter`, `warmer`, `more_specific`, `in_my_voice`. Charged. Stores nothing: show the result, then save it on a yes |
 | a grade | `account_touches(operation="feedback", client_id=..., touch_id=9001)` | free: a score 0 to 10, a band (`keep`, `rewrite`, `start_over`, `write_first`) and five bars with notes |
-| their own edit saved | `account_touches(operation="update", client_id=..., touch_id=9001, changes={"body": "Hi Maya, ..."})` | from `planned`, `drafted`, `awaiting_approval` or `failed`; a body puts it up for approval |
+| their own edit saved | `account_touches(operation="update", client_id=..., touch_id=9001, changes={"body": "Hi Maya, ..."})` | from `planned`, `drafted`, `awaiting_approval` or `failed`; a body puts it up for approval, and at `runs_everything` it may send with no click (The rule) |
 
 - Show the full text before you save it, and save only what the member accepts.
 - Never invent a price, a meeting time, a discount or an offer. When the touch needs one the member has not given, leave it out and ask.

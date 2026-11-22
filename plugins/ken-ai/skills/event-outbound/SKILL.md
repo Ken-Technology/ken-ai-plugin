@@ -11,7 +11,7 @@ This skill picks or adds the event, builds its list, matches it to your accounts
 
 ## Rules
 
-- **A person approves every touch and launches every campaign.** Planned touches wait in Today; nothing here sends.
+- **A person launches every campaign.** The Event touches this skill plans wait in Today: each is a person's to-do, and nothing here sends. An email touch follows the `accounts` skill's rule on who approves it.
 - **Likely is not going.** People found at an exhibiting company or on last year's list are likely there, not confirmed. Write "your team is exhibiting at <event>" or "you spoke at <event> last year", never "saw you're attending". Only a person who said so (`find-people-going`, an attendee list, a LinkedIn event read) is going.
 - **A LinkedIn event read risks the seat.** Show the person the warning and wait for their yes before every read.
 - **Delete only on request.** Removing an event, a row or a suggestion is the user's call.
@@ -99,7 +99,7 @@ It plans one Event touch per target account on the list ("Meet at <event>"), to 
 - Speakers on the list also become event signals on their accounts.
 - A past event is 409 `invalid_state`.
 
-For a written email before the event, add your own touch with the `accounts` skill: `account_touches(operation="create", account_id=101, stakeholder_id=301, channel="email", due_at="2026-11-10T14:00:00Z", reason="signal", title="Coffee at RevOps Summit", subject="RevOps Summit in Austin", body="Hi Maya, ...", rationale="Maya speaks at RevOps Summit on Nov 18 (speaker page); our team is going.")`. Then send the person to Today: `https://app.ken.so/<workspace id>/today`.
+For a written email before the event, add your own touch with the `accounts` skill: `account_touches(operation="create", account_id=101, stakeholder_id=301, channel="email", due_at="2026-11-10T14:00:00Z", reason="signal", title="Coffee at RevOps Summit", subject="RevOps Summit in Austin", body="Hi Maya, ...", rationale="Maya speaks at RevOps Summit on Nov 18 (speaker page); our team is going.")`. That skill's rule decides whether it waits for a person: where `send_email` reads `runs_everything` it sends at its due time with no click, so write it only on the person's yes to this text. Read it back and tell the person what its `status` shows; if it waits, send them to Today: `https://app.ken.so/<workspace id>/today`.
 
 ## Step 5 - People not on an account
 
