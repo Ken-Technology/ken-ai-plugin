@@ -156,23 +156,27 @@ Get multi-list right the first time: `lists(operation="delete", list_id=...)` fa
 
 ## Cost optimization
 
-### 1. Right-size the import
+### 1. Quote the campaign before it spends
 
-Default import limit in this stage: `5 * contact_limit`. Factor in:
+Kenso quotes a campaign from this workspace's own prices and history. Read the quote, say it, and change the plan when the user wants it cheaper. Never work a price out yourself.
 
-- Expected qualification rate (about 40-60%)
-- Expected email find rate (about 40-60%)
-- Target: 2-3x more raw imports than the valid emails you need
+`billing(operation="credit-estimates-create", client_id=..., kind="campaign", campaign_id=318)` prices the campaign as it is configured; add `target_leads=500` to price another lead count, and use `kind="leads"` with `lead_count=500` before the campaign exists. It charges nothing.
 
-### 2. Keep the default email finding and verification
+Say the answer's `quote` as one line, credits first, each part filled from the quote: `About <credits> credits · $<dollars> · usually <low> to <high> · <percent>% of your AI limit`. `quote.per` says what it is for: `quote.per.count` and the answer's `targetLeads` are, at a calibrated basis the leads expected to finish with a valid email, at least 1 on a non-empty list; at a `preset` basis the campaign's target, or the list's lead count when it has no limit, as before. `quote.stages` shows where it goes (leads in and out of each stage and what pays for it; stage percents are rounded one by one and need not add up to `quote.aiLimit.expectedPercent`), and `quote.balance.sufficient` says whether the workspace has the credits. AI work that the plan's AI limit pays is a percent of that limit, never dollars. When `quote` is null or missing, give the estimate's `display` text and say it is an estimate. `references/costs.md` has the whole reading.
+
+### 2. Right-size the import
+
+Default import limit in this stage: `5 * contact_limit`. Not every imported contact becomes a lead: some do not qualify and some have no email to find. Plan for 2-3x more raw imports than the valid emails you need, and trust an estimate's own numbers over this rule when you have them.
+
+### 3. Keep the default email finding and verification
 
 The create defaults (finding `[3, 8]`, verification `[1, 5, 7]`) are the cost-effective set. Change them in the app only when the user asks. Never name the providers behind these ids to a client (`enums.md`).
 
-### 3. Prefer Manual segments when filters are enough
+### 4. Prefer Manual segments when filters are enough
 
-Manual segments (industry, title, geo filters) cost nothing; AI segmentation spends model usage per contact.
+Manual segments (industry, title, geo filters) cost nothing; AI segmentation is AI work on every contact.
 
-### 4. Limit segments
+### 5. Limit segments
 
 2-4 segments is typical. Each adds a sequence and a variable set to maintain.
 
@@ -180,14 +184,14 @@ Manual segments (industry, title, geo filters) cost nothing; AI segmentation spe
 
 ## What spends credits
 
-Say what a step costs before you run it on more than a handful of contacts. Never quote a price you did not read from the workspace's own billing.
+Say the cost before you run a step on more than a handful of contacts. Never state a price you did not read from the workspace's own billing in this conversation.
 
 | Step | Spends |
 |------|--------|
-| Search import, then enrichment (email finding and verification) | Credits per contact |
-| `campaigns(operation="resume")` on a Draft campaign and the AI workflows it starts | Credits / model usage per contact |
-| `prompts(operation="test", ...)` | Model usage per sample |
-| `campaigns(operation="run-scoring", ...)` | Model usage per contact |
+| Search import, then enrichment (email finding and verification) | Credits |
+| `campaigns(operation="resume")` on a Draft campaign and the AI workflows it starts | AI work: the plan's AI limit, or credits on a plan without one |
+| `prompts(operation="test", ...)` | AI work per sample |
+| `campaigns(operation="run-scoring", ...)` | AI work per contact |
 
 The model catalog is dynamic. Read `models(operation="ai-supported-models", flow=<n>)` for the live default and allowed list.
 

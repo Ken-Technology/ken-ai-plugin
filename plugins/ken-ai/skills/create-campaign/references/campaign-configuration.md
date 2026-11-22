@@ -201,7 +201,7 @@ A replace, create or update writes no version row. After the first full configur
 
 ### Step 8: Search import (optional)
 
-Offer: "Import contacts from Search now? [Yes / No / Custom limit]" with a default limit of `5 * contact_limit`. An import spends credits on enrichment: say so before a large one.
+Offer: "Import contacts from Search now? [Yes / No / Custom limit]" with a default limit of `5 * contact_limit`. An import spends credits on enrichment: before a large one, say the cost from the campaign estimate (`references/configuration-guide.md`, Cost optimization).
 
 1. Filters come from the campaign's saved people searches: `saved_searches(operation="list", client_id=...)`, then `saved_searches(operation="get", search_id=...)`. Multi-list campaigns import each list separately; never pass an accounts search as `people_filters_json`. No saved search is a gap: run `load_skill("ken-search")`. Never import invented or pasted filter JSON. Rules and gotchas: `references/configuration-guide.md` (Search import).
 2. Import: `saved_searches(operation="import-to-campaign", campaign_id=..., select_all=True, people_filters_json=<saved filters>, import_limit=<5 * contact_limit or custom>, await_ready=False)`.
