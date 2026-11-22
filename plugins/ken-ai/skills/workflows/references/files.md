@@ -37,7 +37,7 @@ kenso workflows run qualify.workflow.json --ids ids.txt --max-credits <n> --yes
 2. `push` creates the workflow from the file and binds it. It prints `workflowId`, `draftVersion` and `draftHash`; nothing runs yet. Then `kenso workflows check <file> --mode publish` lists what publish would refuse, each issue with its `fix`: apply each fix to the file and push again.
 3. `test` runs the saved draft once on one record: AI and data steps run for real and are charged, every send and CRM write is simulated. It prints `testPassed` and `definitionHash`. Read the run to its last step (`SKILL.md`, Test to the end): a run that stopped at a filter is not a pass.
 4. `push --publish --expected-hash <definitionHash>` publishes exactly the version you tested. An agent always passes `--expected-hash`: the CLI refuses an agent's publish without it.
-5. `run --dry-run` prints the estimate for those records. Show it to the person with the cap you will set, and run with `--yes` only after their yes to that plan.
+5. `run --dry-run` prints the estimate for those records. Show it to the person in the hub's approval block (the `kenso` skill, section 5) with the cap you will set, and wait for their yes, also when `credits.needed` is 0. Then run with `--max-credits` at that cap and `--yes`, and end with the final reply (The final reply, below).
 
 ## Change a workflow
 
@@ -75,8 +75,8 @@ kenso workflows run 412 --file people.csv --record-type person --dry-run
 - The record type is the trigger's; `--record-type` (`account`, `person`, `lead` or `place`) overrides it.
 - `--dry-run` starts nothing and prints `{dryRun, workflowId, records, recordType, credits: {needed, available, sufficient}, perRecord, expectedCredits, cap, next}`. A CSV dry run creates no person.
 - `--max-credits <n>` caps the run in the CLI. The ceiling per record is the definition's `limits.creditsPerRun` when set (`cap.kind` `hard`), else the estimate's maximum per record (`cap.kind` `estimate`). The CLI starts the first records that fit and reports the rest as `not_started`; a cap below one record starts nothing (`cap_too_low`, exit 6), and `next` names the smallest cap that starts one.
-- Under an agent, a run without `--yes` prints the plan and stops, with `next` naming the same command with `--yes`. Add `--yes` only after the person said yes to that plan.
-- Sample on the full ids file, never on a separate file of a few ids: the full run would start those records again. Set `--max-credits` to cover 3 to 5 records (3 to 5 times the plan's `perRecord.maxCredits`; the plan's `cap.willStart` says how many start), with `--wait --out sample.csv`; the rest are `not_started`. After the person's yes to the rest, run the same command again with only `--max-credits` (and `--out`) changed: it stops with `already_started` (exit 7), writes the ids the sample did not start to `not-started.txt` in the sample's run folder, and its `next` runs only those. `run_in_progress` (exit 7) means another kenso process is running that input now: wait for it, then run again.
+- Under an agent, a run without `--yes` prints the plan and stops, with `next` naming the same command with `--yes`. Show that plan in the hub's approval block and add `--yes` only after the person's yes to it.
+- Sample on the full ids file, never on a separate file of a few ids: the full run would start those records again. Set `--max-credits` to cover 3 to 5 records (3 to 5 times the plan's `perRecord.maxCredits`; the plan's `cap.willStart` says how many start), with `--wait --out sample.csv`, after the person's yes to its approval block; the rest are `not_started`. After their yes to a second approval block for the rest, run the same command again with only `--max-credits` (and `--out`) changed: it stops with `already_started` (exit 7), writes the ids the sample did not start to `not-started.txt` in the sample's run folder, and its `next` runs only those. `run_in_progress` (exit 7) means another kenso process is running that input now: wait for it, then run again.
 - `--wait` waits for every started run to finish (`--timeout`, default 30m). `--out <results.csv>` (needs `--wait`) writes one row per input record: `row, id, status, runId, runStatus, creditsCharged, missReason, error`, then one column per step id with that step's output. Write it whenever the results matter later: a succeeded run's step outputs are dropped 7 days after it finishes unless the workflow keeps success details.
 - The summary holds `records`, `started`, `deduplicated`, `notStarted`, `succeeded`, `failed`, `waiting`, `missed`, `creditsCharged`, `cap`, `resultsCsv`, `appUrl` and `next`. Exit 0 when all started (and, with `--wait`, none failed); 5 when some failed, were not found or were not started; 6 when the cap or the balance started nothing; 7 on the conflicts above.
 - The run folder records every chunk's answer, so `kenso runs resume <runId>` never sends a chunk twice. A chunk sent with no recorded answer stops the resume with `chunk_outcome_unknown` (exit 5): see what started with `kenso workflow-runs list --workflow-id <id> --created-after <time>` before anything else.
@@ -89,6 +89,18 @@ kenso workflow-runs logs <runId> --step qualify --full
 ```
 
 One row per step run: `{nodeId, stepType, status, attempt, startedAt, endedAt, ms, credits, error}`, with a header line on stderr (the run's status, its record and what it charged). `--full` adds each step's `input`, `output` and `attempts`. A failed run ends with `next: kenso workflow-runs restart --run-id <id> --dry-run`: `restart` re-runs a failed run's failed steps, and `retry` refuses a run that has ended. After `run --wait`, the summary's `next` names the logs of the first run that failed.
+
+## The final reply
+
+End the job with the hub's final reply, all five lines, in this order. The run summary's `appUrl` is the app page and `resultsCsv` the results file.
+
+```text
+Outcome: <what ran, on how many records, what it produced>
+Misses: <count and reason for each kind of miss, or none>
+Links: <the app page> and <the results file>
+Credits spent: <from the run summary's creditsCharged, or kenso credits usage --run <runId>>
+Next: <the one next step you recommend>
+```
 
 ## The generated commands for the rest
 
@@ -122,4 +134,4 @@ Each test charges its AI and data steps, so keep the set small. A pass counts on
 
 ## Credits
 
-Never state a price from memory. `kenso workflows check` prints `perRecord` for one record, and `kenso workflows run --dry-run` prints `credits {needed, available, sufficient}` for the whole set: quote those, with the workflow's `limits` and the `--max-credits` cap you will set, and wait for the person's yes before `--yes`.
+Never state a price from memory. `kenso workflows check` prints `perRecord` for one record, and `kenso workflows run --dry-run` prints `credits {needed, available, sufficient}` for the whole set: quote those in the hub's approval block, with the workflow's `limits` and the `--max-credits` cap you will set, and wait for the person's yes before `--yes`, also when `needed` is 0.

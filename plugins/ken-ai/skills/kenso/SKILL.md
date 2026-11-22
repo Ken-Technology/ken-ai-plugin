@@ -7,6 +7,12 @@ description: "Use for any outbound work in Kenso: leads, lists, campaigns, seque
 
 This skill comes first for any work in Kenso. It sends you to the skill for the job and sets the rules every other Kenso skill follows: the workspace, spend, sends and the final reply. When another skill says "the spend rules", it means section 5 below.
 
+**Rules that hold in every Kenso job:**
+
+- Name the workspace before the first change: "I will work in <name> (<id>)."
+- Before the real run of anything that can charge or send, `kenso workflows run` included and also when the dry run's `credits.needed` is 0: show the section 5 approval block with the dry run's numbers and wait for the person's yes. A request such as "run it on them", given before the person saw the estimate, is not that yes.
+- End every job with the section 9 final reply, all five lines.
+
 ## 1. First
 
 ```bash
@@ -108,7 +114,7 @@ These rules hold in every Kenso skill.
   - Any other paid batch: sample with a file of 3 to 5 rows, then run the rest from a file without them.
 - Prices come from a `--dry-run`, `kenso credits quote` or `kenso credits rate-card`, never from memory or from a skill.
 - `Effect: write.` or `Effect: send.` in a command's help is not proof that it is free: not every route that charges is marked, and `kenso workflows run` is a send that charges for its steps. The dry run or `kenso credits quote` is the authority.
-- Ask once, with one approval block, and wait for the yes:
+- Ask once, with one approval block, and wait for the yes, also when `credits.needed` is 0:
 
 ```text
 Plan: <what will run>
