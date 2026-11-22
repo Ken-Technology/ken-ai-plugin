@@ -23,6 +23,8 @@ Open a reference with `load_skill(name="workflows", reference="references/exampl
 | `references/lead-source-workflows.md` | the user wants leads or accounts to come in by themselves (Sales Navigator, forms, website visitors, hiring signals, imports), or picks a template: every template, what it needs, and the template loop with a spend limit |
 | `references/test-and-publish.md` | a validate issue code to fix, a test that needs pins, live steps or a wait, a test result you cannot read, a publish refusal |
 | `references/runs.md` | the workflow is live: run-on-records results, reading a run, retry, restart, replay, a send step that waits, why a workflow fails |
+| `references/power-features.md` | the workspace has `workflows_power` and the workflow needs a workspace variable, a computed value, a table, a connection to an outside tool, an approval by a person, a wait for an outside system, a call to another workflow, an engagement trigger, a report or a one-step test |
+| `references/api-recipes.md` | a step calls Apollo, Instantly, Smartlead, Attio or Close: the connection to create and the `http.request@1` step to write |
 | `references/files.md` | the person works with the Kenso CLI (`kenso`): a workflow kept as a file with `kenso.json`, check, push, test and publish from the file, a run on ids or a CSV with a credit cap, a results file |
 | `references/ops-console.md` | the caller is Kenso staff and the question is fleet-wide: queues, provider breakers, stuck runs, spenders, kill switches, system and shadow workflows. Never for anyone else |
 
