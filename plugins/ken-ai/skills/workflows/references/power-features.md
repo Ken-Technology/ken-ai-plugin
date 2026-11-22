@@ -251,8 +251,10 @@ After a step failed under `onFailure: continue` or `branch:<step id>`, a later s
 | `approval timed out` | `human.approve@1`: nobody decided in time under `"onTimeout": "fail"` (no code, the whole text) |
 | `approval cancelled` | `human.approve@1`: the approval was closed without a decision (the whole text) |
 | `unknown_assignee: ...` | `human.approve@1`: the assignee is not an active member, or is on a Client or Network member seat |
+| `approval_limit_reached: ...` | `human.approve@1`: the workspace already has 1,000 approvals waiting for a decision, so none opened. Decide them or cancel the runs that wait on them, then restart the run |
 | `feature_disabled: ...` | `human.approve@1`, `webhook.wait@1`, or `flow.subworkflow@1` with a called workflow that has an interface, a computed input or a `record` input: the feature is off for the workspace |
 | `webhook_wait_timed_out: ...` | `webhook.wait@1`: nothing was posted in time under `"onTimeout": "fail"` |
+| `webhook_wait_limit_reached: ...` | `webhook.wait@1`: the workspace already has 5,000 webhook waits open, so none opened. Post to their resume URLs or cancel the runs that wait, then restart the run |
 | `unexpected_error: <type>` | any step: something failed on Kenso's side (`temporary`) |
 
 ## Reports and team steps
