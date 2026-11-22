@@ -57,7 +57,7 @@ It returns `ok`, `value`, `type`, `issues` (each with a `code`, a `message` and 
 
 ## Tables
 
-A table is the workspace's own small store for workflows: leads already seen, a routing list, a daily tally. A workspace holds up to 50 tables of up to 100,000 rows each.
+A table is the workspace's own small store for workflows: leads already seen, a routing list, a daily tally. A workspace holds up to 50 tables of up to 100,000 rows each, and 500,000 rows across all its tables (`limits` on the tables list shows how many are used; a write past it is 409 `workspace_row_limit_reached`).
 
 Create the table before a step names it:
 
