@@ -40,7 +40,7 @@ The server URL has not changed. Configs that already name the server `ken` keep 
 | Skill | What it does |
 |---|---|
 | `account-brief` | Get a cited one-page brief on an account before a call: why now, who is in the room, what they care about, what to open with. |
-| `accounts` | Add target accounts, research them, map who buys, scan for signals and plan touches that a person approves in Today. |
+| `accounts` | Add target accounts, research them, map who buys, scan for signals and plan touches that send under your Ken agent settings. |
 | `campaign-diagnosis` | Find out why a campaign is up or down, check the numbers are real first, and get one change to try next. |
 | `campaign-improvement` | Fix the email that isn't working in a live campaign: a before and after, graded, saved as a version you can roll back. |
 | `connect-domains` | Import your own sending domains and complete the nameserver cutover. |
@@ -74,7 +74,7 @@ The server URL has not changed. Configs that already name the server `ken` keep 
 | `studio-asset` | Fill a Studio template for an account or candidate, check the page, then create each person's link to use in a touch. |
 | `studio-template` | Build or edit a Studio template: write the bundle, validate it, preview it on real accounts, publish it and manage its versions. |
 | `tam-builder` | Size a market and build the list: every company that fits, why it fits, who to write to, saved with its stats. |
-| `today-review` | See what needs you today, draft or fix the touches you flag, snooze or skip the rest. You approve every send yourself. |
+| `today-review` | See what needs you today, draft or fix the touches you flag, snooze or skip the rest. You approve what waits for you. |
 | `workflows` | Build a workflow from a goal: ask for the gaps, map each requirement to a step, fill it step by step, test, publish, recover runs. |
 
 Generated from `mcp/src/ken_mcp/skills` in ken-backend by `mcp/scripts/build_skill_packages.py`; do not edit by hand.

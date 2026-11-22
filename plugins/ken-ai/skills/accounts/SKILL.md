@@ -1,20 +1,58 @@
 ---
 name: accounts
-description: Run the Accounts loop - add target accounts, research them, map the buying committee, scan signals, plan touches that a person approves in Today, and hand an account to a teammate.
+description: Run the Accounts loop - add target accounts, research them, map the buying committee, scan signals, plan touches that send under the workspace's Ken agent permission, and hand an account to a teammate.
 ---
 
 # Accounts
 
-Accounts is the 1:1 lane in Kenso: a short list of target companies, each worked by hand with touches to the people who buy. An account has its domains, a stage, an owner, a research dossier, a buying committee (stakeholders and open seats), signals and touches. Today in Kenso is where a person approves what goes out.
+Accounts is the 1:1 lane in Kenso: a short list of target companies, each worked by hand with touches to the people who buy. An account has its domains, a stage, an owner, a research dossier, a buying committee (stakeholders and open seats), signals and touches. Today in Kenso is where a person approves the touches that wait for them.
 
-This skill is the loop an agent runs: read what Knowledge knows, add the accounts, research them, map their committees, scan their signals, then plan and write touches. It ends with every touch waiting for a person in Today, or with the account handed to a teammate.
+This skill is the loop an agent runs: read what Knowledge knows, add the accounts, research them, map their committees, scan their signals, then plan and write touches. It ends with every touch you made read back and the person told whether it waits for them in Today or sends at its due time, or with the account handed to a teammate.
 
-## The rule: a person approves every touch
+## The rule: the workspace's permission decides who approves a touch
 
-You plan and write touches. A person approves them. Approve or retry a send only when the person asks you to approve that exact touch, after they saw this version of it: `client_approvals(operation="touches-approve", client_id=..., touch_id=9001, updated_at="<the touch's updatedAt>")` approves it as them, and `touches-retry` sends a failed one again. Never approve a touch because it looks ready, and never approve one you planned or wrote unless the person asked for exactly that.
+You plan and write touches. Whether a person approves one before it sends is the workspace's Ken agent permission (Settings > Ken agent), set per action. Read it before you write a touch with a body: `agent_permissions(operation="get")`. An email follows `send_email`; a LinkedIn message, or a connection request with a note, follows `send_linkedin`.
 
-- A touch with a body waits as `awaiting_approval` until a person clicks Approve in Today or on the approval card, or tells you to approve it. A touch you create always waits for a person, whatever the workspace's agent settings say.
-- Never tell the user a touch was sent or approved because you created it. Say it is waiting for their approval in Today, and when it is due.
+| The action's `mode` | A touch you create, or a body you write or change |
+|---|---|
+| `asks_first` | waits for a person |
+| `runs_on_its_own` | waits for a person: this mode sends Ken's own first draft that its quality check kept, never text an agent or an API key wrote or changed |
+| `runs_everything` | is approved with no click and sends at its due time, unless it is on the list below. You are the last reader before it goes out |
+
+- `agent_permissions` answers 404 `not_found`: the permission is off for the workspace, and every touch waits for a person.
+- `agent_permissions` is missing from your tools, or refuses you: you cannot tell. Act as if it reads `runs_everything`, and tell the person you could not read the setting.
+- On a workspace run for a client, the send actions read `asks_first` until the client's yes is stored.
+
+These wait for a person at every mode:
+
+- A touch a member created, or one a member is working on: they edited it or acted on it, or somebody asked Ken to write it with `account_touches(operation="draft")`, from the app, a key or you.
+- A touch approved before, and one that became ready before its action's mode was set.
+- A touch with no one to approve it: no account owner and no Sends from inbox or LinkedIn account.
+- A touch a key or an agent wrote for a send that is not its own person's. A send belongs to the member whose inbox or LinkedIn account it goes from, else the account owner. A teammate's key or agent may not approve that member's send, and a workspace API key that is nobody's may not approve any, so a touch either one creates waits for that member, and so does a draft a teammate's key or agent acts on, or whose body a key that is nobody's edits.
+- A reply, a meeting email, an after-call follow-up, a reschedule note, a touch with a spend scope, and a workflow's touch (its step's approval setting decides).
+- The first message after someone's LinkedIn connection request that came with a note: it answers what a stranger wrote.
+- A LinkedIn follow, like or connection request with no note that you create. `engage_linkedin`, where it is listed, releases only the ones Ken's plan places.
+- Every iMessage, WhatsApp, Facebook and Instagram touch.
+
+A call, event, intro or task is a person's to-do: nothing sends it, and approving it marks it done.
+
+When the action reads `runs_everything`, the person's click is no longer the safety net. Before you write a touch with a body:
+
+1. Write it only when the person asked for this outreach, or their standing instructions cover it. Name which.
+2. With the person in the conversation, show the exact subject and body, who it goes to and when it sends, and write it on their yes.
+3. Tell them it sends at that time without their click. Never say it is waiting for their approval.
+4. When you are unsure, ask. Or create it with no body and have Ken write it with `account_touches(operation="draft", touch_id=...)`: a draft somebody asked for waits for a person at every mode. A touch left `planned` with no body is not held: Ken writes it ahead of its due date, and under `runs_everything` that draft sends with no click too.
+5. Never raise a mode. Raising a send mode is the person's step in Settings > Ken agent; from here it is refused with 403 `approval_requires_human`. Lower one only when the person asks.
+
+**Read every touch back.** After a create or an update, `account_touches(operation="get", touch_id=5001)`, and report what it says, never what you expect:
+
+- `status` `planned`: no text yet. `awaiting_approval`: nobody has approved it. Right after your write it reads `awaiting_approval` at every mode: an approval under the permission comes from Ken's send pass minutes later, so read it again before you tell the person it went out.
+- `approved`: it goes out at `sendAt`, and `holdReason` says why it waits when set. `approvedAt` is when it was approved. `approvedByMemberId` is the member it goes out for, not proof they clicked: under the permission Ken approves in their name. `sent`: it went out at `sentAt`.
+- `approverMemberId` is the member who approves it when it waits (null when anyone may).
+
+Approve or retry a send only when the person asks you to approve that exact touch, after they saw this version of it: `client_approvals(operation="touches-approve", client_id=..., touch_id=9001, updated_at="<the touch's updatedAt>")` approves it as them, and `touches-retry` sends a failed one again. Never approve a touch because it looks ready, and never approve one you planned or wrote unless the person asked for exactly that.
+
+- Never say a touch was approved or sent because you created it. Say what its status shows, and when it is due.
 - Never invent a price, a meeting time or an offer in a touch. Use what Knowledge, the research or the user gave you, with its source.
 
 Every call takes `client_id`, the workspace id. Send it on every call when the user can see more than one workspace.
@@ -146,13 +184,13 @@ What a signal means:
 
 There are two ways to put touches on an account.
 
-**Kenso's plan.** `account_touches(operation="plan-start", account_id=101)` places planned touches across the people you can reach. Where account tiers are on, the account's tier sizes the plan: its `maxTouches`, `days` and `gapDays` from `account_signals(operation="account-tiers-get")` (on the default ladder Tier 1 is up to 11 touches over 100 days, Tier 5 up to 3 over 21). Otherwise it places up to 9 over 90 days. The account must be `researching`, `warming` or `engaged`, with one person who has an email or LinkedIn; otherwise `invalid_state` says what is missing. Read the plan with `account_touches(operation="plan-get", account_id=101)`: `thin` means map more people. Then write each planned touch. Have Kenso write it with `account_touches(operation="draft", touch_id=5001)` (charged; the touch lands in `awaiting_approval`), or write the body yourself with `update`.
+**Kenso's plan.** `account_touches(operation="plan-start", account_id=101)` places planned touches across the people you can reach. Where account tiers are on, the account's tier sizes the plan: its `maxTouches`, `days` and `gapDays` from `account_signals(operation="account-tiers-get")` (on the default ladder Tier 1 is up to 11 touches over 100 days, Tier 5 up to 3 over 21). Otherwise it places up to 9 over 90 days. The account must be `researching`, `warming` or `engaged`, with one person who has an email or LinkedIn; otherwise `invalid_state` says what is missing. Read the plan with `account_touches(operation="plan-get", account_id=101)`: `thin` means map more people. Then write each planned touch. Have Kenso write it with `account_touches(operation="draft", touch_id=5001)` (charged; the touch lands in `awaiting_approval` and waits for a person at every mode), or write the body yourself with `update`, which the permission decides (The rule).
 
 **Your own touch.**
 
 `account_touches(operation="create", account_id=101, stakeholder_id=301, channel="email", due_at="2026-10-21T14:00:00Z", reason="signal", title="Ramping Maya's three EMEA AEs", subject="Your three EMEA AE hires", body="Hi Maya, ...", rationale="Acme is hiring three AEs for EMEA (careers page, Oct 14), paid for by its Series B. The touch is about ramping them, not the round.")`
 
-- With a body the touch waits for approval. Without one it is `planned`, to write later.
+- With a body the touch lands in `awaiting_approval`, and the permission decides from there (The rule). Without one it is `planned`, and Ken writes it ahead of its due date.
 - Channels: `email`, `linkedin_connect`, `linkedin_message`, `linkedin_follow`, `linkedin_like`, `linkedin_comment`, `call`, `event`, `intro`, `asset`, `task`. Reasons: `cadence`, `signal`, `manual` (the default), `reply`.
 - Instagram channels (`instagram_dm`, `instagram_follow`, `instagram_like`, `instagram_comment`) exist, but Instagram plans, sends and engagement are not available yet.
 - `linkedin_follow`, `linkedin_like` and `linkedin_comment` need the workspace's `linkedin_engagement` and `accounts_writer` flags. Create them with no body and no page link: Kenso puts a follow or a like up for approval as it is, and for a comment it picks the person's recent post and writes the comment first.
@@ -166,17 +204,17 @@ Check the copy before you hand it over:
 
 A create, update or snooze that breaks a Contact limits guardrail fails with 422 `guardrail_violation`. `error.details[0]` has the rule and `nextAllowedAt`, the first due time that passes: move the touch there. The rule `skip_accounts_with_open_opportunity` has no such time, so leave that account to a person.
 
-Done when each touch you made is `awaiting_approval` with a body, or `planned` on purpose.
+Done when you read back each touch you made and know, from its `status` and its action's mode, whether a person approves it or it sends at its due time.
 
 ## Step 7 - Hand over to a person
 
-List what waits on an account: `account_touches(operation="list", account_id=101, status="awaiting_approval")`. Each touch's `approverMemberId` is the member who must approve it (null when anyone may).
+List what waits for a person on an account: `account_touches(operation="list", account_id=101, status="awaiting_approval")`. Each touch's `approverMemberId` is the member who must approve it (null when anyone may).
 
 - If your client shows MCP Apps, call `approvals_review` with `account_id` to show the approval card, with Approve, Edit, Snooze and Skip buttons for the person. Only their click approves, and you never see the grant behind it.
 - Otherwise send the user to Today in Kenso: `https://app.ken.so/<workspace id>/today`.
 - `today(operation="get", timezone="Europe/Bucharest")` reads the member's Today as they see it: touches waiting for approval, failed sends, tasks due today and paused plans.
 
-Report back per account: the research status and why now, the committee coverage, the signals found, and each waiting touch with its person, channel and due time.
+Report back per account: the research status and why now, the committee coverage, the signals found, and each touch you made with its person, channel, due time and `status`: waiting for a person, or set to send with no click.
 
 ## Hand an account to a teammate
 
@@ -194,7 +232,7 @@ When an account is ready for someone else (a meeting booked, an AE taking over),
 
 The account's owner, inbox and plan do not change. The timeline records the hand-off.
 
-## After a person approves
+## After a touch is approved
 
 - An approved touch sends from the account's Sends from inbox or LinkedIn account at `sendAt`. `account_touches(operation="get", touch_id=5001)` shows `holdReason` while it waits (for example `connect_inbox` or a `contact_limit_*` reason) and `failureReason` when a send failed. Retrying a failed send is the person's button too.
 - Move a touch with `account_touches(operation="snooze", touch_id=5001, days=7)`. Drop it with `account_touches(operation="skip", touch_id=5001, reason="Maya left Acme")`. Delete one only when the user asks.
@@ -203,7 +241,7 @@ The account's owner, inbox and plan do not change. The timeline records the hand
 
 ## Who did what
 
-Every write you make is recorded as an agent write through your client, with the connected user behind it. Touches you create are marked as created by an agent, which is why they always wait for a person.
+Every write you make is recorded as an agent write through your client, with the connected user behind it, even when the person asked for it. Touches you create are marked as created by an agent, so the permission for their channel decides whether a person approves them (The rule).
 
 ## Credits and errors
 

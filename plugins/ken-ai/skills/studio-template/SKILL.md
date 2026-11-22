@@ -164,7 +164,7 @@ Pinning, unpinning or pinning an email template to a sequence step changes what 
 
 ## Rules
 
-- Nothing you do here sends. A page reaches a person only through a link someone puts in a touch or a sequence, and a person approves every send.
+- Nothing you do here sends. A page reaches a person only through a link someone puts in a touch or a sequence, which keeps its own approval rules.
 - Publish, `update_live`, `update-version`, `force=True` and dataset deletes change live pages: ask first and say the cost.
 - Never invent prices, customers, numbers or quotes in fallbacks, samples or prompts. Fallbacks read only Kenso variables.
 - Vendor names (the scraper, the search provider, the model) never appear on a page a prospect reads.

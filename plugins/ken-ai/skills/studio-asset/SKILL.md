@@ -13,7 +13,7 @@ Every call takes `client_id`, the workspace id. Send it on every call when the u
 
 ## The rules
 
-- **Nothing sends.** You fill pages, create links and write drafts. A person approves every touch and every send.
+- **Nothing here sends.** You fill pages, create links and write drafts. A touch that carries a link follows the `accounts` skill's rule on who approves it.
 - **Never invent.** A field you cannot fill from real data falls back; it is never made up. No invented customers, numbers, prices, dates, times or offers, and every number on a page traces to its source.
 - **Gate before the first link.** A page in review, on its fallbacks or failing the confidentiality check never gets a link.
 - **Costs are said out loud.** Estimate before a `"ken"` run, and say before you create first links on many pages that each one is charged (`billing(operation="credit-rate-card-get")` has the price).
@@ -123,7 +123,7 @@ A `needs_review` page failed a grade after its retries or holds data that broke 
 
 ## Step 7 - Use it in a touch
 
-- **Accounts:** put the person's link in the next touch you draft for them (the `accounts` skill), or use "Use in next touch" on the account's Assets tab. The touch waits for a person in Today, and it can be approved only once the page is ready.
+- **Accounts:** put the person's link in the next touch you draft for them (the `accounts` skill), or use "Use in next touch" on the account's Assets tab. Whether the touch then waits for a person is the `accounts` skill's rule, and it can be approved only once the page is ready.
 - **Campaigns:** a step carries the merge tag `asset_link`, written in double curly braces, and Kenso builds each company's page one step ahead from the campaign's pinned template; slot fallbacks cover anything not filled yet. Pinning is the `studio-template` skill.
 - **Workflows:** a `studio.page@1` step fills the template for the run's account and returns the person's link as its `url`, for a later `send.email@1` step to carry; a page that needs review gets no link and fails the step. Its inputs and outputs are in the `workflows` skill's `references/definition-format.md`.
 
