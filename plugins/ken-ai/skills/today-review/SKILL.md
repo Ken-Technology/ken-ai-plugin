@@ -77,7 +77,7 @@ Open with `data.brief.text`, then the groups that have rows, most urgent first:
 - `imessage_order_credits` (notice `imessage_order_needs_credits`): the workspace's iMessage line orders wait until paid credits cover each line's first month, the older orders still waiting and any month the workspace's live lines still owe (free credits count only where Kenso allowed them). `imessage_order_credits_unknown`: Kenso could not read whether an order waits, so the member checks the lines in Delivery. Only a member with the billing permission sees either, while the imessage feature is on; Done hides it until the next local midnight.
 - Never report opens.
 - `data.done` is the member's progress today: mention it in one line when it has rows.
-- For the touches waiting across the workspace, not only the member's Today: `account_touches(operation="list", client_id=..., status="awaiting_approval,failed")`. Each item's `approverMemberId` is who must approve it (null when anyone may).
+- For the touches waiting across the workspace, not only the member's Today: `account_touches(operation="list", client_id=..., status="awaiting_approval,failed")`. Each item's `approverMemberId` is who must approve it (null when anyone may). A `call`, `event`, `intro` or `task` touch in `awaiting_approval` is a to-do the person marks done, not an approval: count it with the tasks, never in "to approve".
 
 ## Step 3 - Work the touches the member flags
 
