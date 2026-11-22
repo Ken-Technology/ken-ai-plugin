@@ -49,4 +49,4 @@ By hand in a chat: run `kenso work pull`, then give each work file to its own su
 
 ## No Kenso account yet
 
-The CLI signs in with a Kenso API key. If the user has no Kenso account, send them to https://app.ken.so/get-started to create one, then create a key in Kenso at Settings > Integrations > API keys.
+The CLI signs in with a Kenso API key. If the user has no Kenso account, send them to https://app.ken.so/get-started to create one, then create a key in Kenso at Settings > API keys.
