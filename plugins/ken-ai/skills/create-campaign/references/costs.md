@@ -36,6 +36,7 @@ When `quote` is null or missing, the server does not quote this work yet, or the
 1. `billing(operation="credit-spend-get", client_id=..., period="billing_month")` gives the totals, the split by category, by kind of work and by campaign. `period` is `billing_month`, `last_30_days` or `all_time`. It needs a workspace admin: on 403, say so and stop.
 2. To explain one campaign, workflow or day, list its lines: `billing(operation="credit-ledger-list", client_id=..., campaign_id=318)`, or `workflow_id=12`, or `from_time` and `to_time`.
 3. For the AI limit, `billing(operation="credits-get", client_id=...)` returns `aiLimit.percentUsed` and its `state` (`ok`, `warning` or `reached`). It is absent on a plan that pays AI work in credits.
+4. To compare one campaign with what it was quoted, `billing_plan(operation="campaign-cost-get", client_id=..., campaign_id=318)` returns the quote stored at launch, `spent` (credits and the campaign's percent of the AI limit), `progress` (leads done of the leads the quote expects to finish), `projection` and `status` (`on_track`, `above`, `below`, or `no_quote` before a launch). Say the credits first, and never turn a percent into dollars.
 
 Lead with the biggest line and say what it bought (`Email finding on Q4 Logistics VPs: <credits> credits for <count> emails`). Quote only amounts the tools returned, in credits first.
 
