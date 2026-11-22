@@ -39,6 +39,8 @@ kenso describe email-finds create
 3. Run it with `--dry-run` and read the plan: what it would send and, for paid work, `credits` with `needed`, `available` and `sufficient` (`null` where the CLI could not read or price it). A `null` `needed` is unknown, never free: ask before you run it.
 4. Run it for real only as the rules below allow, with the plan's `next`.
 
+Run `kenso` commands without a pipe, so the exit code and stderr stay visible. Trim the output with `-o json` and `--query <JMESPath>` instead of `head`, `cut` or `grep`.
+
 While you only look around, set `KENSO_READ_ONLY=1`: any command that is not a read is then refused before it sends anything, and a `--dry-run` still prints its plan.
 
 ## 3. Which skill
@@ -154,6 +156,8 @@ kenso workflows push qualify.workflow.json --publish --expected-hash <definition
 kenso workflows run qualify.workflow.json --ids ids.txt --max-credits <cap> --dry-run
 kenso workflows run qualify.workflow.json --ids ids.txt --max-credits <cap> --wait --out results.csv --yes
 ```
+
+Queued runs can wait up to 15 minutes before they start, longer than many coding agents let one command run. So run the `--wait` command in the background with no pipe and read its result when it ends, or add `--timeout 5m` and run the same command again while the summary's `waiting` is above 0: a rerun starts nothing again, follows only this input's runs and rewrites the `--out` file. A run still queued or running is not a failure: say so in the final reply, with that command to check it.
 
 ## 8. Your own agent plan: kenso work
 
