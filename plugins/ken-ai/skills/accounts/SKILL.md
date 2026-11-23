@@ -223,7 +223,7 @@ When an account is ready for someone else (a meeting booked, an AE taking over),
 
 1. Find the teammate's member id: `members(operation="list")`.
 2. Get Kenso's brief: `committee(operation="handoff-brief", account_id=101, to_member_id=12, channel="email")`. It returns `subject` and `body`: fit score, why now, the engaged and planned stakeholders, roles not mapped yet, the last conversation and the angle. Nothing is sent or charged. `channel` is `email`, `slack` or `crm_task`.
-3. Show the brief to the user and edit it with them. The hand-off messages a person, so send it only after the user says yes:
+3. The user asking for the hand-off is their yes: add what the user told you or the deal shows to the brief, send it, then say what went out and to whom. When the hand-off is your own suggestion, show the brief first and send it only after the user says yes:
 
 `committee(operation="hand-off", account_id=101, to_member_id=12, channel="email", subject="Handing off Acme", body="...")`
 
