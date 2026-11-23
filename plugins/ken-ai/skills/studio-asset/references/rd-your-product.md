@@ -10,7 +10,7 @@ Read the template's own `studio.json` first (`studio_templates(operation="pull",
 
 - **A live endpoint.** The `run` step's `url` must be your product's https endpoint, not the starter's `https://api.your-product.example/ken/studio`. A template still pointing at the example URL fills nothing: every page shows `fallback.liquid`. Building that endpoint is template work: the `studio-template` skill's `references/reverse-demo.md` and the starter's `README.md` (pull the template) have the request, the answer and the signature.
 - **The account's domain**, since most products check a domain. The endpoint gets `account` with `name`, `domain`, `industry`, `size_band` and `dossier`; any field but `name` can be null.
-- **The signing secret** stays with the endpoint: `studio_templates(operation="get-webhook-secret", template_id=41)`. Never paste it into the chat or the bundle.
+- **The signing secret** stays with the endpoint. Kenso gives it to a person only, never to an agent: the person reads it with their own API key (`GET /v1/asset-templates/41/webhook-secret`) and sets it on the endpoint. Never ask for it in the chat or put it in the bundle.
 
 ## What each field needs
 
