@@ -9,7 +9,7 @@
     {
       "name": "ken-ai",
       "source": "./plugins/ken-ai",
-      "version": "2.2.102",
+      "version": "2.2.103",
       "description": "Kenso skills for Claude Code and other coding agents: build cold email campaigns, handle replies, report results and keep sending healthy in your Kenso workspace, through the Kenso MCP server."
     }
   ]
