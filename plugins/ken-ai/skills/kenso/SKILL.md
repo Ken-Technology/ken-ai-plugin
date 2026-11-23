@@ -82,6 +82,7 @@ Load a skill with `kenso skill show` and its name, for example `kenso skill show
 | The next-steps email after a call | `next-step-email` |
 | The handoff to the AE after a call | `handoff-to-ae` |
 | Open deals by stage, and the stuck ones | `pipeline-review` |
+| The deals Ken flagged for you, and why | `deal-watch` |
 | The weekly or monthly results report | `report` |
 | The person asks for the start interview | `kenso-start` |
 
