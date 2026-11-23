@@ -59,7 +59,7 @@ Each row also names the registrar, from public RDAP: `registrar` (`name`, `ianaI
 
 If `platformAllowed` is false (Google needs Google Workspace availability, Outlook needs Microsoft 365), drop that name or move it to the other of Google and Outlook. Azure is allowed unless LookupFailed, but it is not offered for new inboxes (rule 6).
 
-A row whose `errorCode` is DomainBlocklisted is on Spamhaus DBL or SURBL. Drop that name and pick another: the import refuses it, and `risk_confirmed` does not lift it.
+A name on Spamhaus DBL or SURBL still imports: Kenso tracks the listing and never refuses or pauses for it. A fresh name stays cleaner, so say it is listed and let the user choose. A row whose `errorCode` is DomainBlocklisted appears only if Kenso switched that refusal back on: then drop the name, since `risk_confirmed` does not lift it.
 
 `requiresConfirm` is a warning, not a hard fail. If a pool falls below packing minimum after drops, go back to step 1 or 2.
 
@@ -141,7 +141,7 @@ Do not loop the check on a timer. One shot on user request, then `domain-imports
 | DomainPendingElsewhere | Another workspace started importing the name (its import is still pending, lapsed or was deleted) and never moved its nameservers. Show `claim.recordName` and `claim.recordValue`: the user adds that TXT record at the domain's own DNS (where they edit its records today), waits for DNS to update (it can take minutes, sometimes longer), then you retry the import. The same record comes from `domain_orders(operation="claim", domain=..., client_id=...)`. Only a workspace that controls the DNS can add it |
 | ClaimLookupFailed | The TXT record could not be read right now. Retry later. Not the same as LookupFailed |
 | ConfirmRequired | MX or live site. Continue or drop that name |
-| DomainBlocklisted | On Spamhaus DBL or SURBL. Drop that name and pick another. Do not retry or set `risk_confirmed`: neither lifts it |
+| DomainBlocklisted | Only while Kenso has the blocklist refusal switched back on (off since 23 Nov 2026): on Spamhaus DBL or SURBL. Drop that name and pick another. Do not retry or set `risk_confirmed`: neither lifts it |
 | PlatformUnavailable / `platformAllowed=false` | That name cannot take that platform. Drop or re-pool |
 | Owner email missing | Set the workspace owner email, then retry |
 

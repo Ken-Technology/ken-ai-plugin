@@ -10,7 +10,7 @@ What each `reason` from `analytics(operation="auto-pauses-list")` means, and wha
 | `domain_gmail_spam_rate` | domain | Gmail reports too much of the domain's mail as spam | Domain health and a placement test |
 | `domain_placement_spam` | domain | A placement test found the domain's mail in spam | The test result, then domain health and blocklists |
 | `reply_ingest_dead` | inbox | Replies stopped arriving from the inbox, so its replies would be missed | The inbox's connection: it may need to be reconnected |
-| `uri_blocklist_listed` | domain | A link host in the copy is on a blocklist | The links in the campaign's copy, and the link host |
+| `uri_blocklist_listed` | domain | History only: the domain was on a blocklist (Spamhaus DBL, SURBL). Since 23 Nov 2026 a listing is tracked and never pauses | Domain health and blocklists. Delisting is requested; sending goes on |
 | `tenant_ban` | inbox | The mailbox's Microsoft 365 tenant refuses to send | The mailbox host. Other inboxes on the same tenant will fail too |
 | `mailbox_sender_ndr_rate` | inbox | Too many of the inbox's sends came back as non-delivery reports | The inbox's settings and its sending host |
 | `workspace_breaker` | workspace | A send hold on the whole workspace | Only support releases it. Tell the user to contact support |
