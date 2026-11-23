@@ -156,7 +156,7 @@ Done when `valid` is true in `mode="publish"` and you have read every warning.
 - `quote.credits`: the expected cost (`expectedMillicredits`), the range it usually lands in (`lowMillicredits` to `highMillicredits`) and the same three in US cents. Divide millicredits by 1,000 for credits.
 - `quote.aiLimit`: the share of the AI limit the run uses (`expectedPercent`) and whether it fits (`fits`). Where the workspace pays AI work in credits its `applies` is false (or `aiLimit` is null): that work is then in `quote.credits`. AI work is a percent of the limit, never dollars.
 - `quote.balance`: the credits left after (`afterMillicredits`) and whether there are enough (`sufficient`).
-- `quote.basis.source`: `workspace` (this workspace's own history), `kenso` (typical Kenso usage), `pilot` (this workflow's own first runs) or `preset` (no history yet: call it a first estimate).
+- `quote.basis.source`: `workspace` (this workspace's own history), `kenso` (typical Kenso usage), `pilot` (this workflow's own first runs), or `preset`: a typical figure, not yet measured on this workspace's own runs or on enough Kenso-wide runs.
 - `quote.per`: what the numbers are for, such as 500 records.
 - `quote.savings`: ways to spend less (Spend less).
 
