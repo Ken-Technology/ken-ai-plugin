@@ -102,7 +102,13 @@ Read each page with `studio_pages(operation="get", asset_id=901)`: `data`, `slot
 4. Confidentiality: no email address or phone number except the sender's own, no other client's names or data, no vendor or tool names, no "demo".
 5. You read it once through `previewUrl`, on desktop and mobile.
 
-A `needs_review` page failed a grade after its retries or holds data that broke a rule. Refill it once (`studio_pages(operation="refill", asset_id=901)`, charged like a fill), or ask a person to review it on its Customize screen (https://app.ken.so/<workspace id>/studio/pages/901/customize): their save there moves it to `ready`; your own `customize` edit does not.
+A `needs_review` page failed a grade after its retries or holds data that broke a rule. You may approve it yourself once you have read it:
+
+1. Read the page with `studio_pages(operation="get", asset_id=901)` and its `previewUrl`, and check it against the five points above. The grade that failed is the one thing you overrule, so judge that part yourself.
+2. Fix what falls short with `studio_pages(operation="customize", asset_id=901, overrides={...})`, then read the page again. An edit alone leaves it in review.
+3. Approve it with `studio_docs(operation="page-approve", asset_id=901, expected="<updatedAt from your last get>")`. It moves to `ready` and records you as the approver (kind agent, your client as via). The page's schema, data rules, link check and required slots still run: each problem comes back in `error.details` and the page stays in review. `409 concurrent_change` means it changed since you read it: read it again first.
+
+Approve only what you would send under your own name. When the page reads wrong and you cannot fix it, refill it once (`studio_pages(operation="refill", asset_id=901)`, charged like a fill) or ask a person to review it on its Customize screen (https://app.ken.so/<workspace id>/studio/pages/901/customize).
 
 ## Step 6 - Create the links
 
