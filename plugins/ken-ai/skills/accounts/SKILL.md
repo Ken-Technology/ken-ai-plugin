@@ -16,13 +16,13 @@ You plan and write touches. Whether a person approves one before it sends is the
 | The action's `mode` | A touch you create, or a body you write or change |
 |---|---|
 | `asks_first` | waits for a person |
-| `runs_on_its_own` | waits for a person: this mode sends Ken's own first draft that its quality check kept, never text an agent or an API key wrote or changed |
+| `runs_on_its_own` | waits for a person: this mode sends Ken's own first draft that its quality check kept, never a touch an agent or an API key started or changed |
 | `runs_everything` | is approved with no click and sends at its due time, unless it is on the list below. You are the last reader before it goes out |
 
 - `agent_permissions` answers 404 `not_found`: the permission is off for the workspace, and every touch waits for a person.
 - `agent_permissions` is missing from your tools, or refuses you: you cannot tell. Act as if it reads `runs_everything`, and tell the person you could not read the setting.
 - On a workspace run for a client, the send actions read `asks_first` until the client's yes is stored.
-- At `runs_everything`, text you or an API key wrote (a touch you create with a body, or with a subject Ken keeps when it drafts the body, a body or subject you write or change, even a subject you change before Ken drafts, or a draft you ask Ken for with `draft`) goes with no click only once a person signed in to the app has saved `runs_everything` for that send, and only text that became ready after that save. While the action's `agentTextAsksFirst` is true, nobody has, and your text waits for a person. You cannot make that save: the API refuses the confirm from an agent or a key (403 `approval_requires_human`). Ask the member to open Settings > Ken agent in the app and save Autonomous for that send.
+- At `runs_everything`, a touch you or an API key started or changed goes with no click only once a person signed in to the app has saved `runs_everything` for that send, and only one that became ready after that save. That is any touch you create, also one you leave `planned` for Ken to write (Ken's draft of it waits too), and any touch you change before or after Ken drafts it: its subject, body, rationale, title, recipient or any other field, or a draft you ask Ken for with `draft`. While the action's `agentTextAsksFirst` is true, nobody has made that save, and these wait for a person. You cannot make that save: the API refuses the confirm from an agent or a key (403 `approval_requires_human`). Ask the member to open Settings > Ken agent in the app and save Autonomous for that send.
 
 These wait for a person at every mode:
 
@@ -42,8 +42,8 @@ When the action reads `runs_everything`, the person's click is no longer the saf
 1. Write it only when the person asked for this outreach, or their standing instructions cover it. Name which.
 2. With the person in the conversation, show the exact subject and body, who it goes to and when it sends, and write it on their yes.
 3. Tell them it sends at that time without their click. Never say it is waiting for their approval.
-4. When you are unsure, ask before you write. A draft you ask Ken for with `account_touches(operation="draft", touch_id=...)` sends with no click under `runs_everything` (once a person has saved it in the app, so `agentTextAsksFirst` is false) when you act for the sender (the member whose inbox or LinkedIn account it goes from, else the account owner), and waits only when you act for a teammate. A touch left `planned` with no body is not held either: Ken writes it ahead of its due date, and under `runs_everything` that draft sends with no click too.
-5. Never raise a mode. Raising a send mode is the person's step in Settings > Ken agent; from here it is refused with 403 `approval_requires_human`, and saving `runs_everything` where it already reads so writes nothing (only a person's confirm in the app stores it), so it never lets your own text go without a click. Lower one only when the person asks.
+4. When you are unsure, ask before you write. A draft you ask Ken for with `account_touches(operation="draft", touch_id=...)` sends with no click under `runs_everything` (once a person has saved it in the app, so `agentTextAsksFirst` is false) when you act for the sender (the member whose inbox or LinkedIn account it goes from, else the account owner), and waits only when you act for a teammate. A touch you create and leave `planned` with no body is held the same way: Ken writes it ahead of its due date, and under `runs_everything` that draft sends with no click once a person has saved it in the app.
+5. Never raise a mode. Raising a send mode is the person's step in Settings > Ken agent; from here it is refused with 403 `approval_requires_human`, and saving `runs_everything` where it already reads so writes nothing (only a person's confirm in the app stores it), so it never lets your own touches go without a click. Lower one only when the person asks.
 
 **Read every touch back.** After a create or an update, `account_touches(operation="get", touch_id=5001)`, and report what it says, never what you expect:
 
