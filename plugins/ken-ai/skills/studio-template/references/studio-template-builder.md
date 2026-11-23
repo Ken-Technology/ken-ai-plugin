@@ -481,8 +481,9 @@ The policy the validator and the page server share, verbatim:
       "pass(word|code|phrase)?", "[a-z]*passw(or)?d", "pwd", "pin",
       "(credit|debit)?card(number|num|no|holder|code|exp|expiry)?", "cc-?(number|num|no|exp|csc|cvv|cvc)", "cvv",
       "cvc", "ccv", "security-?code", "iban", "routing(number|num|no)?", "account-?(number|num|no)", "ssn",
-      "social-?security", "tax-?id", "national-?id", "passport", "driver'?s?-?licen[cs]e", "otp", "totp", "mfa",
-      "2fa", "one-?time", "verification-?code", "auth-?code"
+      "social-?security", "tax-?id", "national-?id", "passport", "driver'?s?-?licen[cs]e", "(t?otp|mfa|2fa)[a-z]*",
+      "[a-z]*(otp|mfa)", "one-?time[a-z]*", "[a-z]*verification[a-z]*", "(verify|auth|login|sms|confirmation)-?code",
+      "two-?factor", "secret"
     ]
   }
 }
@@ -725,7 +726,7 @@ The loop:
 | `liquid-render-arg` | error / warning | Error: chart `type` outside `bar`, `funnel`, `line`, `pie`. Warning: drop an argument the snippet does not read; use `href` instead of a cta `kind` other than `booking` |
 | `liquid-unknown-variable` | warning | Use a root variable (`account`, `person`, `sender`, `brand`, `link`, `data`, `asset_url`) or `assign` it first; as written it renders empty |
 | `liquid-undeclared-slot` | error | Declare the slot in `studio.json`, or fix the name the template reads |
-| `liquid-output-context` | error | A value from `data`, `account`, `person`, `sender` or `role` sits in CSS, an Alpine directive, an unquoted attribute or a tag's attribute list: end it with a number filter (`\| plus: 0`), use `\| js_string` in a directive, or move it into quoted attribute text or the element's text |
+| `liquid-output-context` | error | A value from `data`, `account`, `person`, `sender` or `role` sits in CSS, an Alpine directive, an iframe `srcdoc`, an unquoted attribute, a tag's name or its attribute list (also when read as `['data']` or through a `group_by` or `where_exp` string): end it with a number filter (`\| plus: 0`), use `\| js_string` in a directive, or move it into quoted attribute text or the element's text |
 | `liquid-date-format` | error | Shorten the `date` format to at most 64 characters; write other text outside the filter |
 | **Content Security Policy** | | |
 | `csp-script-src` | error | Load external scripts only from the script sources (Chart.js 4, Alpine CSP 3, Motion 11) |
@@ -734,7 +735,7 @@ The loop:
 | `csp-iframe-src` | error | Frame only booking or video hosts from the lists; use `ken/booking`; remove `<object>`, `<embed>`, `<applet>` |
 | `csp-img-src` | error | Load images from `assets/` (`asset_url`), a `data:` image or `https://api.ken.so/media/`; this also applies to `img` and `srcset` in slot HTML |
 | `csp-form-action` | error | Use `ken/form`; never post to another host |
-| `csp-input-type` | error | Remove password inputs, `cc-*`, password or `one-time-code` autocomplete, and password, one-time code (`otp`, `mfa`, `2fa`, `verification_code`), card or ID-number fields; do not bind an input's `type`, `name` or `autocomplete` |
+| `csp-input-type` | error | Remove password inputs, `cc-*`, password or `one-time-code` autocomplete, and password, one-time or sign-in code (`otp`, `otpCode`, `mfa`, `2fa`, `verification_code`, `login_code`, `sms_code`, `secret`), card or ID-number fields; do not bind an input's `type`, `name` or `autocomplete` |
 | `csp-inline-handler-url` | error | Remove the `javascript:` URL (also encoded or split forms); use a real link, the kit, or an Alpine directive |
 | **Links** | | |
 | `link-scheme` | error | Use `https:`, `mailto:`, `tel:`, a relative path or `#`; `data:` only for images; no `http:`. A schemeless link with `&`, `:` or a control character before its first `/`, `?` or `#` also fails |
