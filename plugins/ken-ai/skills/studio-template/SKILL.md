@@ -151,7 +151,7 @@ Publish refuses with 409 `invalid_state` on validation errors (each detail names
 
 **Datasets** (CSV rows a `dataset` recipe step picks from, such as `peers` or `case-studies`): upload with `studio_templates(operation="create-upload-url", template_id=41, path="peers.csv", content_type="text/csv", size_bytes=48210)`, PUT the bytes with the returned headers, then `studio_templates(operation="datasets-create", template_id=41, name="peers", upload_id="<uploadId>")`. List them with `studio_templates(operation="datasets-list", template_id=41)`. `studio_templates(operation="datasets-delete", dataset_id=12)` removes one: pages that pick from it fall back, so ask first.
 
-**Webhook steps** (your own endpoint fills slots, as in `rd-your-product`): read the signing secret with `studio_templates(operation="get-webhook-secret", template_id=41)`. Never paste it into a chat, a file in the bundle or the page.
+**Webhook steps** (your own endpoint fills slots, as in `rd-your-product`): the endpoint checks each call with the template's signing secret. Kenso gives that secret to a person only, never to an agent: the person reads it with their own API key (`GET /v1/asset-templates/41/webhook-secret`) and sets it on the endpoint themselves. Never ask for it in a chat, and never put it in a file in the bundle or the page.
 
 **Campaign pins.** A campaign's sequence can carry the merge tag `asset_link`, written in double curly braces, and Kenso builds each page one step ahead from the pinned template:
 
