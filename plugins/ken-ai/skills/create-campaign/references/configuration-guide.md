@@ -58,11 +58,11 @@ Live campaign with segments + copy + prompts
 
 ## Campaign settings
 
-Writable through `campaigns(operation="update", ...)`: `name`, `contact_limit`, `sending_days`, `sending_start_time`, `sending_end_time`, `sending_timezone`, `max_emails_per_day`, `ramp_up_days`, `excluded_countries` (the countries the campaign never sends to, a full replace; `[]` clears it), and the campaign options its full docs list (`describe_tools(['campaigns'])`). Gap-fill picks up a schedule or daily-cap change on its next pass, about every 10 minutes. On a client's live campaign, any schedule or volume change needs a yes that names that client, carried in `sending_days_requested_by`.
+Writable through `campaigns(operation="update", ...)`: `name`, `contact_limit`, `sending_days`, `sending_start_time`, `sending_end_time`, `sending_timezone`, `max_emails_per_day`, `ramp_up_days`, `excluded_countries` (the countries the campaign never sends to, a full replace; `[]` clears it), `duplication_scope` (also on `campaigns(operation="create")`; it applies to imports started from then on), and the campaign options its full docs list (`describe_tools(['campaigns'])`). Gap-fill picks up a schedule or daily-cap change on its next pass, about every 10 minutes. On a client's live campaign, any schedule or volume change needs a yes that names that client, carried in `sending_days_requested_by`.
 
 AI workflows are writable through `campaign_flow(operation="replace-ai-workflows", ...)` (next section).
 
-Read through `campaign_ops(operation="status")` and set in the campaign settings in the app (link in the stage body): data sources, enrichments, website page selections, email enrichments and verifications, personal emails, dedup settings, A/B mode.
+Read through `campaign_ops(operation="status")` and set in the campaign settings in the app (link in the stage body): data sources, enrichments, website page selections, email enrichments and verifications, personal emails, recently-emailed dedup, A/B mode.
 
 | Setting | Convention | Notes |
 |---------|-----------|-------|
@@ -73,7 +73,7 @@ Read through `campaign_ops(operation="status")` and set in the campaign settings
 | `sending_days` | Mon-Fri | Weekday ints, 0 = Sunday |
 | `sending_start_time` / `sending_end_time` | `"09:00"` / `"17:00"` | Without any schedule, create stamps Mon-Fri 10:00-18:00 ET |
 | `sending_timezone` | `"America/New_York"` | Or `"prospect"` for a window local to each lead |
-| `duplication_scope` | 1 (CampaignSegment) | App setting |
+| `duplication_scope` | 1 (CampaignSegment) | Operator convention; the system default for a new campaign is 0 (Campaign). Writable as above |
 | `campaign_data_sources` | `[17]` | App setting |
 | AI workflows | `[1, 4]` | Plus 2 and 8 (AI Line Check) once AI variables exist, plus 3 when rewriting is used; written with `replace-ai-workflows` |
 | `campaign_data_enrichments` | `[3, 4]` | Not defaulted on at create; Home page selection when on. App setting |
