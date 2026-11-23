@@ -17,7 +17,7 @@ The values behind campaign settings, prompts, segments, and sequences, with wher
 | `status` | get | Collapsed lifecycle string | Lifecycle calls only, never update |
 | `campaignStatuses` | status | CampaignStatus numbers | Lifecycle calls only |
 | `campaignAiWorkflows` | status (also `campaign_flow(operation="list-ai-workflows")`) | Flow ids. `[1, 4]` at create; 2 and 3 are attached by you, 6 by scoring, 8 (AI Line Check) with 2: keep 8 when you attach 2 with a replace | `campaign_flow(operation="replace-ai-workflows", ai_workflow_ids=[...])`, a full replace |
-| `duplicationScope` | status | DuplicationScope | App setting |
+| `duplicationScope` | status (also `campaigns(operation="get")`, with `effectiveDuplicationScope`) | DuplicationScope | `campaigns` create or update `duplication_scope` |
 | `recentlyEmailedDedupDays` | status | 1-3650 or null (off). Suppresses contacts emailed within the window when they are imported. For reactivation / winback | App setting |
 | `segmentationMode` | status | SegmentationMode | App setting (create time or later) |
 | `allowPersonalEmails` | status | bool. Allow gmail / yahoo / etc. | App setting |
@@ -89,9 +89,9 @@ The Default segment (`isDefault=true`) is stored with no type in AI mode. In per
 - 3 = assistant - `"assistant"`
 
 ## DuplicationScope
-- **0 = Campaign** (the app's "other campaigns" box checked; `workspace` on `campaigns(operation="get")`): a contact already in another campaign of this workspace is a duplicate too. Never across workspaces. Default for new campaigns
-- 1 = CampaignSegment (the box unchecked; `campaign` on get): dedup only inside this campaign, across all its segments
-- Dedup inside the same campaign is on either way. A workspace-level duplicate setting, when someone set one, overrides both values.
+- **0 = Campaign** (the app's "other campaigns" box checked; `workspace` on `campaigns(operation="get")`): a contact already in another campaign of this workspace is a duplicate too. Never across workspaces. The system default for a new campaign
+- 1 = CampaignSegment (the box unchecked; `campaign` on get): dedup only inside this campaign, across all its segments. The operator convention (`configuration-guide.md`)
+- Dedup inside the same campaign is on either way. A workspace-level duplicate setting, when someone set one, overrides both values: `effectiveDuplicationScope` on `campaigns(operation="get")` says what dedup actually does (`workspace`, `campaign`, `segment` or `off`).
 
 ## Wait days (confirmed)
 - `waitDays` on Email N = days to wait **before** Email N sends (delta from the previous email). Email 1 is `0`.
