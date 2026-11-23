@@ -287,9 +287,9 @@ Pages render with LiquidJS 10 on the page server. The validator parses with Scri
 - **Filters**: strict. A filter LiquidJS does not know makes the whole template fail at render, and the page drops to its fallback. Use the standard ones: `default`, `escape`, `append`, `prepend`, `replace`, `remove`, `split`, `join`, `first`, `last`, `size`, `map`, `where`, `sort`, `uniq`, `slice`, `truncate`, `truncatewords`, `upcase`, `downcase`, `capitalize`, `strip`, `strip_html`, `newline_to_br`, `strip_newlines`, `url_encode`, `date`, `plus`, `minus`, `times`, `divided_by`, `modulo`, `round`, `floor`, `ceil`, `abs`, `at_least`, `at_most`, `json`, `raw`.
 - **Variables**: not strict. An unknown variable renders empty; the validator warns with `liquid-unknown-variable`. Root variables are `account`, `person`, `sender`, `brand`, `link`, `data`, `asset_url`, plus whatever the template assigns.
 - **Dates** render in UTC with the `en-US` locale.
-- **Limits**: 50,000 render steps (each node, loop iteration and kit call is one) and 2 MB of output per page. Past either, the render fails and the fallback serves.
+- **Limits**: 50,000 render steps (each node, loop iteration and kit call is one; a filter call is one more, plus one per 100 characters of its input, and a `date` filter 100 more per `%` directive) and 2 MB of output per page. A `date` format holds at most 64 characters (`liquid-date-format`). Past any of these, the render fails and the fallback serves.
 - **Escaping**: every `{{ }}` output is HTML-escaped automatically. Existing entities are kept, so an explicit `| escape` is harmless and never escapes twice. To output HTML from a slot, use `| raw`. Markup a filter adds is escaped too, so prose with line breaks escapes first and ends in `raw`: `{{ data.intro | escape | newline_to_br | strip_newlines | raw }}`, or the reader sees `<br />` as text. Filled HTML must pass `data-active-content`: formatting elements only, never scripts, styles, forms, frames, media or handlers.
-- **Scripts**: a template has none (`csp-inline-script`). Print only numbers into an `x-data` literal or a directive; print text with Liquid in the markup, where escaping keeps it safe.
+- **Scripts**: a template has none (`csp-inline-script`). A value read from `data`, `account`, `person`, `sender` or `role` (or assigned from one) goes into a directive, a `<style>` block or a `style` attribute only through a number filter (`{{ data.score | plus: 0 }}`) or, in a directive, as text through `| js_string` with no quotes around it (`x-data="{ name: {{ data.name | js_string }} }"`); anything else is `liquid-output-context`. Quote every attribute value that holds Liquid. Print other text with Liquid in the markup, where escaping keeps it safe.
 - **Defaults**: give every Kenso variable that can be null a `| default:` or an `{% if %}` guard (which ones: see Kenso variables).
 - **Truthiness**: an empty string is truthy. An empty top-level slot is replaced by its fallback or removed before render, so `{% if data.x %}` works for it. Test nested strings with `{% if e.ps and e.ps != '' %}`.
 - **Literal braces**: a rendered page that contains `{{` or `{%` counts as a failed render. Never print literal Liquid braces, not even through `{% raw %}`.
@@ -476,12 +476,13 @@ The policy the validator and the page server share, verbatim:
     "fieldTypes": ["text", "email", "tel", "url", "number", "date", "textarea", "select", "checkbox"],
     "maxFields": 12,
     "deniedInputTypes": ["password"],
-    "deniedAutocompletePrefixes": ["cc-", "current-password", "new-password"],
+    "deniedAutocompletePrefixes": ["cc-", "current-password", "new-password", "one-time-code"],
     "deniedFieldNamePatterns": [
       "pass(word|code|phrase)?", "[a-z]*passw(or)?d", "pwd", "pin",
       "(credit|debit)?card(number|num|no|holder|code|exp|expiry)?", "cc-?(number|num|no|exp|csc|cvv|cvc)", "cvv",
       "cvc", "ccv", "security-?code", "iban", "routing(number|num|no)?", "account-?(number|num|no)", "ssn",
-      "social-?security", "tax-?id", "national-?id", "passport", "driver'?s?-?licen[cs]e"
+      "social-?security", "tax-?id", "national-?id", "passport", "driver'?s?-?licen[cs]e", "otp", "totp", "mfa",
+      "2fa", "one-?time", "verification-?code", "auth-?code"
     ]
   }
 }
@@ -724,6 +725,8 @@ The loop:
 | `liquid-render-arg` | error / warning | Error: chart `type` outside `bar`, `funnel`, `line`, `pie`. Warning: drop an argument the snippet does not read; use `href` instead of a cta `kind` other than `booking` |
 | `liquid-unknown-variable` | warning | Use a root variable (`account`, `person`, `sender`, `brand`, `link`, `data`, `asset_url`) or `assign` it first; as written it renders empty |
 | `liquid-undeclared-slot` | error | Declare the slot in `studio.json`, or fix the name the template reads |
+| `liquid-output-context` | error | A value from `data`, `account`, `person`, `sender` or `role` sits in CSS, an Alpine directive, an unquoted attribute or a tag's attribute list: end it with a number filter (`\| plus: 0`), use `\| js_string` in a directive, or move it into quoted attribute text or the element's text |
+| `liquid-date-format` | error | Shorten the `date` format to at most 64 characters; write other text outside the filter |
 | **Content Security Policy** | | |
 | `csp-script-src` | error | Load external scripts only from the script sources (Chart.js 4, Alpine CSP 3, Motion 11) |
 | `csp-inline-script` | error | Remove the inline `<script>` and the `on*` handler attributes; use the kit, CSS, or Alpine directives with inline expressions. Already published versions keep serving, but their own inline scripts no longer run |
@@ -731,7 +734,7 @@ The loop:
 | `csp-iframe-src` | error | Frame only booking or video hosts from the lists; use `ken/booking`; remove `<object>`, `<embed>`, `<applet>` |
 | `csp-img-src` | error | Load images from `assets/` (`asset_url`), a `data:` image or `https://api.ken.so/media/`; this also applies to `img` and `srcset` in slot HTML |
 | `csp-form-action` | error | Use `ken/form`; never post to another host |
-| `csp-input-type` | error | Remove password inputs, `cc-*` or password autocomplete, and card or ID-number fields; do not bind an input's `type`, `name` or `autocomplete` |
+| `csp-input-type` | error | Remove password inputs, `cc-*`, password or `one-time-code` autocomplete, and password, one-time code (`otp`, `mfa`, `2fa`, `verification_code`), card or ID-number fields; do not bind an input's `type`, `name` or `autocomplete` |
 | `csp-inline-handler-url` | error | Remove the `javascript:` URL (also encoded or split forms); use a real link, the kit, or an Alpine directive |
 | **Links** | | |
 | `link-scheme` | error | Use `https:`, `mailto:`, `tel:`, a relative path or `#`; `data:` only for images; no `http:`. A schemeless link with `&`, `:` or a control character before its first `/`, `?` or `#` also fails |
