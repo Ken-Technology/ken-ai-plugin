@@ -89,8 +89,8 @@ The Default segment (`isDefault=true`) is stored with no type in AI mode. In per
 - 3 = assistant - `"assistant"`
 
 ## DuplicationScope
-- 0 = Campaign (the app's "other campaigns" box checked): a contact already in another campaign of this workspace is a duplicate too. Never across workspaces.
-- **1 = CampaignSegment** (the box unchecked): dedup only inside this campaign, across all its segments - default for new campaigns
+- **0 = Campaign** (the app's "other campaigns" box checked; `workspace` on `campaigns(operation="get")`): a contact already in another campaign of this workspace is a duplicate too. Never across workspaces. Default for new campaigns
+- 1 = CampaignSegment (the box unchecked; `campaign` on get): dedup only inside this campaign, across all its segments
 - Dedup inside the same campaign is on either way. A workspace-level duplicate setting, when someone set one, overrides both values.
 
 ## Wait days (confirmed)
