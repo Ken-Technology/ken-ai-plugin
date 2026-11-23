@@ -48,6 +48,8 @@ Done when you know whether the interested count can be trusted.
 
 Read `sentCount` and `contactedCount` by day. Fewer sends come before fewer replies, so a reply drop that follows a send drop is a sending question, not a copy question.
 
+This read is email only (its default channel), so a LinkedIn-only campaign shows 0 sent here. For a campaign with LinkedIn on, read its LinkedIn sends too before you judge them: `analytics(operation="get-campaign-performance", from_time="2026-10-01T00:00:00Z", to_time="2026-10-27T23:59:59Z", campaign_id=42, group_by="day", channel="linkedin")`. Never restart a campaign because of its email stages.
+
 - Status: a paused, completed or errored campaign stops sending. `campaigns(operation="get", campaign_id=42)` says which.
 - Holds: `analytics(operation="auto-pauses-list")` lists the inboxes, domains and campaigns Kenso paused on its own, with the reason and the rate that tripped it. `isActive` true means the hold still blocks sending.
 - Leads: `analytics(operation="get-weekly-report", campaign_id=42)` returns `next`, which says how many leads are left and when the last one starts. A campaign with no leads left stops sending.
@@ -62,13 +64,18 @@ The processing stages and campaign batches describe email. A LinkedIn-only campa
 
 1. Read `campaigns(operation="get-processing-status", campaign_id=42)`.
    - `notUsed` lists what a LinkedIn-only campaign does not use (its email stages, then `campaign_batches`), and each of those stages has `used: false`. Leave them out of the diagnosis.
-   - `linkedIn` is the lane funnel: `lanes` (count and `nextDueAt` per status), the campaign's `nextDueAt`, each seat's `invitesToday` against its `dailyInviteCap`, and `accountPlayHeld`.
+   - `linkedIn` is the lane funnel: `lanes` (count and `nextDueAt` per status), the campaign's `nextDueAt`, each seat's `invitesToday` against its `dailyInviteCap` with its `nextSendAt` and `notSendingReason`, and `accountPlayHeld`.
 2. Read the sequence where it lives. A campaign with segments sends each segment its own LinkedIn sequence, so an empty campaign-level sequence is normal there. The segmentation stage's `segments` list gives each `segmentId`; read each one with `linkedin(operation="segment-linkedin-sequences-get", segment_id=301)`.
 3. Judge movement, not the email stages. The lanes are moving when counts shift from `pending` and `resolving` toward `invite_sent`, `accepted` and `in_sequence`, when `nextDueAt` is today or soon, or when a seat's `invitesToday` is at or near its `dailyInviteCap`.
-4. Explain slow LinkedIn sending by the seats before you suspect a bug. A new seat warms up: `rampStage` 0, 1 and 2 send about 5, 10 and 20 invites a day, and from stage 3 it sends its `configuredDailyInviteCap`. A seat with `invitesLeftToday` 0 is done for its day, one with `pausedAt` set sends nothing, and one whose `status` is not `connected` sends nothing until it is fixed in Kenso (a disconnected seat is reconnected there). A seat with a low acceptance rate, or one that re-ramps, can get a lower `dailyInviteCap` while LinkedIn safety is on, and `dailyInviteCap` is always the number the scheduler uses today. Many lanes behind one seat at its cap is a pace, not a fault: say how many days the queue takes at that cap, with the numbers.
+4. Explain slow LinkedIn sending by the seats before you suspect a bug. A new seat warms up: `rampStage` 0, 1 and 2 send about 5, 10 and 20 invites a day, and from stage 3 it sends its `configuredDailyInviteCap`. A seat with a low acceptance rate, or one that re-ramps, can get a lower `dailyInviteCap` while LinkedIn safety is on, and `dailyInviteCap` is always the number the scheduler uses today. `invitesLeftToday` is what the seat still sends in its own day. Many lanes behind one seat at its cap is a pace, not a fault: say how many days the queue takes at that cap, with the numbers.
+   A seat sends only in its working hours (default Monday to Friday 08:00-18:00 in its time zone), so 0 invites today is normal every evening, before its first invite of a weekday and all weekend. `notSendingReason` says why a seat sends no invite now, and `nextSendAt` when it sends next; both are absent when it can send now:
+   - `outside_working_hours`: closed now, normal. It sends at `nextSendAt`, its next opening.
+   - `cap_reached`: today's cap is spent. It sends at `nextSendAt`, the next day's opening.
+   - `seat_hold`: LinkedIn safety holds its invites (after a LinkedIn warning or refused invites) and lifts the hold on its own. It sends at `nextSendAt`.
+   - `paused`, `unpaid` or `not_connected`: it sends nothing until a person acts in Kenso: a member resumes the seat, its LinkedIn seat is paid, or it is reconnected.
 5. `accountPlayHeld` counts leads that match an active account play now. The sender holds each one and checks it again a day later, so those lanes wait on purpose.
 
-Never suggest restarting or resetting a LinkedIn-only campaign whose lanes are moving: a restart does not raise a seat's cap, so the lanes go no faster. Only when nothing moves (no lane due, no invites today on a connected seat with invites left, `linkedIn` missing on a campaign with LinkedIn on) do you report it as a problem for the Kenso team, with the funnel's numbers.
+Never suggest restarting or resetting a LinkedIn-only campaign: a restart does not raise a seat's cap or open its working hours, so the lanes go no faster. Report a problem to the Kenso team, with the funnel's numbers, only when nothing moves: lanes whose `nextDueAt` is hours past on a seat with no `notSendingReason` (open, not held, invites left), and still past on a second read. A seat with a `nextSendAt` is waiting for that time, not stuck. A missing `linkedIn` is not a bug either (the read can fail, or the API may not have it yet): read the processing status again, and if it is still missing, judge by the `channel="linkedin"` sends from Step 2 and say you could not read the LinkedIn funnel.
 
 ## Step 3 - Bounces
 
