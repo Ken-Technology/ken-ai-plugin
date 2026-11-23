@@ -42,7 +42,7 @@ When the call is refused or answers 404, Knowledge is off for this workspace. Sa
 
 ## Step 1: Read what is there
 
-1. `knowledge_review(operation="tree-get")`: every folder and file with its name, level, status and version. Add `include_bodies=true` only for a small tree.
+1. `knowledge_review(operation="tree-get")`: every folder and file with its name, level, status and version, each account folder without its contents. Read one account's folders and files with `account_id`. Add `include_bodies=true` only for a small tree.
 2. `workspace(operation="get", workspace_id=...)`: `website` and `companyContext`, the short company summary campaign prompts read. The workspace id comes from `workspace(operation="list")`.
 3. `knowledge(operation="website-pages-list")`: the pages Kenso watches and each one's status.
 4. `knowledge_review(operation="sources-list")`: connected mailboxes, CRM and recorders.
