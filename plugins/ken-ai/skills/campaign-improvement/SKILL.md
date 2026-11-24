@@ -54,6 +54,8 @@ For each step you would change, show:
 
 Grade both texts: `email_copy(operation="grade", subject_key="acme-42-seg7-step3", copy="<the email as plain text>")`. Keep `subject_key` stable per step, and pass `refresh=True` to grade changed copy under the same key. A follow-up's copy starts with `This is a follow-up.` and a newline. The grade has a label (`keep`, `rewrite` or `start_over`) and a score per criterion. A `weird_word` yes is never `keep`. For the full copy rulebook, load `load_skill(name="create-campaign", reference="references/email-review.md")`.
 
+Take one reading of each live step's body you looked at: `email_copy(operation="detect", subject="<subject>", body="<body>")`. Show it with the step in the app's words: "Reads templated" for `reads_generated`, "Near the line" for `borderline`, "Reads natural" for `reads_human`, "Too short to read" for `too_short`, plus "rough reading" when `measured` is false. When most steps read templated, name the format habits the sequence repeats (one greeting, one sign-off, a PS line on every email) as the likely reason. The reading only reports: it is never the reason for a change, and the proposed text gets no reading of its own. When the call answers `unavailable` or a quota error, leave the reading out without a word and carry on.
+
 Wait for the yes. Change only what the yes covers.
 
 ## Step 4 - A personalization line

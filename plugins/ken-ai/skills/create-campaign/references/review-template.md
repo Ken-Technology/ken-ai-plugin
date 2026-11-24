@@ -47,6 +47,7 @@ Use this layout when you show a review to a person. When a caller asks for a dif
 - Merge fields: [lead variables valid; every AI variable has a personalization prompt, or the ones missing]
 - Links: [link count per email; tracking tokens preserved]
 - Model grade (optional): [`email_copy` grade label per email, and any weird_word Yes]
+- Reading: [per email: Reads templated, Near the line, Reads natural or Too short to read, plus "rough reading" when `measured` is false; when most read templated, the format habits the sequence repeats. Leave this line out when detect was unavailable]
 
 ### Priority Improvements
 1. [Most important fix]
