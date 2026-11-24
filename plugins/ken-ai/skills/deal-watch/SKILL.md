@@ -19,7 +19,7 @@ Every call takes `client_id`, the workspace id. Send it on every call when the u
 
 ## Step 1 - List the open items
 
-`deal_watch(operation="list", client_id=24)`
+`deal_watch(operation="list", client_id=...)`
 
 - Open items are the ones in front of the user now: sent or ready, and snoozed ones whose snooze ended, from the last 7 days. `state="all"` adds the ones they acted on, snoozed or dismissed. `opportunity_id=9001` keeps one deal's items ("why did Ken flag this deal?").
 - No items: only when `data` is empty and `pagination.hasMore` is false, say "Ken has nothing for you on your deals right now." and stop. An empty page with `hasMore` true is not the end (an item whose deal closed drops out of its page): call again with `cursor=pagination.nextCursor`.
@@ -40,8 +40,8 @@ Keep each item to a few lines. When there are many, show the first five and ask 
 
 For each item, offer these, and run only the one the user picks:
 
-- **Snooze for 7 days:** `deal_watch(operation="snooze", client_id=24, item_id=812)`.
-- **Dismiss as not useful,** with the user's reason: `deal_watch(operation="dismiss", client_id=24, item_id=812, reason="not_useful", note="Already talking to their CFO")`. Ken then stops flagging that reason for them for 30 days. `reason="not_urgent"` says the deal can wait; `reason="dismiss"` just clears it.
+- **Snooze for 7 days:** `deal_watch(operation="snooze", client_id=..., item_id=812)`.
+- **Dismiss as not useful,** with the user's reason: `deal_watch(operation="dismiss", client_id=..., item_id=812, reason="not_useful", note="Already talking to their CFO")`. Ken then stops flagging that reason for them for 30 days. `reason="not_urgent"` says the deal can wait; `reason="dismiss"` just clears it.
 - **Act on the deal** with the deal and task tools: read it with `opportunities(operation="get", opportunity_id=9001)`, change it with `opportunities(operation="update", opportunity_id=9001, changes={"next_step": "Send the redlines to Priya"})` on the user's yes, or add a task with `tasks(operation="create", title="Call Priya about the redlines", opportunity_id=9001)`. An item's `actions` name what Ken suggests (draft an email to `personName`, create the task `taskTitle`, move the close date to `closeDate`); offer them as ideas, never as done.
 
 After a snooze or a dismiss, say what the answer shows (`state`, and `snoozedUntil` after a snooze). A `404` means the item is not the user's or is gone; a `409` `invalid_state` gives the reason in its message: say it.
