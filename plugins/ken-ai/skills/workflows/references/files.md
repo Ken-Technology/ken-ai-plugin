@@ -10,7 +10,7 @@ A file is **bound** when `kenso.json` maps it to a workflow id. `init`, `pull` a
 
 ```json
 {
-  "workspaceId": "3047",
+  "workspaceId": "<workspace id>",
   "profile": "client-a",
   "workflows": { "workflows/qualify.workflow.json": 412 }
 }

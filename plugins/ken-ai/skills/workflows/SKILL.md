@@ -5,7 +5,7 @@ description: Build the workflow the user meant over MCP - ask for the gaps, chec
 
 # Workflows
 
-A workflow is automation in Kenso (Workflows, https://app.ken.so/<workspace id>/workflows): one trigger (a signal, a new lead, a webhook, a schedule, or a run on records someone picks), a list of steps (find people, enrich, qualify with AI, branch, promote to Accounts, draft an email, post to Slack) and limits (credits per month and per run, runs per day). A `general` workflow runs on the workspace's accounts, people or leads. A `campaign` workflow belongs to one campaign and runs on its leads. A `system` workflow is Kenso's own and read-only: Kenso keeps one for each Knowledge skill (edit the skill instead), and the ones it seeds for its own jobs are a 404 for anyone but staff (`references/ops-console.md`).
+A workflow is automation in Kenso (Workflows, https://app.ken.so/<workspace id>/workflows): one trigger (a signal, a new lead, a webhook, a schedule, or a run on records someone picks), a list of steps (find people, enrich, qualify with AI, branch, promote to Accounts, draft an email, post to Slack) and limits (credits per month and per run, runs per day). A `general` workflow runs on the workspace's accounts, people or leads. A `campaign` workflow belongs to one campaign and runs on its leads. A `system` workflow is Kenso's own and read-only: Kenso keeps one for each Knowledge skill (edit the skill instead), and the ones it seeds for its own jobs are a 404 for anyone but staff.
 
 **The hub's rules.** Before the real `kenso workflows run`, show the approval block of the hub skill `kenso` (section 5) with the dry run's numbers and wait for the person's yes, also when its `credits.needed` is 0; after it, end with the hub's final reply (section 9), all five lines. Read the hub in full: load the `kenso` skill, or run `kenso skill show kenso` and read the whole output.
 
@@ -26,7 +26,6 @@ Open a reference with `load_skill(name="workflows", reference="references/exampl
 | `references/power-features.md` | the workspace has `workflows_power` and the workflow needs a workspace variable, a computed value, a table, a connection to an outside tool, an approval by a person, a wait for an outside system, a call to another workflow, an engagement trigger, a report or a one-step test |
 | `references/api-recipes.md` | a step calls Apollo, Instantly, Smartlead, Attio or Close: the connection to create and the `http.request@1` step to write |
 | `references/files.md` | the person works with the Kenso CLI (`kenso`): a workflow kept as a file with `kenso.json`, check, push, test and publish from the file, a run on ids or a CSV with a credit cap, a results file |
-| `references/ops-console.md` | the caller is Kenso staff and the question is fleet-wide: queues, provider breakers, stuck runs, spenders, kill switches, system and shadow workflows. Never for anyone else |
 
 Every call takes `client_id`, the workspace id. Send it on every call when the user can see more than one workspace.
 
