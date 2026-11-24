@@ -126,7 +126,7 @@ Canonical strings, with the LinkedInStepType / LinkedInStepConditionType integer
 | stepType | Integer | Notes |
 |----------|--------|-------|
 | `profile_visit` | 1 = ProfileVisit | No body, no versions |
-| `connection_request` | 2 = ConnectionRequest | Note max 275 characters |
+| `connection_request` | 2 = ConnectionRequest | Note at most the sequence's `connectionNoteMaxChars`: 200 when a sending account has no LinkedIn Premium, else 275 (also for an account whose Premium was never checked). Write it well under 200 with the names filled in |
 | `message` | 3 = Message | Sent as an InMail automatically when the contact is not connected |
 | `in_mail` | 4 = InMail | An explicit InMail step |
 | `follow` | 5 = Follow | A body is ignored (never sent). No versions |
