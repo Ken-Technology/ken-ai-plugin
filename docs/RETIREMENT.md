@@ -58,8 +58,7 @@ re-homed to the ken-ai-mcp repo (note filed there per the checklist).
 
 The production `list_skills` parity check is impossible until ken-ai-mcp PR #402
 deploys. Per the orchestrator's binding amendment, parity was verified locally
-(read-only) against the merged MCP worktree
-`/Users/cristian/Projects/.aiob-wt/int-ken-ai-mcp`, branch
+(read-only) against a local worktree of the former ken-ai-mcp repo, branch
 `ai-onboarding/integration` @ `db18e8efa6e4ff985142ebc8e32b84bc9ac54b24`.
 
 The MCP `list_skills` tool (`src/ken_mcp/tools/skills.py`) delegates to
