@@ -80,7 +80,7 @@ When a label is wrong, fix it, because reports and the To Reply tab follow it:
 
 `threads(operation="update", thread_id="thr_...", changes={"interest": "interested"})`
 
-Interest values: `interested`, `not_interested`, `negative`, `automated`, `unclassified`, `unsubscribe`, `objection`, `wrong_contact`, `out_of_office`, `referral`, `question` (email only; a workspace without the Question label answers 400, so leave the label as it is there). LinkedIn threads refuse `automated`. Tell the user each label you changed. To mark many threads read or archived at once: `threads(operation="bulk-update", ids=["thr_..."], changes={"is_read": True})`.
+Interest values: `interested`, `not_interested`, `negative`, `automated`, `unclassified`, `unsubscribe`, `objection`, `wrong_contact`, `out_of_office`, `referral`, `question` (email replies to a sales campaign only; a 1:1 reply, a recruiting campaign reply or a workspace without the Question label answers 400, so leave the label as it is there). LinkedIn threads refuse `automated`. Tell the user each label you changed. To mark many threads read or archived at once: `threads(operation="bulk-update", ids=["thr_..."], changes={"is_read": True})`.
 
 ## Step 3 - Draft the answers
 
