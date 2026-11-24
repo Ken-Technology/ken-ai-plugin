@@ -21,12 +21,12 @@ Reference for the reply-handling skill. Ids: threads are `thr_`, messages `msg_`
 
 ## Interest
 
-`interested`, `not_interested`, `negative`, `automated`, `unclassified`, `unsubscribe`, `objection`, `wrong_contact`, `out_of_office`, `referral`, `question` (email only; a workspace without the Question label answers 400, so leave the label as it is there).
+`interested`, `not_interested`, `negative`, `automated`, `unclassified`, `unsubscribe`, `objection`, `wrong_contact`, `out_of_office`, `referral`, `question` (email replies to a sales campaign only; a 1:1 reply, a recruiting campaign reply or a workspace without the Question label answers 400, so leave the label as it is there).
 
 - `threads(operation="list", interest=...)` filters by it. With no tab, or `all`, it reads each thread's newest reply from the contact, so a thread you answered still lists.
 - `threads(operation="update", thread_id="thr_...", changes={"interest": "interested"})` changes it. LinkedIn threads refuse `automated`.
 - A label moves the thread between tabs and into or out of positive-reply counts in reports, so tell the user what you changed.
-- A positive reply is a distinct contact filed `interested`. If replies come in and nothing is ever filed `interested`, the classifier may not be running for this workspace: say that, and do not report a 0% positive rate.
+- A positive reply is a distinct contact filed `interested` or `question` (a factual question about us, where the workspace has Question replies on). If replies come in and nothing is ever filed `interested`, the classifier may not be running for this workspace: say that, and do not report a 0% positive rate.
 
 ## Thread fields worth reading
 
