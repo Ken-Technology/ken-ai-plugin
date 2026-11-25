@@ -16,10 +16,13 @@ Every question the build asks has the same shape: `questionId`, `kind` (`single`
 | `performance_help` | single | `book_call`: Yes, book a call; `not_now`: Not now | no |
 | `recruiting_role` | single | `careers_page`: Read my careers page; `paste_jd`: I'll paste the job description; `describe`: I'll describe the role | yes |
 | `widen_search` | single | `search_wider`: Search more widely (offered once per build); `name_companies`: I'll name a few companies (the names go in `text`, comma separated); `connect_first`: Set up sending first | no |
+| `website` | multi | `try_again`: Try (the domain) again; `no_website`: We don't have a website | yes, the website |
 
 `teammate_role` is asked only of a teammate a workspace invited, never in a sign-up.
 
 `widen_search` is asked when a build found no account or wrote no plan. The build waits for the answer: `search_wider` and `name_companies` search again, and `connect_first` ends the build so the person connects their email first. `connect_first` is offered only when the next step from the connect step would be to connect a mailbox (or ask for IT consent). It is left out when the person has a connected mailbox of their own, when Ken inboxes were chosen (their own `kenInboxes` answer, or the workspace's inbox order while it is pending or ordered), and for a manager, a viewer or a client seat. It can be asked again, without `search_wider`, when the second try also finds nobody.
+
+`website` is asked when Ken could not read the company's domain (it does not resolve, the fetch failed, the page had no text), in place of `read`, and the build waits for the answer. Ask the person for their company's website and send it as `text` with no `choiceIds` (`billr.io` or a full URL): Ken saves it as the workspace's website and reads it before the build goes on. `try_again` reads the same domain again, and `no_website` goes on without a read. When the new site cannot be read either, or the text is not a website, Ken asks `website` again and its `context` says why. Answer `website` only while it is in `openQuestions`: an answer sent at any other time changes nothing.
 
 When Ken could read nothing about the company (no website, a site with no text) and the person wrote no brief, the build waits on a generated `multi` question with the prompt "What do you sell, and who buys it?" before it drafts anything. Ask the person and send their sentence as `text` with no `choiceIds`: it becomes their brief, and the accounts are searched for that customer. Its two choices, `name_companies` and `skip`, go on without a customer: the build then searches no accounts and asks `widen_search` at the end. A `brief` input answers it too.
 
