@@ -5,7 +5,7 @@ Part of the `workflows` skill. Each recipe is a connection and an `http.request@
 ## The pattern
 
 1. Create the connection once per workspace with `workflow_tools(operation="workflow-connections-create", ...)`. Each recipe gives the call.
-2. The answer has `setupUrl`. Give it to the person so they paste the tool's key there themselves. Never ask for a key in the chat.
+2. The answer has `setupUrl`. Give it to the person so they paste the tool's key there themselves. Never ask for a key in the chat, and never pass one to a tool: no tool here takes a key. For an app in the integration catalog, do not create a key connection here: the person makes it on Kenso's New connection screen, which takes the key as the app shows it and builds the value the app reads (`connection.key` from `workflow_tools(operation="workflow-integrations-list")` says how). The `setupUrl` page keeps what is pasted as is, which an app such as Close cannot read.
 3. Check it with `workflow_tools(operation="workflow-connections-test", ...)` on a path the tool answers with a plain GET.
 4. Write the step with `connection` and a path. Try that one step with `workflow_tools(operation="workflow-step-tests-create", ...)`: it is simulated, and `wouldSend` shows the call with the secret hidden.
 5. Test the whole workflow, then publish. Publishing a step with a connection needs the Integrations permission.
@@ -88,11 +88,7 @@ Create the person, or update them when the email is already there. The `matching
 
 ## Close
 
-Close signs a call with HTTP Basic, the key as the user name and an empty password. A `basic` connection would hold the key in the open as the user name, so use a `header` connection on `Authorization` and keep the whole value in the secret:
-
-`workflow_tools(operation="workflow-connections-create", client_id=..., name="close", type="header", auth_name="Authorization", secret_name="CLOSE_AUTH", base_url="https://api.close.com")`
-
-Tell the person what to paste at `setupUrl`: the word `Basic`, a space, then the base64 encoding of their Close key with a colon at its end. The colon is encoded together with the key, not added after the encoded text, and nothing follows the colon.
+Close signs a call with HTTP Basic, the key as the user name and an empty password. A `basic` connection would hold the key in the open as the user name, so it is a `header` connection on `Authorization` that keeps the whole value in the secret. Kenso builds that value from the plain key (Close's `connection.key` format is `basic_user`), so the person never encodes anything: send them through Close's `connection.setupByType.header` steps, which end with pasting the key on Kenso's New connection screen. Never ask them to encode the key or paste it in the chat.
 
 Create a lead with one contact (the path ends with a slash):
 
