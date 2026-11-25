@@ -1,12 +1,14 @@
 # Power features
 
-Part of the `workflows` skill. `SKILL.md` builds a workflow and takes it live, and `definition-format.md` is the format. This file is what the `workflows_power` feature adds: workspace variables, computed values, tables, connections to outside tools, workflows that call workflows, approvals by a person, a wait for an outside system, an engagement trigger, richer schedules, reports, team steps, a one-step test and the plain summary. Calls to Apollo, Instantly, Smartlead, Attio and Close are in `api-recipes.md`.
+Part of the `workflows` skill. `SKILL.md` builds a workflow and takes it live, and `definition-format.md` is the format. This file is what the `workflows_power` feature adds: workspace variables, computed values, tables, connections to outside tools (with OAuth or the workspace's CRM), ready-made app calls, workflows that call workflows or serve an agent as tools, approvals by a person, a wait for an outside system or a reply, an engagement trigger, triggers on record changes, forms, webhooks that answer the sender, richer schedules, loops inside loops, list steps, a cap on runs at once, reports, owners, team steps, a one-step test, saved test cases and the plain summary. Calls to Apollo, Instantly, Smartlead, Attio and Close are in `api-recipes.md`.
 
 ## Is it on
 
 Everything here needs the `workflows_power` feature next to `workflows`. Only Kenso turns a feature on. Two things every workspace has: the `plain.assumptions` list and the `changes` list of a version diff. Without the feature the operations on this page are not available, and a step type, a `{{vars.NAME}}` reference or a call to a function under "More formula functions" is a `feature_disabled` issue: an error at publish, nothing in a draft.
 
-The operations sit on two facades: `workflow_data` (variables, tables, rows) and `workflow_tools` (formulas, calls, approvals, connections, schedules, step tests, summaries). `describe_tools` lists each operation's fields.
+The operations sit on two facades: `workflow_data` (variables, tables, rows, test cases) and `workflow_tools` (formulas, calls, approvals, connections and their sign-in, the integration catalog, schedules, step tests, summaries). `describe_tools` lists each operation's fields.
+
+The hosted form (`trigger.form@1`) also needs the `workflows_forms` feature, which is off for every workspace until Kenso turns it on for one: until then publish refuses it with `feature_disabled` naming `workflows_forms`. A form on a Studio page (`trigger.studio_form@1`) does not need it.
 
 When the feature is turned off again for a workspace, three published steps stop with `feature_disabled` instead of half-running. `webhook.wait@1` fails where it would open a new wait, because the run has no resume address then. `human.approve@1` fails where it would open an approval, because nobody could decide it then, and an approval opened earlier that times out fails the step instead of applying `onTimeout`. A `flow.subworkflow@1` step fails when the called workflow has an interface, its `inputs` hold a computed value, or the step has a `record` input; a called workflow with no interface, plain inputs and no `record` starts as before.
 
@@ -38,7 +40,7 @@ These need the `workflows_power` feature: with it off, publish refuses a formula
 
 | Group | Functions |
 |---|---|
-| text | `replace(text, search, replacement)`, `substring(text, start, length)`, `join(list, separator)`, `matches(text, pattern)`, `extract(text, pattern, group)`, `titleCase(text)`, `emailDomain(email)`, `urlDomain(url)` |
+| text | `replace(text, search, replacement)`, `substring(text, start, length)`, `join(list, separator)`, `matches(text, pattern)`, `extract(text, pattern, group)`, `titleCase(text)`, `emailDomain(email)`, `urlDomain(url)`, `htmlEscape(text)` (escapes `&`, `<`, `>`, `"` and `'` for a value put into HTML, such as a Pipedrive note or an HTML email body) |
 | lists | `pluck(list, key)`, `where(list, key, op, value)`, `sum`, `min`, `max` and `avg` (a list and an optional key), `sort(list, key, direction)`, `unique(list, key)`, `slice(list, start, end)`, `concat`, `last`, `flatten` |
 | objects | `get(value, path, default)`, `keys`, `merge`, `pick`, `object(key, value, ...)` |
 | dates | `formatDate(date, format, timezone)`, `parseDate(text, format)`, `dateDiff(from, to, unit)` with the unit `minutes`, `hours` or `days`, `addHours`, `addMinutes`, `startOfDay(date, timezone)`, `weekday(date, timezone)` |
@@ -126,6 +128,8 @@ A connection holds how to reach one outside tool: its base address, the hosts a 
 
 The answer carries `secretSet` and `setupUrl`. When `secretSet` is false, give the person `setupUrl` so they enter the value themselves. Never ask for a key in the chat and never write one into a definition.
 
+For an app in the integration catalog, walk the person through `connection.setupByType[<type>]` from `workflow_tools(operation="workflow-integrations-list")`: one short step each, in plain words, ending on Kenso's New connection screen where they paste the key. That screen builds the value the app reads from the key as the app shows it (`connection.key.format`: `raw`, `bearer` or `basic_user`, Close's `Basic` value), so nobody encodes a key or writes a header. No tool here takes the key itself, so do not make a key connection for a catalog app with `workflow-connections-create`: its `setupUrl` page keeps what is pasted as is, which an app such as Close cannot read. A crm connection takes no key.
+
 Then check it: `workflow_tools(operation="workflow-connections-test", client_id=..., connection_name="crm", method="GET", path="/v1/me", expect_status=200)` makes one GET or HEAD call and returns `ok`, `status`, `expectStatus`, `durationMs`, `testedAt` and `failure`. It answers `secret_not_set` while the secret has no value, and its outcome is the connection's `lastTest` until an update changes `base_url`, `allowed_hosts` or `secret_name`. `workflow-connections-list` lists them, and `workflow-connections-get`, `workflow-connections-update` and `workflow-connections-delete` manage one by `connection_name`.
 
 A secret with no value shows up in three places, each with its own form: the connection test answers 400 `secret_not_set` (field `secretName`), a run's step stops with the setup error `secret_missing:NAME` (the run waits in Needs attention), and the workflow's summary lists the need `connection_secret_missing`. All three mean the same thing: a person sets the value at the connection's `setupUrl`. `unknown_secret` is only for a `secret_name` that is not a valid name.
@@ -144,9 +148,49 @@ A secret with no value shows up in three places, each with its own form: the con
 | `query` | query parameters as text values, URL-encoded for you |
 | `form` | form fields, sent as the body. Set `form` or `body`, never both. |
 | `neverError` | `true`: the step succeeds on any HTTP status and the output `ok` says whether it was 2xx, so a later step can branch on `status`. A timeout or a blocked address still fails. |
-| `pagination` | follows a GET API's pages and returns every item in `items`, with `pages` and `stopReason` (`no_more`, `max_pages`, `max_items`, `repeated_page`, `empty_page`) |
+| `pagination` | follows a GET API's pages, or a POST search's, and returns every item in `items`, with `pages` and `stopReason` (`no_more`, `max_pages`, `max_items`, `repeated_page`, `empty_page`) |
 
-`pagination.mode` picks how the next page is asked for: `cursor` (needs `cursorPath`, where the answer holds the next cursor, and `cursorParam`, the query parameter that sends it), `offset` (needs `offsetParam` and `pageSize`; `limitParam` sends the page size) or `next_url` (needs `nextUrlPath`, where the answer holds the next page's address). `itemsPath` is where the list sits in the answer; without it the answer itself is the list. `pageSize` is 1 to 1,000 and `maxPages` 1 to 20 (5 by default). A paginated step is GET only, stops at 1,000 items (or 200 KB of them, counted as for `table.find@1`'s rows, with `stopReason` `max_items`) and at 120 seconds in all, and a wrong block is `invalid_pagination`. Its output has no `json`: read `items`. `status` and `headers` are the last page's.
+`pagination.mode` picks how the next page is asked for: `cursor` (needs `cursorPath`, where the answer holds the next cursor, and `cursorParam`, the query parameter that sends it), `offset` (needs `offsetParam` and `pageSize`; `limitParam` sends the page size) or `next_url` (needs `nextUrlPath`, where the answer holds the next page's address). `itemsPath` is where the list sits in the answer; without it the answer itself is the list. `pageSize` is 1 to 1,000 and `maxPages` 1 to 20 (5 by default). A paginated step is GET, unless it pages a POST search by a body cursor (below). It stops at 1,000 items (or 200 KB of them, counted as for `table.find@1`'s rows, with `stopReason` `max_items`) and at 120 seconds in all, and a wrong block is `invalid_pagination`. Its output has no `json`: read `items`. `status` and `headers` are the last page's. A page over the 1 MB a request reads is never read as whole: a later one ends the loop with `stopReason` `response_too_large` and the items before it, and a first one (or the only answer of a step without pagination, when it is JSON) fails the step with `response_too_large`. Ask for less: a filter, fewer fields or a smaller page.
+
+A search sent as POST that takes its cursor in the JSON body (HubSpot's `after`) pages with `"in": "body"` in a `cursor` block: `cursorParam` is then the dot path in `body` that takes the cursor, `body` must be a JSON object, and every page is the same POST to the same URL with only the cursor changed. A POST is never retried automatically, paging or not, so a failed page fails the step. Still use `"in": "body"` only on an endpoint that reads, never on a POST that creates or changes anything. A cursor that comes back a second time ends the loop with `repeated_page`. `"in": "body"` with another method, another mode or a text body is `invalid_pagination`.
+
+```json
+{ "id": "find", "type": "http.request@1", "with": { "connection": "hubspot", "url": "/crm/v3/objects/contacts/search", "method": "POST", "body": { "filterGroups": [{ "filters": [{ "propertyName": "lifecyclestage", "operator": "EQ", "value": "lead" }] }], "limit": 100 }, "pagination": { "mode": "cursor", "itemsPath": "results", "cursorPath": "paging.next.after", "cursorParam": "after", "in": "body", "maxPages": 5 } } }
+```
+
+### OAuth and CRM connections
+
+Two more connection types hold no key a person pastes:
+
+- `oauth2`: a token from the workspace's own OAuth app at the provider. `oauth` takes `preset` (`hubspot`, `salesforce`, `salesforce_sandbox`, `google_sheets` or `custom`, the default), `clientId` (required, not a secret), `grant` (`authorization_code`, the default: a person signs in, with PKCE; or `client_credentials`: nobody signs in), and `authorizeUrl`, `tokenUrl`, `scopes`, `clientAuth` (`body` or `basic`), `audience` and `extraAuthorizeParams`, which a preset fills when left out, with `base_url` and `allowed_hosts`. `custom` needs `tokenUrl`, and `authorizeUrl` with `authorization_code`; each URL is https on a public host. `secret_name` names the workflow secret that holds the app's client secret: a person sets it at the connection's `setupUrl`, never in chat. A wrong field is 400 `invalid_oauth` at `oauth.<field>`.
+- `crm`: the token of the CRM the workspace connected under Settings > Integrations. `crm_provider` is `hubspot`, `salesforce`, `pipedrive` or `attio`, and must be the CRM the workspace connected (409 `crm_not_connected` otherwise). Leave out `secret_name`, `auth_name`, `base_url` and `allowed_hosts`: the CRM sets them. A `crm` connection takes no key, so it reads `secretSet: true`.
+
+`workflow_tools(operation="workflow-connections-create", client_id=..., name="hubspot", type="oauth2", secret_name="HUBSPOT_CLIENT_SECRET", oauth={"preset": "hubspot", "clientId": "<the app's client id>"})`
+
+The answer's `oauth` holds the settings, `status` (`not_connected`, `connected` or `needs_reconnect`), `redirectUri` (always `https://app.ken.so/integrations/workflow-connections/callback`: the person registers it at the provider) and `setup`, the numbered steps to create the app there; `crm` is `{provider, status}`; `connectUrl` is the app page that connects it. Changing `clientId`, a URL, `scopes`, `clientAuth` or `secret_name` makes it `not_connected` again and forgets the grant, and so does deleting it. No answer ever holds a token or a client secret.
+
+To connect it: `workflow_tools(operation="workflow-connection-authorizations-create", client_id=..., connection_name="hubspot")`. For `authorization_code` it returns `authorizeUrl`, the provider's sign-in page, valid for 10 minutes and once: give it to the person, who opens it in a browser signed in to Kenso as the member who made the call, and the Kenso app finishes when the browser comes back. Never open it yourself or ask for a password. If the browser does not reach the app, finish with `workflow_tools(operation="workflow-connection-authorizations-complete", client_id=..., redirect_url="<the whole URL it landed on>")`. A `client_credentials` or `crm` connection connects at once: `authorizeUrl` is null and `status` is `connected`. The errors: 409 `connection_not_oauth`, 409 `oauth_client_secret_missing` (send the person to the `setupUrl` in the message), 409 `crm_not_connected`, 400 `oauth_state_invalid` (expired, used, started by someone else, or the connection changed since: start again), 400 `oauth_denied`, 400 `invalid_redirect_url`, 502 `oauth_token_refused` (the provider's reason), 404 `oauth_unavailable` while Kenso has OAuth connections switched off, and 429 after 30 starts and completions an hour (a sign-in spends 2).
+
+A step names the connection as any other, and Kenso sends `Authorization: Bearer <token>`. It refreshes the token shortly before it expires and once after a 401, then sends the request again. Publish refuses a step whose `oauth2` connection is not connected (`connection_not_connected` at `<step>.with.connection`; the fix names `workflow-connection-authorizations-create` and the `connectUrl`), and the summary shows it as the need `setup_missing` ("Connect HubSpot", or "Reconnect HubSpot") with the action `open_setup` to the `connectUrl`. In a run a step can stop with these codes. Setup, which waits for a person: `connection_not_connected`, `connection_needs_reconnect` (the provider refused the refresh: a person connects it again), `crm_not_connected` (the CRM was disconnected under Settings > Integrations) and `oauth_unavailable` (Kenso has OAuth connections switched off). Temporary, which the step retries: `oauth_refresh_busy` (another step was refreshing the token) and `oauth_token_refused` (the token URL gave no token).
+
+## Ready-made app calls
+
+`integration.call@1` runs one operation of an app Kenso already knows (HubSpot, Salesforce, Google Sheets, Attio, Close, Pipedrive, Apollo, Instantly, Smartlead), with a connection of this workspace, instead of a hand-built `http.request@1`. `workflow_tools(operation="workflow-integrations-list", client_id=...)` lists the apps, each with the connection types it takes, its preset, base URL, the steps to set each type up (`connection.setupByType`), its operations and the workspace's connections that fit. `workflow_tools(operation="workflow-integrations-get", client_id=..., app_key="hubspot")` gives every operation's `inputs` (`name`, `type`, `required`, `description`, `default`), `sideEffects` (`read`, `write` or `delete`), `paginated` and `example.with`, a complete `with` block to paste.
+
+```json
+{ "id": "find", "type": "integration.call@1", "with": { "operation": "hubspot.contacts.search", "connection": "hubspot", "inputs": { "email": "{{person.email}}" } } }
+```
+
+- `operation` is `<app>.<key>`, written in the step. `connection` is a connection whose type the app takes, on a host the app allows. Both are read as written.
+- `inputs` holds the operation's inputs, up to 30, as references or computed values. An optional input left out takes its catalog default.
+- `maxItems` (1 to 1,000, 100 by default) is the most items the step returns: an operation that pages (`paginated: true`) reads its pages up to it, and any other cuts the list in its one answer to it (and to 200 KB), with `truncated: true` when it cut. On an operation that answers one record it is ignored. `neverError` works as in `http.request@1`.
+- An input the catalog marks `literal` (Salesforce's `soql`, Google Sheets' `range` in `rows.read`) takes only fixed text written in the step: a reference or a formula there could change what it reads, and is `integration_input_type` at publish and in a run. To find Salesforce records by a value from the run, use `salesforce.records.find` with `object`, `field` and `value` (and `fields`, `limit`): Kenso writes the value into the query safely, quotes included. A required input given as blank text is missing (`integration_input_missing`).
+- An input the catalog marks `scalarRefs` (Attio's `filter` in `records.query`) is written out in the step, never as one reference, and may hold references, but each must give a single value in a run (text, a number, true/false or null): an object or a list there, such as a webhook sending `{"$not_empty": true}` for an email, fails the step permanent with `integration_input_type` before anything is sent, so point each reference at one value.
+- The output is `operation`, `status`, `ok` and `data` (the answer, or the part of it the operation returns). An operation that returns a list gives `items`, `count` and `truncated` instead of `data`.
+- It runs through `http.request@1`'s own guards, limits and quotas: 2xx succeeds, 429 and 5xx fail as temporary, other 4xx fail permanently. Only an operation that reads is retried. One that writes is final once it is sent, even one the app takes as a GET (Apollo's `organizations.enrich`), except after a 429, which the app did not take: it waits for the app's `Retry-After` and tries again. An answer over 1 MB fails as `response_too_large`, or ends the pages read with `truncated: true`.
+- A step test and a test run send an operation that reads for real; one that writes or deletes is simulated unless the step is in `liveSteps`.
+
+Publish checks it against the catalog: `unknown_integration_operation` (its fix names the closest operation), `integration_input_missing`, `integration_input_unknown`, `integration_input_type`, `integration_connection_mismatch` (the connection is the wrong type or host; the fix names the preset), `unknown_connection` and `connection_not_connected`. A run's step fails with the codes of `http.request@1`, plus `connection_needs_reconnect` and `crm_not_connected`. It is free and counts against the workspace's HTTP request limits.
 
 ## A workflow that calls a workflow
 
@@ -175,6 +219,20 @@ To call one from outside a workflow: `workflow_tools(operation="workflow-calls-c
 
 To test a workflow with an interface, give the test sample values: `workflow_builder(operation="test", client_id=..., workflow_id=812, inputs={"domain": "acme.com"})`. Left out, each input gets a sample of its type. A test that succeeded returns `outputs`, the interface outputs as a call would return them, so check the output formulas there before you publish.
 
+## A workflow as an agent's tool
+
+`ai.agent@1` can run workflows as tools. List up to 5 in `workflowTools`:
+
+```json
+{ "id": "research", "type": "ai.agent@1", "with": { "instructions": "Decide whether {{account.name}} is worth a call. Score it first.", "workflowTools": [{ "workflowId": 812, "name": "score_company", "description": "Scores a company from its domain" }] } }
+```
+
+Each one is a published workflow of this workspace with an `interface`: the agent passes the interface inputs as the tool's arguments, Kenso runs the workflow on the run's record and waits up to 30 seconds, and the agent reads its status and outputs. `name` is a lower-case letter followed by 2 to 39 lower-case letters, digits or `_`, unique in the step; left out, it is `wf_` and the workflow's name. `description` is what the tool is for; left out, the workflow's own description. One step run starts at most 10 workflow runs, counting the runs its earlier attempts started when the step is retried; a call that repeats one of their calls still gets that run back. The output adds `toolRuns`, one `{tool, runId, status}` per run the agent started, in order. A tool run still going after 30 seconds keeps running, and its result does not come back to the agent. All of a step's tool calls wait 60 seconds in total: after that a call answers at once with the run's `status` and `runId`, even when it repeats an earlier call, or with its outputs when a repeated call's run has already ended.
+
+One agent-tool level only: a workflow an agent started as a tool, and any sub-workflow below it, cannot start workflows through its own agent's tools. Its agent hears `agent_tool_nested` and answers without them. Saving warns with `agent_tool_nested` when a listed workflow has such an agent: list the workflows it runs in this step instead, or call it with `flow.subworkflow@1`.
+
+Saving checks the list: a workflow that is not published or declares no interface is `agent_tool_not_callable`, a name that is taken, a built-in tool's or not valid is `agent_tool_name`, and the workflow the step is part of is `agent_tool_self`. While it runs, the agent may hear `agent_tool_refused` (the workflow cannot run now), `agent_tool_limit` (the step already started 10) or `agent_tool_nested` (this run, or one above it, was started by an agent's tool). Each workflow run charges its own steps, outside the step's `creditCap`. The summary line of the step says which workflows it can run, as "Can run: Score a company".
+
 ## Approvals
 
 `human.approve@1` stops the run until a person decides.
@@ -190,7 +248,7 @@ To test a workflow with an interface, give the test sample values: `workflow_bui
 
 Its output is `decision` (`approved` or `rejected`), `decidedBy`, `decidedAt`, `note`, `fields`, `timedOut`, `simulated` and `approvalId`. Guard what follows: `"when": "{{approve.decision}} == 'approved'"`. A test run does not wait: the step is simulated as approved, with `simulated` true. When a run is restarted, its cancelled approval, or one that timed out under `"onTimeout": "fail"`, opens again; one that timed out under `reject` or `approve` keeps that decision. If the feature is turned off for the workspace, nobody can decide, so the step fails with `feature_disabled` instead of opening an approval, and an approval that was already open fails the step the same way when it times out, whatever `onTimeout` says.
 
-The waiting approvals are a queue: `workflow_tools(operation="workflow-approvals-list", client_id=..., status="pending", assignee="me")` (`status` is `pending`, `approved`, `rejected`, `timed_out` or `cancelled`; `assignee="me"` is the queue of the person you act for, their own approvals and the ones for `anyone`, while a member id lists only the approvals assigned to that member), then `workflow_tools(operation="workflow-approvals-get", client_id=..., approval_id=31)`. An approval for a member or the owner belongs to that person, whatever their Workflows access, or an Admin, and one for `anyone` to any member who can edit workflows, so decide only when that person tells you to: `workflow_tools(operation="workflow-approvals-decide", client_id=..., approval_id=31, decision="approve", note="Agreed on the call", fields={"discount": 10})`. `decision` is `approve` or `reject` and `note` is up to 2,000 characters. The same decision again returns the stored approval; the other decision, or one on an approval that timed out or was cancelled, answers `approval_already_decided`.
+The waiting approvals are a queue: `workflow_tools(operation="workflow-approvals-list", client_id=..., status="pending", assignee="me")` (`status` is `pending`, `approved`, `rejected`, `timed_out`, `cancelled` or `decided`, which is every status but `pending`, newest decision first; `assignee="me"` is the queue of the person you act for, their own approvals and the ones for `anyone`, while a member id lists only the approvals assigned to that member), then `workflow_tools(operation="workflow-approvals-get", client_id=..., approval_id=31)`. Each list row carries `record` (`{type, id, name}`: the lead, person, account or place the run is about, left out when it has none), and once decided `decidedAt` and `decidedBy` (`{memberId, name}`, left out when no member decided). An approval for a member or the owner belongs to that person, whatever their Workflows access, or an Admin, and one for `anyone` to any member who can edit workflows, so decide only when that person tells you to: `workflow_tools(operation="workflow-approvals-decide", client_id=..., approval_id=31, decision="approve", note="Agreed on the call", fields={"discount": 10})`. `decision` is `approve` or `reject` and `note` is up to 2,000 characters. The same decision again returns the stored approval; the other decision, or one on an approval that timed out or was cancelled, answers `approval_already_decided`.
 
 ## Wait for an outside system
 
@@ -208,6 +266,14 @@ The address is signed and belongs to one run. Each POST, with a body of up to 25
 
 Use one `webhook.wait@1` for each time the outside system posts to the address. A post is not matched to a step: it resumes the oldest step that waits, or is kept for the next one. So a sender that retries a post it already delivered answers the run's next `webhook.wait@1` with the repeat. In a run that waits more than once, have each wait check the body (an event id, a `type` field) before it trusts it. A workspace keeps early posts for at most 100 runs at a time; past that a post is answered 503 with `Retry-After`, and the sender should send it again. A wait whose rerun after the timeout is retried still follows `onTimeout`; it does not wait a second time.
 
+A wait can also end on an event. `orEvent` names one that ends it when it comes first for the run's lead, person or account, any event `logic.wait_for_event@1` takes, and `orMatch` the payload fields it must have:
+
+```json
+{ "id": "signed", "type": "webhook.wait@1", "with": { "timeoutSeconds": 604800, "onTimeout": "continue", "orEvent": "reply.received" } }
+```
+
+With `orEvent` the output adds `resumedBy` (`webhook`, `event` or `timeout`) and `event` (`{type, payload}` when the event came first, else null); `receivedAt` is null when the event came first. Without `orEvent` both are left out. The run must be about a lead, person or account: a run about no record, such as a webhook trigger or a mailbox label trigger with `createPerson` false, is refused with `wait_event_needs_record`.
+
 ## Engagement trigger
 
 `trigger.engagement@1` starts a lead run when a lead opens, clicks, accepts or unsubscribes:
@@ -217,6 +283,48 @@ Use one `webhook.wait@1` for each time the outside system posts to the address. 
 ```
 
 `event` is `email_opened`, `link_clicked`, `linkedin_invite_accepted` or `unsubscribed`. `campaignId` narrows it to one campaign. `minCount` (1 to 20) starts the run once the lead has done it that many times in one campaign; only opens and clicks repeat, and machine opens and bot clicks never count. The tally lasts 30 days after the lead's latest counted one, so a lead whose opens or clicks are further apart starts again at 1. `oncePerRecordDays` (1 to 365, 7 by default) starts at most one run per lead and event in that many days. The run reads `{{trigger.event}}`, `{{trigger.count}}`, `{{trigger.contactId}}`, `{{trigger.campaignId}}`, `{{trigger.occurredAt}}` and, for a click, `{{trigger.url}}`. A `minCount` outside 1 to 20, or above 1 for `linkedin_invite_accepted` or `unsubscribed`, is `invalid_engagement_trigger`, and so is an `oncePerRecordDays` outside 1 to 365.
+
+## Record change triggers
+
+Four triggers start a run when a record changes in Kenso: `trigger.lead_changed@1`, `trigger.person_changed@1`, `trigger.account_changed@1` and `trigger.deal_changed@1`.
+
+```json
+{ "trigger": { "type": "trigger.account_changed@1", "with": { "on": "updated", "fields": ["tier"], "match": { "tier": { "to": "A" } }, "oncePerRecordDays": 30 } } }
+```
+
+- `on` is `created`, `updated` or `both` (default `updated`). A lead trigger takes `updated` only: `trigger.new_leads@1` starts on new leads.
+- `fields` starts only when one of these changed, up to 20 (left out: any field). A custom field is `custom.<key>`. The fields each record has: lead `firstName`, `lastName`, `email`, `title`, `linkedinUrl`, `ownerMemberId`; person `fullName`, `title`, `email`, `phone`, `linkedinUrl`, `leadStatus`, `relationship`, `ownerMemberId`; account `name`, `domain`, `industry`, `employeeCount`, `tier`, `type`, `customer`, `ownerMemberId`; deal `name`, `amount`, `closeDate`, `nextStep`, `dealType`, `ownerMemberId`. A deal's stage or status is not here: start from `trigger.opportunity_stage@1`.
+- `match` starts only when each named field changed this way: field to `{"to": ..., "from": ...}`, either or both, each a value or a list of values. Up to 5 fields; all must hold.
+- `includeWorkflowChanges` also starts on a change another workflow made (default false). It needs `oncePerRecordDays` of 1 or more, and a lead trigger refuses it. A workflow never starts on a change its own steps saved. Work a step hands to Kenso to finish later (research, finding an email or phone, mapping a buying committee) is saved by Kenso, not by the workflow, so it can start the same workflow again: list only the `fields` that matter, or set `oncePerRecordDays`, to stop that.
+- `oncePerRecordDays` is 0 to 365 (default 0, a run for every change).
+
+The run is about the record and reads `{{trigger.record}}`, `{{trigger.recordId}}`, `{{trigger.change}}`, `{{trigger.changedFields}}`, `{{trigger.changes}}` (each changed field's `from` and `to`, up to 20 fields, values cut at 500 characters), `{{trigger.actor}}` (`kind`: `user`, `api`, `agent`, `workflow` or `system`, and `memberId`), `{{trigger.occurredAt}}`, `{{trigger.accountId}}`, `{{trigger.personId}}` and, on a deal, `{{trigger.opportunityId}}`. A bulk edit of many leads starts no run. A lead owner that a workflow sets is logged but never starts a lead trigger.
+
+## Forms
+
+`trigger.form@1` starts a run each time someone sends the workflow's own form, a page Kenso hosts. It needs the `workflows_forms` feature too.
+
+```json
+{ "trigger": { "type": "trigger.form@1", "with": { "title": "Book a demo", "intro": "Tell us about your team.", "fields": [{ "name": "email", "label": "Work email", "type": "email", "required": true, "mapsTo": "email" }, { "name": "size", "label": "Team size", "type": "select", "options": ["1-10", "11-50", "51+"] }], "dedupField": "email", "dedupWindowDays": 30 } } }
+```
+
+- `title` and 1 to 20 `fields`, each `{name, label, type, required, options, placeholder, mapsTo}`. `type` is `text`, `long_text`, `email`, `phone`, `url`, `number`, `date`, `select` (with `options`) or `checkbox`. A field that asks for a password, card or ID number is refused.
+- `mapsTo` maps a field to the person: `email`, `firstName`, `lastName`, `fullName`, `company`, `companyDomain`, `title`, `phone` or `linkedinUrl`. `createPerson` (default true when a field maps to `email` or `linkedinUrl`) creates or matches that person first and needs `lead_intake`; the run is then about the person and adds `personId`, `accountId` and `created`.
+- `dedupField` with `dedupWindowDays` starts one run per value in that window. `redirectUrl` sends the browser to your own https page after a submission; otherwise the page shows `successMessage`. `submitLabel` names the button.
+
+The run reads `{{trigger.fields.<name>}}`, `{{trigger.submittedAt}}`, `{{trigger.sourceId}}` and `{{trigger.page}}` (`referrer`, and `utm` with `source`, `medium` and `campaign`). Publishing creates the form; reading the workflow returns its link as `form.url` and an iframe embed code as `form.embedHtml`, and the summary carries it as `share` ("Form link"). A form problem is `invalid_form` at publish.
+
+The form's link is a Kenso address on api.ken.so, so it must never go in cold email: publish refuses it in a send, campaign, reply or voice note step (`form_link_in_send`). For a form in outreach, put the form on a Studio page and start from `trigger.studio_form@1` (`assetId` and `formId`, either left out for all; `oncePerRecordDays` 0 to 365). Studio pages are served on the workspace's own link host. That trigger runs about the lead whose page link it was, or with no record for a page that is not a lead's, and reads `{{trigger.fields.<name>}}`, `{{trigger.assetId}}`, `{{trigger.assetTitle}}`, `{{trigger.formId}}`, `{{trigger.submittedAt}}`, `{{trigger.leadId}}`, `{{trigger.personId}}` and `{{trigger.accountId}}`. It does not need `workflows_forms`.
+
+## Answer the sender
+
+A `trigger.webhook@1` with `respond` answers the system that sent the data with the run's interface outputs, so a form tool or another app can wait for a score:
+
+```json
+{ "trigger": { "type": "trigger.webhook@1", "with": { "preset": "generic", "createPerson": false, "respond": { "waitSeconds": 10, "body": "envelope" } } } }
+```
+
+The request waits up to `waitSeconds` (1 to 25, 10 by default) for the run. A run that succeeded answers 200 `{status, runId, outputs}`, or with `"body": "outputs"` the outputs object alone. A failed or cancelled run answers 200 with `outputs` null and `error` (`workflow_failed`), or 502 with `"body": "outputs"`; the sender never sees a step's error text. A run not finished in time answers 202 with its `runId`, so keep waits and approvals out of such a workflow. When Kenso cannot wait (the workspace is at its cap of waiting requests or its hourly quota, or a read failed), the answer is the plain 202 with `runId` and the header `Ken-Sync: skipped`, never an error, so the sender does not send it again. A webhook without `respond` answers 202 as before. The summary says it as "When another app sends data here. It answers that app with score and tier."
 
 ## Schedules
 
@@ -255,7 +363,37 @@ After a step failed under `onFailure: continue` or `branch:<step id>`, a later s
 | `feature_disabled: ...` | `human.approve@1`, `webhook.wait@1`, or `flow.subworkflow@1` with a called workflow that has an interface, a computed input or a `record` input: the feature is off for the workspace |
 | `webhook_wait_timed_out: ...` | `webhook.wait@1`: nothing was posted in time under `"onTimeout": "fail"` |
 | `webhook_wait_limit_reached: ...` | `webhook.wait@1`: the workspace already has 5,000 webhook waits open, so none opened. Post to their resume URLs or cancel the runs that wait, then restart the run |
+| `for_each_items_failed: ...` | `logic.for_each@1` inside another for each's body: some of its items failed, so its outer item fails too. Give the inner for each `"onFailure": "continue"` to let the outer item go on and read the inner `failed` count |
+| `for_each_nested_limit: ...` | `logic.for_each@1` inside another for each's body: the two lists together would run more than 5,000 items. Lower `maxItems` on either loop |
 | `unexpected_error: <type>` | any step: something failed on Kenso's side (`temporary`) |
+
+## A loop inside a loop
+
+A for each's body may hold one more `logic.for_each@1`, two levels at most (`nested_for_each` for a third). Both loops need `maxItems` (`nested_for_each_needs_max_items`), and the two together run at most 5,000 items (`nested_for_each_too_large`; at run time `for_each_nested_limit`):
+
+```json
+{ "id": "rows", "type": "logic.for_each@1", "with": { "items": "{{fetch.items}}", "maxItems": 50, "steps": [{ "id": "people", "type": "logic.for_each@1", "with": { "items": "{{item.people}}", "maxItems": 20, "steps": [{ "id": "save", "type": "table.upsert@1", "with": { "table": "contacts", "row": { "email": "{{item.email}}" } } }] } }] } }
+```
+
+Inside the inner body, `{{item.email}}` and the like read the inner item. `{{run.itemIndex}}` is the item's position in its own loop, in a single loop too. A step run of the inner body has the iteration id `<outer id>:<i>/<inner id>:<j>`, such as `rows:2/people:0`. A failed step fails its inner item; an inner loop with failed items then fails with `for_each_items_failed` and ends its outer item, unless the inner for each has `"onFailure": "continue"`. A top-level loop never fails on its items. The summary says it as "Inside it, repeat 1 step for each person of each row".
+
+## List steps
+
+`list.map@1` turns each item of a list into a new one, with formulas that read the item (`{{item.email}}`), its position (`index`, from 0) and `context`:
+
+```json
+{ "id": "lines", "type": "list.map@1", "with": { "items": "{{week.rows}}", "where": "{{item.sent}} > 0", "value": "{{item.campaignName}} + ': ' + text({{item.sent}}) + ' sent'" } }
+```
+
+Set `fields` (an object of name to formula, up to 30) or `value` (one formula), not both. `where` drops the items it is not true for first, and `keep` starts each object from the item's own keys. A formula reads nothing else: pass a value from the run as `"context": {"min": "{{score.value}}"}` and read `{{context.min}}` (`map_reference_not_allowed`). `maxItems` is 1 to 5,000 (5,000 by default). `onItemError` is `null` (the field is null, the default), `skip` or `fail`. The output is `items`, `count`, `dropped`, `errors` (the first 10, `{index, message}`) and `truncated`. A problem with the formulas is `invalid_map` when the workflow is saved.
+
+`list.merge@1` puts lists together. `mode` is `append` (one after another; `dedupeBy` drops a later item whose value at that field an earlier one has), `combine` (match items by `key`, a field or a dot path of up to 3 levels; `join` is `inner`, `left` or `outer`, the default; `onConflict` is `first` or `last`, the default) or `first_present` (the first of `inputs` that is not null, '' or []):
+
+```json
+{ "id": "all", "type": "list.merge@1", "with": { "mode": "combine", "inputs": ["{{crm.items}}", "{{search.items}}"], "key": "email", "join": "left" } }
+```
+
+`inputs` holds 2 to 10 lists for `append` and `combine`, 1 to 10 values for `first_present`. The output is `items` and `count` (and `unmatched` for `combine`), or `value`, `index` and `found` for `first_present`. Both steps are free and run for real in a test.
 
 ## Reports and team steps
 
@@ -263,7 +401,21 @@ After a step failed under `onFailure: continue` or `branch:<step id>`, a later s
 { "id": "week", "type": "report.query@1", "with": { "dataset": "replies", "windowDays": 7, "filters": { "campaignId": 4411 }, "groupBy": "classification", "limit": 50 } }
 ```
 
-`report.query@1` reads the workspace's own numbers for a digest: `dataset` is `workflow_runs` (`filters` object keys `workflowId`, `status` and `isTest`, false by default; `groupBy` `status`, `workflow` or `day`) or `replies` (`filters` object keys `campaignId` and `classification`; `groupBy` `classification`, `campaign` or `day`). A filter written beside `filters` instead of inside it is not read. `windowDays` is 1 to 90 whole UTC days ending at the start of today. The output is `dataset`, `from`, `to`, `total`, `rows` and `truncated`. Saving checks these names: a `dataset` that is neither is `invalid_input`, a `groupBy` the dataset does not group by is `unknown_group_by`, and a `filters` key it does not take is `unknown_filter`. `dataset` is written in the step, never a reference. A `groupBy` that is a reference, or a computed `filters`, is checked when the step runs and fails with the same two codes (`unknown_dataset` is the run-time code for a dataset the save did not check).
+`report.query@1` reads the workspace's own numbers for a digest: `dataset` is `workflow_runs` (`filters` object keys `workflowId`, `status` and `isTest`, false by default; `groupBy` `status`, `workflow` or `day`) or `replies` (`filters` object keys `campaignId` and `classification`; `groupBy` `classification`, `campaign` or `day`), or one of the campaign datasets below. A filter written beside `filters` instead of inside it is not read. `windowDays` is 1 to 90 whole UTC days ending at the start of today. The output is `dataset`, `from`, `to`, `total`, `rows` and `truncated`. Saving checks these names: a `dataset` that is neither is `invalid_input`, a `groupBy` the dataset does not group by is `unknown_group_by`, and a `filters` key it does not take is `unknown_filter`. `dataset` is written in the step, never a reference. A `groupBy` that is a reference, or a computed `filters`, is checked when the step runs and fails with the same two codes (`unknown_dataset` is the run-time code for a dataset the save did not check).
+
+The campaign datasets read the numbers the Analytics page shows:
+
+| `dataset` | Each row | `filters` | `groupBy` |
+|---|---|---|---|
+| `sends` | `sent`, `delivered`, `bounced`, `contacted` | `campaignId`, `channel` (`email`, `linkedin`) | `campaign`, `day`, `channel` |
+| `opens` | `opens`, `uniqueOpens` | `campaignId` | `campaign`, `day` |
+| `clicks` | human clicks | `campaignId` | `campaign`, `day` |
+| `meetings` | `booked`, `held` | `campaignId` | `campaign`, `day` |
+| `campaigns` | one row per campaign: `campaignId`, `campaignName`, `status`, `sent`, `delivered`, `bounced`, `uniqueOpens`, `clicks`, `replies`, `interested`, `meetings`, `replyRate`, `positiveReplyRate`, `bounceRate` | `campaignId`, `status` | none |
+
+`opens`, and `campaigns` for its `uniqueOpens`, are estimates (Apple Mail and some scanners open every message they receive), so their output adds `estimate: true`. `held` is null, never 0, where the workspace does not track held meetings. `campaigns` lists only the campaigns with activity in the window, most sent first; `total` is how many match, and a rate is a fraction (0.042) and null when nothing was contacted. Its `status` is `active` (sending), `draft`, `building`, `ready`, `paused`, `completed`, `error` or `archived`.
+
+Every dataset but `workflow_runs` shows campaign names and numbers, so testing or publishing a workflow with one needs the caller's Campaigns view (403 `permission_denied` otherwise); a workflow already on keeps running. An answer is kept for the UTC day: the same workspace, `dataset`, window, `filters`, `groupBy` and `limit` read again that day usually return it without reading again or taking the report quota. A very large answer (over 256K characters) is never kept, and a kept one can be dropped early when the process's report memory is full; either reads again and takes its unit.
 
 ```json
 { "id": "owner", "type": "team.pick_member@1", "with": { "strategy": "round_robin", "roles": ["editor"], "key": "inbound" } }
@@ -276,6 +428,31 @@ After a step failed under `onFailure: continue` or `branch:<step id>`, a later s
 ```
 
 `notify.email@1` emails workspace members, never a lead: `to` is a member id, `owner`, or a list of up to 20; `subject` is up to 200 characters and `body` up to 10,000 of plain text. The output is `sent` and `memberIds`. A test run simulates it. A workspace sends up to 5,000 workflow emails a day on most plans, one per recipient, approval emails included: a step past the limit mails nobody and waits for the limit to reset.
+
+## Owners
+
+`record.set_owner@1` makes a workspace member the owner of the run's lead, person or account, or of a deal:
+
+```json
+{ "id": "assign", "type": "record.set_owner@1", "with": { "memberId": "{{owner.memberId}}", "record": "lead", "ifSet": "keep", "cascade": true } }
+```
+
+- `memberId` is an active member of this workspace, written as an id or a reference (`owner_not_member`, or `unknown_member` at publish for an id written in the step).
+- `record` is `lead`, `person`, `account` or `deal`; left out, the run's own record, or the deal when `dealId` is set. On a lead run, `person` is the lead's person and `account` the lead's account; on a person run, `account` is the person's account. A record the run does not have is `unknown_owner_record` at publish and `owner_record_missing` when it runs.
+- `ifSet` is `replace` (the default: set it whoever owns it now, a person included) or `keep` (leave a record that has an owner as it is).
+- `cascade` on a lead also makes the member the owner of the lead's person and account, each only when it has no owner yet. A lead that `keep` leaves with another owner cascades nothing.
+
+The output is `record`, `recordId`, `ownerMemberId`, `previousOwnerMemberId` and `changed`. A person, account or deal change shows on its timeline as made by a workflow. The step is free, and a test run simulates it. A save to `account.ownerMemberId` or `person.ownerMemberId` leaves an owner a person set by hand alone, but a save to `lead.ownerMemberId` always replaces the lead's owner, since a lead does not record who set it: to leave a lead's owner alone, use this step with `"ifSet": "keep"`. The summary calls the new owner "a teammate", never by name.
+
+## Runs at once
+
+`limits.maxConcurrentRuns` (1 to 100) caps how many runs of the workflow go at the same time, and `limits.concurrencyScope` says what it counts: `workflow` (the default) or `record` (each lead, person or account on its own):
+
+```json
+{ "limits": { "creditsPerMonth": 1, "creditsPerRun": 0.1, "runsPerDay": 500, "atLimit": "ask", "maxConcurrentRuns": 1, "concurrencyScope": "record" } }
+```
+
+A run past the cap waits its turn before its first step: its run reads show `hold: {"reason": "concurrency", "since": ...}`, and it starts when another run ends or parks on a wait. The summary's `waiting` says it in words, for example "3 runs are waiting their turn. Up to 5 run at once." or "Only one runs at a time.". Test runs are not counted. Set it only when the goal needs it, for example one run per lead at a time so two replies cannot pick two owners. Out of range is `invalid_concurrency`.
 
 ## Try one step
 
@@ -294,9 +471,21 @@ It runs one step by itself, with no workflow and no run. The step's input goes i
 
 Every issue is `{path, code, message, fix}`: `path` says where (`$.with.<field>` or `$.scope.<path>`), `code` is the code alone, and `fix` says what to do. A value that cannot be computed from `scope` is its formula code (`division_by_zero`, `type_mismatch`) at its field. A column the table lacks is `unknown_table_column` at `$.with.row.<column>`, and a `connection` that is not a name written in the step is `unknown_connection`, as publish reports both. A `flow.subworkflow@1` test fills `inputs` from `scope` and, when the step waits, lists the called workflow's declared output names under `output.outputs`, each null. `workflow-formulas-evaluate` reads `{{vars.NAME}}` the same way, so one formula gives one answer in both tools.
 
+## Saved test cases
+
+A test case is a named test request of one workflow and what its run must end with. Saving one runs nothing:
+
+`workflow_data(operation="workflow-test-cases-create", client_id=..., workflow_id=12, name="interested reply", request={"record": {"type": "lead", "id": 4411}}, expect={"status": "succeeded", "assertions": [{"formula": "{{steps.assign.changed}} == true", "label": "the lead got an owner"}]})`
+
+- `request` is what `workflow_builder(operation="test", ...)` takes: `record`, `inputs`, `trigger` (a trigger payload) and `pinnedOutputs`. Left out, the case tests the newest record.
+- `expect` is `status` (`succeeded`, the default, or `failed`), an optional `reason` (`filtered`) and up to 20 `assertions`, each a formula that must be true against the finished run. It reads `{{outputs.<name>}}`, `{{steps.<id>.<path>}}`, `{{trigger.<path>}}`, `{{run.status}}` and `{{run.reason}}`. Compare with `==`, and write function names in lower case (`lower(...)`). A formula that does not parse is `invalid_expectation`.
+- `from_run_id` copies the request from a run of this workflow, test or live, with each succeeded step's output pinned. A run of another workflow is `unknown_run`.
+
+A workflow holds up to 50 cases with unique names. Run them with `workflow_data(operation="workflow-test-case-runs-create", client_id=..., workflow_id=12)` (all of them, or `test_case_ids`, up to 20; `wait_seconds` 0 to 50). It returns `passed`, `failed` and `running` counts (`failed` includes `error`) and one result per case, `{testCaseId, name, status, runId, failures}`. Each case is a test run: a passing one counts as the draft's test pass for publish, and its charges are a test's. List, read, change and delete them with `workflow-test-cases-list`, `-get`, `-update` and `-delete`. The list leaves out each case's `request`: read it with `-get`. A failure keeps at most 2,000 characters of its `actual` value and of its `message`. Deleting a case also clears its request, expectation and last result.
+
 ## Assumptions, titles, summary, changes
 
 - **Assumptions.** When you had to guess, say so in the draft: `plain.assumptions` is a list of `{id, text, stepIds, status, why}` with the status `open` or `confirmed`, up to 50 entries of up to 300 characters. Every workspace has it. Ask the person about each open one, then save the draft with `status: "confirmed"`. An id is never reused: give a new one the next `a<n>` past both the highest id in the list and `plain.assumptionsIssued` (the highest number the workflow has given; leave it as it is). An id used twice is the error `plain_assumption_duplicate_id`, which publish refuses. Warnings: `plain_assumption_unknown_step`, `plain_assumption_invalid_status`.
 - **Titles.** With the feature on, a save rewrites the title of a filter, branch, wait, for each, approval, report, pick member, email or table step from its settings, and `plain.when.summary` from the trigger, so the words always match what runs. Set `titlePinned` on a step to keep your own title.
-- **Summary.** `workflow_tools(operation="workflow-summaries-get", client_id=..., workflow_id=12)` is the workflow in plain words: `status` (`draft`, `off`, `problem`, `needs_you` or `working`), `headline`, `when`, `does` (up to six lines), `allSteps` (every step in the same shape as a `does` line, up to 100: read it to say what a later step does), `needs` (what a person must do: `approval_pending`, `assumption_open`, `secret_missing`, `connection_secret_missing`, `setup_missing`, `draft_unpublished`, and what turning it on would be refused for: `approval_required`, `voice_notes_off`, `voice_note_channel_mismatch`, `imessage_line_required`, `plan_required`, `linkedin_limit`, `publish_blocked`), `outcome` (the last 7 days), `problems` (`step_failing`, `invalid`, each with a fix) and `assumptions`. Read it to the person instead of the JSON, and say "turn on", never "publish". `approval_pending` carries `count`, how many approvals wait for the caller. A need's `action` of kind `ask_ken` carries `prompt`, a sentence the person could send you: on a `setup_missing` need for a table or a saved connection the workspace lacks, create the table or save the connection. `draft_unpublished` has no action while turning the workflow on would be refused (an error, a refusal need, or no test passed on the draft yet), and its `detail` says what to do first. Do not turn on an off workflow that has a refusal need: do what its action says first.
+- **Summary.** `workflow_tools(operation="workflow-summaries-get", client_id=..., workflow_id=12)` is the workflow in plain words: `status` (`draft`, `off`, `problem`, `needs_you` or `working`), `headline`, `when`, `does` (up to six lines), `allSteps` (every step in the same shape as a `does` line, up to 100: read it to say what a later step does), `needs` (what a person must do: `approval_pending`, `assumption_open`, `secret_missing`, `connection_secret_missing`, `setup_missing`, `draft_unpublished`, and what turning it on would be refused for: `approval_required`, `voice_notes_off`, `voice_note_channel_mismatch`, `imessage_line_required`, `plan_required`, `linkedin_limit`, `publish_blocked`), `outcome` (the last 7 days), `problems` (`step_failing`, `invalid`, each with a fix), `assumptions` `waiting` (`{text}`, the runs waiting their turn now under a cap on runs at once, left out when none wait) and `share` (a hosted form's link, left out for any other workflow). Read it to the person instead of the JSON, and say "turn on", never "publish". `approval_pending` carries `count`, how many approvals wait for the caller. A need's `action` of kind `ask_ken` carries `prompt`, a sentence the person could send you: on a `setup_missing` need for a table or a saved connection the workspace lacks, create the table or save the connection. `draft_unpublished` has no action while turning the workflow on would be refused (an error, a refusal need, or no test passed on the draft yet), and its `detail` says what to do first. Do not turn on an off workflow that has a refusal need: do what its action says first.
 - **Changes.** `workflows(operation="versions-diff", client_id=..., workflow_id=12, number=3)` also returns `changes`, a list of `{path, before, after}` that names steps by id (`steps[score].with.formula`), up to 200 entries, with `changesTruncated` beyond that. Every workspace has it.
