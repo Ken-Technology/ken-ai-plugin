@@ -29,7 +29,7 @@ Every call takes `client_id`, the workspace id. Send it on every call when the u
 | Activity on an account | `accounts` get, activity, `account_touches` list | Accounts on |
 | Meetings on an account | `meetings` list | Meetings view and Meetings on |
 | Email threads | `threads` list | every member |
-| CRM sync health | `crm` connections-list, sync-get | every member |
+| CRM sync health | `crm` connections-list, sync-get; `crm_mirror` feed-list, parity-get and `crm_sync_issues` list | every member; the `crm_mirror` reads need the CRM mirror on |
 | Top-of-funnel numbers (optional) | `analytics_campaign` query | staff, or the `generative_ui` flag on for the workspace |
 
 Opportunities is in beta. If `opportunities` is not listed for you, or `opportunities(operation="list")` answers 404 `not_found`, stop: say "Opportunities is not on for this workspace yet" and send the user to `https://app.ken.so/<workspace id>/accounts/opportunities`. Do not retry. Any other part that is missing: skip it, say which, and carry on.
@@ -38,7 +38,16 @@ Then check whether the CRM is feeding deals in:
 
 `crm(operation="connections-list")`, then for each live connection `crm(operation="sync-get", connection_id=3)`.
 
-If `status` is paused, `lastError` is set, `needsAttentionCount` is above 0 or `queueDepth` is large, say first that deal data may be behind, with the numbers, and point the user to `https://app.ken.so/<workspace id>/settings/integrations`. There is no "sync now" from here.
+If `status` is paused, `lastError` is set, `needsAttentionCount` is above 0 or `queueDepth` is large, say first that deal data may be behind, with the numbers, and point the user to `https://app.ken.so/<workspace id>/settings/integrations`. There is no "sync now" for the whole connection from here.
+
+Read three more for each live connection:
+
+- `crm_sync_issues(operation="list", connection_id=3)`: the writes the CRM refused. Where the workspace has the CRM mirror on, each also has `reason` (why, in plain words) and `fix` (the one fix the app shows). Name the open ones on deals.
+- The two `crm_mirror` reads below need the CRM mirror on and answer 404 `not_found` while it is off: skip them then.
+- `crm_mirror(operation="feed-list", connection_id=3, errors_only=true)`: the refused writes in the sync feed, newest first. `crm_mirror(operation="feed-list", connection_id=3, entity_type="opportunity", entity_id=77)` is one deal's changes in and out, with `side` (`crm` or `ken`) and `reason` (`sync`, `first_link`, `conflict_lost`, `revert`, `put_back` or `machine_fill`).
+- `crm_mirror(operation="parity-get", connection_id=3)`: the deals the CRM has against the deals Kenso has, with why each difference. A gap means the pipeline you read is not the whole CRM pipeline: say so with the numbers.
+
+Retry or dismiss an issue only on the user's yes. Editing the field map and creating a field in the CRM stay in the app, for admins: send them to `https://app.ken.so/<workspace id>/settings/integrations`.
 
 ## Step 1 - Read the pipeline
 
@@ -118,7 +127,7 @@ If replies came in but `interested` is 0, the replies may not be classified yet.
 
 - No stale-deal or forecast report: Step 2 rebuilds staleness from activity each time.
 - No stage edits beyond win probabilities.
-- No "sync now" for the CRM: `sync-get` is status only.
+- No "sync now" for the whole CRM connection: `sync-get` is status only.
 - No held meetings where the workspace has meeting attribution off.
 
 `references/stale-signals.md` holds the thresholds and how to read each signal. `references/weekly-update.md` holds the update layout and the metric definitions. Open one with `load_skill("pipeline-review", reference="references/stale-signals.md")`.

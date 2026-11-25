@@ -142,7 +142,7 @@ Explain that the blocklist keeps current clients, partners, and anyone they cann
 
 **Integrations:** optional and low pressure. Connect when ready at https://app.ken.so/<workspace id>/settings/integrations:
 
-- CRM sync: https://app.ken.so/<workspace id>/settings/integrations
+- CRM sync: https://app.ken.so/<workspace id>/settings/integrations. Where the workspace has the CRM mirror, connecting a CRM imports nothing until an admin picks what to bring in and starts the import in the app, and the connection stays import-only, writing nothing to the CRM, until an admin turns sync on. Editing the field map and creating a field in the CRM stay in the app, for admins.
 - Calendar: https://app.ken.so/<workspace id>/settings/calendar
 - LinkedIn accounts connect from https://app.ken.so/<workspace id>/delivery?tab=linkedin
 - API keys, when they need them: https://app.ken.so/<workspace id>/settings/api-keys

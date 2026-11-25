@@ -240,6 +240,8 @@ The account's owner, inbox and plan do not change. The timeline records the hand
 - A reply pauses the account's plan. Resume it with `account_touches(operation="plan-resume", account_id=101)` or end it with `plan-end`, only when the user says so.
 - The account's timeline: `accounts(operation="activity", account_id=101)`.
 
+Where the workspace has the CRM mirror on, a record linked to a CRM carries `crm` and `crmOwner` blocks, and `crm_mirror` reads its sync status, field history, compare and sync now, and puts an old value back. Read `references/crm-records.md` (`load_skill("accounts", reference="references/crm-records.md")`) before you answer about a record's CRM link or change one.
+
 ## Who did what
 
 Every write you make is recorded as an agent write through your client, with the connected user behind it, even when the person asked for it. Touches you create are marked as created by an agent, so the permission for their channel decides whether a person approves them (The rule).
