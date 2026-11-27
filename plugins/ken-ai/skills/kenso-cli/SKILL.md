@@ -20,6 +20,7 @@ kenso runs resume <runId>   # an interrupted run; terminal lost: kenso runs list
 kenso accounts import --file accounts.csv --dry-run   # companies; a file of people: kenso people import --file people.csv
 kenso studio push 12 --dir ./tpl   # to preview local edits push first (draft; live needs --publish), then studio preview 12
 kenso studio fill 12 --accounts ids.txt --dry-run   # or --campaign 10546 --contacts leads.csv
+kenso images upload --campaign 812 --variable hero_image ./images --dry-run   # one image per lead you made (files <contactId>.png or <email>.svg, or a CSV); not charged
 kenso opportunities update --each rows.csv --dry-run   # any API command on a file of rows (CSV or JSONL; keys fill flags and body). One record: kenso campaigns update --campaign-id 812 --name Q4 --dry-run
 kenso mcp call list_skills   # only to list Ken's skills
 kenso logs tail --status 4xx,5xx --since 10m   # stream the workspace's failed API calls, one line each; Ctrl-C stops (exit 4 = not on for the workspace yet)
