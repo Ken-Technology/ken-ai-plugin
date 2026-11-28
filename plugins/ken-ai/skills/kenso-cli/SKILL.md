@@ -32,7 +32,7 @@ Charges: follow the kenso skill's spend rules; the dry run of a `spend` command 
 
 ## Work (beta): My agent
 
-A workspace can set a kind of Kenso AI work (personalization, qualification, segmentation, rewriting, meeting brief, call brief, workflow prompt) to My agent in Settings > AI work: then it waits for the person's own coding agent, at 0 Kenso AI credits. The `kenso work` commands take no `--dry-run`. Never read the items' text into the chat: the files carry it.
+Every workspace can set a kind of Kenso AI work (personalization, qualification, segmentation, rewriting, meeting brief, call brief, workflow prompt, image) to My agent in Settings > AI work: then it waits for the person's own coding agent, and runs at no Kenso cost. The `kenso work` commands take no `--dry-run`. Never read the items' text into the chat: the files carry it.
 
 ```bash
 kenso work status   # what waits, per kind

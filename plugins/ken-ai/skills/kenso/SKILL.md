@@ -162,7 +162,7 @@ Queued runs can wait up to 15 minutes before they start, longer than many coding
 
 ## 8. Your own agent plan: kenso work
 
-Where your workspace has it, `kenso work` runs Kenso AI steps on your own Claude or Codex plan at 0 Kenso AI credits. Check with `kenso work status`: it lists what waits for your agent, and answers `not_found` when the workspace does not have it yet. When most of an estimate is AI steps, name this to the person as an option before they approve.
+Every workspace has `kenso work`: it runs Kenso AI steps, each lead's campaign image included, on your own Claude or Codex plan, at no Kenso cost. A member picks My agent per kind in Settings > AI work. Check with `kenso work status`: it lists what waits for your agent, and answers `not_found` only where agent work is turned off for the workspace. When most of an estimate is AI steps, name this to the person as an option before they approve.
 
 ```bash
 kenso work status
